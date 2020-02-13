@@ -1,0 +1,18 @@
+FROM python:3.7
+ENV PYTHONPATH=/
+
+# copy installation loop and convert to unix
+RUN apt-get update && apt-get install -y dos2unix
+COPY ./loop_installation.sh /tmp/loop_installation.sh
+RUN dos2unix /tmp/loop_installation.sh && apt-get --purge remove -y dos2unix && rm -rf /var/lib/apt/lists/*
+
+COPY ./src/data_access/requirements.txt /src/data_access/requirements.txt
+COPY ./src/modelling/requirements.txt /src/modelling/requirements.txt
+COPY ./src/misc/requirements.txt /src/misc/requirements.txt
+RUN bash /tmp/loop_installation.sh
+
+COPY ./src/__init__.py /src/__init__.py
+
+COPY ./src/data_access /src/data_access
+COPY ./src/modelling /src/modelling
+

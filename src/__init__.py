@@ -1,0 +1,22 @@
+DEFAULT_VARIABLES = {
+    "APP_HOST": "0.0.0.0",
+    "APP_PORT": 5000,
+    "POSTGRES_HOST": "localhost",
+    "POSTGRES_PORT": 5432,
+    "POSTGRES_DB": "capplan",
+    "POSTGRES_USER": "",
+    "POSTGRES_PASSWORD": "",
+    "MONGO_HOST": "localhost",
+    "MONGO_PORT": 27017,
+    "MONGO_USER": "?",
+    "MONGO_PASSWORD": "?",
+    "REDIS_HOST": "localhost",
+    "REDIS_PORT": 6379,
+    "REDIS_DB": 0,
+    "REDIS_USER": "?",
+    "REDIS_PASSWORD": "?",
+    "FLASK_HOST": "0.0.0.0",
+    "FLASK_PORT": 5000,
+    "FRONTEND_API_QUEUE": "consumer_api_queue",
+    "NUMBER_PROCESSES_WORKER": 4
+}
