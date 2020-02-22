@@ -1,6 +1,8 @@
 import connexion
-from src.misc.config_manager import ConfigManager
 import pkg_resources
+from flask_cors import CORS
+
+from src.misc.config_manager import ConfigManager
 
 config = ConfigManager()
 
@@ -9,6 +11,7 @@ def get_app():
     app = connexion.FlaskApp(__name__)
     path = pkg_resources.resource_filename("src", "api/swagger.yml")
     app.add_api(path)
+    CORS(app.app)
     return app
 
 
