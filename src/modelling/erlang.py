@@ -16,7 +16,8 @@ class ErlangB:
         sum = 0.0
         for i in range(self.c + 1):
             sum += power_faculty(self.a, i)
-        return sum
+
+        return power_faculty(self.a, self.c) / sum
 
 
 if __name__ == "__main__":
