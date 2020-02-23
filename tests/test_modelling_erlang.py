@@ -13,5 +13,5 @@ class ErlangTester(unittest.TestCase):
     def test_get_probability(self):
         erlang = ErlangB(number_agents=1, workload=5)
         prob = erlang.get_probability()
-        self.assertEqual(prob, 0.1)
+        self.assertEqual(prob, 0.8333333333333334)
 
