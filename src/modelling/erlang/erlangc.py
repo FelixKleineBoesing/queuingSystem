@@ -1,6 +1,6 @@
 import math
 
-from src.modelling.helpers import power_faculty, get_p0_for_mmc_system
+from src.modelling.helpers import power_faculty
 
 
 class ErlangC:
@@ -72,3 +72,16 @@ class ErlangC:
         """
         return self.get_blocking_probability(lambda_=lambda_, mu=mu, number_agents=number_agents) / \
                (number_agents * mu - lambda_) + 1 / mu
+
+
+def get_p0_for_mmc_system(workload: float, number_agents: int):
+    result = 0
+    for i in range(number_agents):
+        result += power_faculty(workload, i)
+
+    result += power_faculty(workload, number_agents) * number_agents / (number_agents - workload)
+
+    if result > 0:
+        return 1 / result
+    else:
+        return 0
