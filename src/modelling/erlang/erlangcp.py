@@ -89,18 +89,20 @@ class ErlangCP:
 
     def get_number_agents_for_service_level(self, lambda_, mu: float, nu: float, max_waiting_time: int,
                                             size_waiting_room: int = None, target_sla: float = 0.8):
-        def func(self, lambda_, mu, nu, max_waiting_time, size_waiting_room, target_sla):
-            def wrapper(number_agents):
-                res = (target_sla - self.get_max_waiting_probability(lambda_=lambda_, mu=mu, nu=nu,
-                                                                     number_agents=int(number_agents),
-                                                                     max_waiting_time=max_waiting_time,
-                                                                     size_waiting_room=size_waiting_room)) ** 2
-                return res
-            return wrapper
 
-        result = minimize_scalar(func(self, lambda_, mu, nu, max_waiting_time, size_waiting_room, target_sla))
-        print(result)
-        return result
+        def optim_func(number_agents):
+            res = (target_sla - self.get_max_waiting_probability(lambda_=lambda_, mu=mu, nu=nu,
+                                                                 number_agents=int(number_agents),
+                                                                 max_waiting_time=max_waiting_time,
+                                                                 size_waiting_room=size_waiting_room)) ** 2
+            return res
+
+        result = minimize_scalar(optim_func)
+
+        return int(result.x) + 1
+
+    def get_parameter_for_function(self):
+        pass
 
 
 def get_prob_for_pn_in_mmckm_system(lambda_: float, mu: float, nu: float, number_agents: int, size_waiting_room: int,
