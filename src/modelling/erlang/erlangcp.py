@@ -4,7 +4,6 @@ from scipy.optimize import minimize, minimize_scalar
 from src.modelling.helpers import power_faculty
 
 
-
 class ErlangCP:
 
     """
@@ -100,9 +99,6 @@ class ErlangCP:
         result = minimize_scalar(optim_func)
 
         return int(result.x) + 1
-
-    def get_parameter_for_function(self):
-        pass
 
 
 def get_prob_for_pn_in_mmckm_system(lambda_: float, mu: float, nu: float, number_agents: int, size_waiting_room: int,

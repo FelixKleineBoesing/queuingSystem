@@ -12,6 +12,7 @@ if __name__ == "__main__":
     number_agents = 28
     max_waiting_time = 20
     size_waiting_room = 80
+    target_sla = 0.8633721956843062
 
     erlangcp = ErlangCP()
 
@@ -37,4 +38,9 @@ if __name__ == "__main__":
 
     res = erlangcp.get_mean_number_customer_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                       size_waiting_room=size_waiting_room)
-    print("average number customers in system: {}".format(res))
+    print("Average number customers in system: {}".format(res))
+
+    res = erlangcp.get_number_agents_for_service_level(lambda_=lambda_, mu=mu, nu=nu, target_sla=target_sla,
+                                                       size_waiting_room=size_waiting_room,
+                                                       max_waiting_time=max_waiting_time)
+    print("Get number of agents for expected service level: {}".format(res))
