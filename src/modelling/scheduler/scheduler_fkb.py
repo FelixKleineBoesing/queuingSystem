@@ -23,26 +23,48 @@ class SchedulerFKB(Scheduler):
 
     def _build_model(self):
         self._data = np.zeros((len(self.number_agents_per_half_hour), len(self.number_agents_per_half_hour)))
+
+    def _get_optimal_next_shift(self, demands: np.ndarray, shifts: np.ndarray):
+        shifts = shifts.copy()
+        results = []
+        shift_sums = np.sum(shifts, axis=1)
+        for i in range(shifts.shape[0]):
+            if shift_sums[i] > 0:
+                tmp = shifts.copy()
+                tmp[tmp[:, i] > 0, i] = tmp[tmp[:, i] > 0, i] + 1
+                results.append(self._get_service_efficiency(demands, tmp))
+            else:
+                results.append(np.NaN)
+
+        index = np.argmin(results)
+        shifts[shifts[:, index] > 0, index] = shifts[shifts[:, index] > 0, index] + 1
+        return shifts
+
+    @staticmethod
+    def _get_service_efficiency(demands: np.ndarray, shifts: np.ndarray):
+        return 1 - (sum(demands) / np.sum(shifts))
+
+    def solve(self):
         demand = np.array(self.number_agents_per_half_hour)
         j = 0
         for i in range(len(self.number_agents_per_half_hour)):
             condition_met = all(demand <= np.sum(self._data, axis=1))
-            service_ineffiecency = 1 - (sum(self.number_agents_per_half_hour) / np.sum(self._data))
+            service_ineffiecency = self._get_service_efficiency(demand, self._data)
             print("Service Inefficiency is : {}".format(service_ineffiecency))
             print("Condition met: {}".format(condition_met))
             sum_agents = np.sum(self._data[i, :])
-            if sum_agents < self.number_agents_per_half_hour[i]:
-                self._data[i:i+self.number_intervals_per_agent, j] = self.number_agents_per_half_hour[i] - sum_agents
+            if sum_agents < self.number_agents_per_half_hour[i] and \
+                    i < self._data.shape[0] - self.number_intervals_per_agent:
+                self._data[i:i + self.number_intervals_per_agent, j] = self.number_agents_per_half_hour[i] - sum_agents
                 j += 1
-
+            else:
+                self._get_service_efficiency(demand, self._data)
+                # TODO call recursively
 
         # TODO add lunch time
         # TODO add part times
 
         print(np.sum(self._data, axis=1))
-
-    def solve(self):
-        pass
 
 
 if __name__ == "__main__":
