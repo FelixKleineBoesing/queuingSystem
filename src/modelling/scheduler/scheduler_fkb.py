@@ -27,7 +27,7 @@ class SchedulerFKB(Scheduler):
     def _get_optimal_next_shift(self, demands: np.ndarray, shifts: np.ndarray):
         shifts = shifts.copy()
         results = []
-        shift_sums = np.sum(shifts, axis=1)
+        shift_sums = np.sum(shifts, axis=0)
         for i in range(shifts.shape[0]):
             if shift_sums[i] > 0:
                 tmp = shifts.copy()
@@ -36,7 +36,7 @@ class SchedulerFKB(Scheduler):
             else:
                 results.append(np.NaN)
 
-        index = np.argmin(results)
+        index = np.nanargmin(results)
         shifts[shifts[:, index] > 0, index] = shifts[shifts[:, index] > 0, index] + 1
         return shifts
 
@@ -58,8 +58,16 @@ class SchedulerFKB(Scheduler):
                 self._data[i:i + self.number_intervals_per_agent, j] = self.number_agents_per_half_hour[i] - sum_agents
                 j += 1
             else:
-                self._get_service_efficiency(demand, self._data)
-                # TODO call recursively
+                if np.sum(self._data[i, :]) >= self.number_agents_per_half_hour[i]:
+                    condition_met = True
+                else:
+                    condition_met = False
+                while not condition_met:
+                    self._data = self._get_optimal_next_shift(demands=demand, shifts=self._data)
+                    self._get_service_efficiency(demand, self._data)
+                    print(i)
+                    if np.sum(self._data[i, :]) >= self.number_agents_per_half_hour[i]:
+                        condition_met = True
 
         # TODO add lunch time
         # TODO add part times
