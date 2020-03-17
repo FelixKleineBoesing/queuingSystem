@@ -32,7 +32,12 @@ class SchedulerFKB(Scheduler):
             if shift_sums[i] > 0:
                 tmp = shifts.copy()
                 tmp[tmp[:, i] > 0, i] = tmp[tmp[:, i] > 0, i] + 1
-                results.append(self._get_service_efficiency(demands, tmp))
+                service_inefficiency = self._get_service_efficiency(demands, tmp)
+                condition = np.bitwise_and(np.sum(shifts, axis=1) < demands, np.sum(tmp, axis=1) <= demands,
+                                           np.sum(shifts, axis=1) < np.sum(tmp, axis=1))
+                # TODO fix conditiono
+                service_inefficiency = service_inefficiency / np.sum(condition)
+                results.append(service_inefficiency)
             else:
                 results.append(np.NaN)
 
