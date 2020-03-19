@@ -30,20 +30,39 @@ class SchedulerFKB(Scheduler):
         shift_sums = np.sum(shifts, axis=0)
         for i in range(shifts.shape[0]):
             if shift_sums[i] > 0:
-                tmp = shifts.copy()
-                tmp[tmp[:, i] > 0, i] = tmp[tmp[:, i] > 0, i] + 1
-                service_inefficiency = self._get_service_efficiency(demands, tmp)
-                condition = np.bitwise_and(np.sum(shifts, axis=1) < demands, np.sum(tmp, axis=1) <= demands,
-                                           np.sum(shifts, axis=1) < np.sum(tmp, axis=1))
-                # TODO fix conditiono
-                service_inefficiency = service_inefficiency / np.sum(condition)
+                service_inefficiency = self._get_service_inefficiency_by_condition(shifts=shifts, demands=demands,
+                                                                                   column=i, indices=shifts[:, i] > 0)
                 results.append(service_inefficiency)
             else:
                 results.append(np.NaN)
 
+        if np.all(~np.isfinite(results)):
+            for i in range(shifts.shape[0]):
+                service_inefficiency = self._get_service_inefficiency_by_condition()
+                pass
+                # TODO calculate service inefficiency by condition
+
+
+
+
+        # TODO if all shifs give inf or nan, we need to create a new shift that satisfies the condition the most
+
         index = np.nanargmin(results)
         shifts[shifts[:, index] > 0, index] = shifts[shifts[:, index] > 0, index] + 1
         return shifts
+
+    def _get_service_inefficiency_by_condition(self, shifts, demands, column, indices :list):
+        """
+        divides the service inefficiency by the number of demand that can be covered additionaly
+
+        :return:
+        """
+        tmp = shifts.copy()
+        tmp[indices, column] = tmp[indices, column] + 1
+        service_inefficiency = self._get_service_efficiency(demands, tmp)
+        condition = np.logical_and.reduce((np.sum(shifts, axis=1) < demands, np.sum(tmp, axis=1) <= demands,
+                                           np.sum(shifts, axis=1) < np.sum(tmp, axis=1)))
+        return service_inefficiency / np.sum(condition)
 
     @staticmethod
     def _get_service_efficiency(demands: np.ndarray, shifts: np.ndarray):
