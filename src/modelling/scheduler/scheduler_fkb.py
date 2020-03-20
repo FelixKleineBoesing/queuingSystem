@@ -37,19 +37,34 @@ class SchedulerFKB(Scheduler):
                 results.append(np.NaN)
 
         if np.all(~np.isfinite(results)):
+            results = []
+            column = self._get_free_shift(shifts=shifts)
             for i in range(shifts.shape[0]):
-                service_inefficiency = self._get_service_inefficiency_by_condition()
-                pass
-                # TODO calculate service inefficiency by condition
-
-
-
-
-        # TODO if all shifs give inf or nan, we need to create a new shift that satisfies the condition the most
-
-        index = np.nanargmin(results)
-        shifts[shifts[:, index] > 0, index] = shifts[shifts[:, index] > 0, index] + 1
+                if i < self._data.shape[0] - self.number_intervals_per_agent:
+                    indices = list(range(i, i + self.number_intervals_per_agent))
+                    service_inefficiency = self._get_service_inefficiency_by_condition(shifts=shifts, demands=demands,
+                                                                                       column=column, indices=indices)
+                    results.append(service_inefficiency)
+                else:
+                    results.append(np.NaN)
+            index = np.nanargmin(results)
+            shifts[index:index+self.number_intervals_per_agent, column] = \
+                shifts[index:index+self.number_intervals_per_agent, column] + 1
+        else:
+            index = np.nanargmin(results)
+            shifts[shifts[:, index] > 0, index] = shifts[shifts[:, index] > 0, index] + 1
         return shifts
+
+    def _get_free_shift(self, shifts: np.ndarray):
+        """
+        return the index of a column where no shift is assigned
+
+        :param shifts:
+        :return:
+        """
+        for i in range(shifts.shape[1]):
+            if np.all(shifts[:, i] == 0):
+                return i
 
     def _get_service_inefficiency_by_condition(self, shifts, demands, column, indices :list):
         """
