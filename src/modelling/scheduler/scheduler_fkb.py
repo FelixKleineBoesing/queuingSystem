@@ -24,6 +24,32 @@ class SchedulerFKB(Scheduler):
     def _build_model(self):
         self._data = np.zeros((len(self.number_agents_per_half_hour), len(self.number_agents_per_half_hour)))
 
+    def solve(self):
+        demand = np.array(self.number_agents_per_half_hour)
+        j = 0
+        for i in range(len(self.number_agents_per_half_hour)):
+            condition_met = all(demand <= np.sum(self._data, axis=1))
+            service_ineffiecency = self.get_service_efficiency(demand, self._data)
+            print("Service Inefficiency is : {}".format(service_ineffiecency))
+            print("Condition met: {}".format(condition_met))
+            sum_agents = np.sum(self._data[i, :])
+            if sum_agents < self.number_agents_per_half_hour[i] and \
+                    i <= self._data.shape[0] - self.number_intervals_per_agent:
+                self._data[i:i + self.number_intervals_per_agent, j] = self.number_agents_per_half_hour[i] - sum_agents
+                j += 1
+            else:
+                if np.sum(self._data[i, :]) < self.number_agents_per_half_hour[i]:
+                    condition_met = False
+                    while not condition_met:
+                        self._data = self._get_optimal_next_shift(demands=demand, shifts=self._data)
+                        self.get_service_efficiency(demand, self._data)
+                        print(i)
+                        if np.sum(self._data[i, :]) >= self.number_agents_per_half_hour[i]:
+                            condition_met = True
+        # TODO add lunch time
+        # TODO add part times
+        return self._data
+
     def _get_optimal_next_shift(self, demands: np.ndarray, shifts: np.ndarray):
         shifts = shifts.copy()
         results = []
@@ -40,7 +66,7 @@ class SchedulerFKB(Scheduler):
             results = []
             column = self._get_free_shift(shifts=shifts)
             for i in range(shifts.shape[0]):
-                if i < self._data.shape[0] - self.number_intervals_per_agent:
+                if i <= self._data.shape[0] - self.number_intervals_per_agent:
                     indices = list(range(i, i + self.number_intervals_per_agent))
                     service_inefficiency = self._get_service_inefficiency_by_condition(shifts=shifts, demands=demands,
                                                                                        column=column, indices=indices)
@@ -74,49 +100,24 @@ class SchedulerFKB(Scheduler):
         """
         tmp = shifts.copy()
         tmp[indices, column] = tmp[indices, column] + 1
-        service_inefficiency = self._get_service_efficiency(demands, tmp)
+        service_inefficiency = self.get_service_efficiency(demands, tmp)
         condition = np.logical_and.reduce((np.sum(shifts, axis=1) < demands, np.sum(tmp, axis=1) <= demands,
                                            np.sum(shifts, axis=1) < np.sum(tmp, axis=1)))
         return service_inefficiency / np.sum(condition)
 
     @staticmethod
-    def _get_service_efficiency(demands: np.ndarray, shifts: np.ndarray):
+    def get_service_efficiency(demands: np.ndarray, shifts: np.ndarray):
         return 1 - (sum(demands) / np.sum(shifts))
-
-    def solve(self):
-        demand = np.array(self.number_agents_per_half_hour)
-        j = 0
-        for i in range(len(self.number_agents_per_half_hour)):
-            condition_met = all(demand <= np.sum(self._data, axis=1))
-            service_ineffiecency = self._get_service_efficiency(demand, self._data)
-            print("Service Inefficiency is : {}".format(service_ineffiecency))
-            print("Condition met: {}".format(condition_met))
-            sum_agents = np.sum(self._data[i, :])
-            if sum_agents < self.number_agents_per_half_hour[i] and \
-                    i < self._data.shape[0] - self.number_intervals_per_agent:
-                self._data[i:i + self.number_intervals_per_agent, j] = self.number_agents_per_half_hour[i] - sum_agents
-                j += 1
-            else:
-                if np.sum(self._data[i, :]) >= self.number_agents_per_half_hour[i]:
-                    condition_met = True
-                else:
-                    condition_met = False
-                while not condition_met:
-                    self._data = self._get_optimal_next_shift(demands=demand, shifts=self._data)
-                    self._get_service_efficiency(demand, self._data)
-                    print(i)
-                    if np.sum(self._data[i, :]) >= self.number_agents_per_half_hour[i]:
-                        condition_met = True
-
-        # TODO add lunch time
-        # TODO add part times
-
-        print(np.sum(self._data, axis=1))
 
 
 if __name__ == "__main__":
     agents_per_hour = [12, 10, 13, 12, 15, 24, 22, 33, 36, 40, 31, 29, 24, 27, 22, 24, 31, 33, 34, 31, 24, 19, 10,
                        12, 12, 7, 10, 7]
+    agents_excel_sheet = [12, 12, 14, 21, 28, 22, 33, 36, 40, 41, 50, 50, 35, 46, 50, 50,
+                          34, 38, 33, 26, 22, 21, 17, 17, 14, 10, 7]
+
     scheduler = SchedulerFKB(number_agents_per_half_hour=agents_per_hour, lunch_time=1,
                              number_intervals_per_agent=17)
-    scheduler.solve()
+    print(scheduler.get_service_efficiency(demands=agents_per_hour, shifts=agents_excel_sheet))
+    shifts = scheduler.solve()
+    print(np.sum(shifts, axis=1))
