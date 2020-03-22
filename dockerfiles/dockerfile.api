@@ -1,5 +1,6 @@
 FROM python:3.7
 ENV PYTHONPATH=/
+ENV PYTHONUNBUFFERED=1
 
 # copy installation loop and convert to unix
 RUN apt-get update && apt-get install -y dos2unix

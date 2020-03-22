@@ -8,7 +8,7 @@ class ErlangBTester(unittest.TestCase):
 
     def test_erlangb_construction(self):
         erlang = ErlangB()
-
+        
     def test_get_probability(self):
         prob = self.get_prob(number_agents=1, lambda_=15, mu=3)
         self.assertEqual(prob, 0.8333333333333334)

@@ -2,11 +2,14 @@ import unittest
 
 from src.modelling.erlang import ErlangC
 
+# TODO add the other method to the tester
+
 
 class ErlangCTester(unittest.TestCase):
 
     def test_erlangb_construction(self):
         erlang = ErlangC()
+
 
     def get_max_waiting_probability(self, lambda_: float, mu: float, number_agents: int, max_waiting_time: int):
         erlang = ErlangC()

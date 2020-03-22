@@ -1,7 +1,6 @@
 from src.modelling.erlang.erlangb import ErlangB
 from src.modelling.erlang.erlangc import ErlangC
 from src.modelling.erlang.erlangcp import ErlangCP
-from src.modelling.helpers import power_faculty
 
 if __name__ == "__main__":
     # lambda, mu and nu are defined in 1/second. Therefore, lambda= 1/10 means each 10 seconds someone arrives.
