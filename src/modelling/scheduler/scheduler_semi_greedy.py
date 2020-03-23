@@ -1,6 +1,8 @@
 import logging
 
 import numpy as np
+from typing import Dict, Tuple
+
 from src.modelling.scheduler.scheduler_base import Scheduler
 
 
@@ -14,17 +16,17 @@ class SchedulerSemiGreedy(Scheduler):
     minimizes the cost the most.
     """
 
-    def __init__(self, number_agents_per_half_hour: list, lunch_time: int = 1, lunch_time_border: int = 6,
+    def __init__(self, demands: list, lunch_time: int = 1, lunch_time_border: int = 6,
                  number_intervals_per_agent: int = 17, verbose: bool = True):
         """
 
-        :param number_agents_per_half_hour: a list of demands for agents
+        :param demands: a list of demands for agents
         :param lunch_time: the length of the lunch
         :param lunch_time_border: describes the distance that a lunch must have from beginning and end of a shift
         :param number_intervals_per_agent: the number of intervals that an agent has to work
         """
         super().__init__(number_intervals_per_agent=number_intervals_per_agent,
-                         number_agents_per_half_hour=number_agents_per_half_hour,
+                         demands=demands,
                          lunch_time=lunch_time,
                          lunch_time_border=lunch_time_border,
                          verbose=verbose)
@@ -47,7 +49,7 @@ class SchedulerSemiGreedy(Scheduler):
         """
         demands = np.array(self.number_agents_per_half_hour)
         shifts = self._assign_agents_until_satisfied(demands=demands, shifts=self.shifts)
-
+        shifts = self._assign_lunch_times_until_satisfied(demands=demands, shifts=shifts)
         # TODO add lunch time
         # TODO add part times
 
@@ -86,6 +88,15 @@ class SchedulerSemiGreedy(Scheduler):
         return sum_agents_per_shift - (max_agents_per_shift * self.number_intervals_per_agent -
                                        max_agents_per_shift * self.lunch_time)
 
+    def _assign_lunch_times_until_satisfied(self, demands: np.ndarray, shifts: np.ndarray):
+        """
+        assigns lunch time greedily until lunch time is satisfied
+
+        :return:
+        """
+        self._get_next_optimal_lunch_time(demands=demands, shifts=shifts)
+        return shifts
+
     def _get_next_optimal_lunch_time(self, demands: np.ndarray, shifts: np.ndarray):
         """
         assigns the next optimal lunch time to a shift. The number of agent available will be reduced by 1 for
@@ -95,8 +106,69 @@ class SchedulerSemiGreedy(Scheduler):
         :param shifts: array of shifts and timesteps
         :return:
         """
-        #TODO
-        pass
+        results = []
+        chosen_shifts = []
+
+        bounds = self._get_lunch_time_bounds(shifts=shifts)
+        shift_indices = list(bounds.keys())
+        min_bound = np.min(list(bounds.values()))
+        max_bound = np.max(list(bounds.values()))
+        for i in range(min_bound, max_bound + 1):
+            for j in shift_indices:
+                if bounds[j][1] >= i >= bounds[j][0] and np.all(shifts[i:(i+self.lunch_time), j] > 0):
+                    chosen_shifts.append(j)
+                    tmp = shifts.copy()
+                    tmp[i:(i+self.lunch_time), j] = tmp[i:(i+self.lunch_time), j] - 1
+                    service_ineffiency =
+                    results.append()
+
+
+
+
+        return shifts
+
+    def _get_lunch_time_bounds(self, shifts: np.ndarray):
+        """
+        returns the lunch time bounds (upper and lower) in which the lunch_time may be placed
+
+        :param shifts:
+        :return:
+        """
+        bounds = self._get_bounds(shifts=shifts)
+        lunch_time_bounds = {}
+        for col in bounds:
+            lunch_time_bounds[col] = (bounds[col][0] + self.lunch_time_border,
+                                      bounds[col][1] - self.lunch_time_border - self.lunch_time + 1)
+
+        return lunch_time_bounds
+
+    def _get_bounds(self, shifts) -> Dict[int, Tuple]:
+        """
+        returns the bounds of each shifts in a tuple: (lower, upper)
+
+        :param shifts:
+        :return:
+        """
+        indices = self._get_assigned_shifts(shifts=shifts)
+        bounds = {}
+        for i in indices:
+            lower = None
+            upper = None
+            for j in range(shifts.shape[0]):
+                if lower is None:
+                    if shifts[j, i] > 0 and j == 0:
+                        lower = j
+                    elif shifts[j, i] == 0 and shifts[j + 1, i] > 0:
+                        lower = j + 1
+                if upper is None:
+                    if shifts[j, i] > 0 and j == (shifts.shape[0] - 1):
+                        upper = j
+                    elif shifts[j, i] > 0 and shifts[j + 1, i] == 0:
+                        upper = j
+                if upper is not None and lower is not None:
+                    break
+            bounds[i] = (lower, upper)
+        return bounds
 
     def _get_optimal_next_agent(self, demands: np.ndarray, shifts: np.ndarray):
         """
@@ -111,8 +183,10 @@ class SchedulerSemiGreedy(Scheduler):
         shift_sums = np.sum(shifts, axis=0)
         for i in range(shifts.shape[0]):
             if shift_sums[i] > 0:
-                service_inefficiency = self._get_service_inefficiency_by_condition(shifts=shifts, demands=demands,
-                                                                                   column=i, indices=shifts[:, i] > 0)
+                tmp = shifts.copy()
+                tmp[shifts[:, i] > 0, i] = tmp[shifts[:, i] > 0, i] + 1
+                service_inefficiency = self._get_service_inefficiency_for_agent_assignment(new_shifts=tmp, old_shifts=shifts,
+                                                                                           demands=demands)
                 results.append(service_inefficiency)
             else:
                 results.append(np.NaN)
@@ -125,13 +199,22 @@ class SchedulerSemiGreedy(Scheduler):
         return shifts
 
     def _assign_agent_to_existing_shift(self, demands: np.ndarray, shifts: np.ndarray):
+        """
+        assigns one agent to an existing shift based on which shift adds least inefficiency
+
+        :param demands:
+        :param shifts:
+        :return:
+        """
         results = []
         column = self._get_free_shift(shifts=shifts)
         for i in range(shifts.shape[0]):
             if i <= shifts.shape[0] - self.number_intervals_per_agent:
                 indices = list(range(i, i + self.number_intervals_per_agent))
-                service_inefficiency = self._get_service_inefficiency_by_condition(shifts=shifts, demands=demands,
-                                                                                   column=column, indices=indices)
+                tmp = shifts.copy()
+                tmp[indices, column] = tmp[indices, column] + 1
+                service_inefficiency = self._get_service_inefficiency_for_agent_assignment(new_shifts=tmp, old_shifts=shifts,
+                                                                                           demands=demands)
                 results.append(service_inefficiency)
             else:
                 results.append(np.NaN)
@@ -168,7 +251,15 @@ class SchedulerSemiGreedy(Scheduler):
 
         return shifts
 
+    def _get_assigned_shifts(self, shifts: np.ndarray):
+        """
+        get the indices of the shifts that are already assigned in the shifts array
 
+        :param shifts:
+        :return:
+        """
+        shifts_indices = np.where(np.sum(shifts, axis=0) > 0)
+        return shifts_indices[0]
 
     def _get_free_shift(self, shifts: np.ndarray):
         """
@@ -181,25 +272,50 @@ class SchedulerSemiGreedy(Scheduler):
             if np.all(shifts[:, i] == 0):
                 return i
 
-    def _get_service_inefficiency_by_condition(self, shifts, demands, column, indices :list):
+    def _get_service_inefficiency_for_lunch_time_assignment(self, old_shifts: np.ndarray, new_shifts: np.ndarray,
+                                                            demands: np.ndarray):
         """
-        divides the service inefficiency by the number of demand that can be covered additionaly
+        divides the service inefficiency by the number of demand that can be covered additionaly. This is the
+        cost function that should be optimized. The lesser the added service inefficiency the better.
 
         :return:
         """
-        tmp = shifts.copy()
-        tmp[indices, column] = tmp[indices, column] + 1
-        service_inefficiency = self.get_service_efficiency(demands, tmp)
-        condition = np.logical_and.reduce((np.sum(shifts, axis=1) < demands, np.sum(tmp, axis=1) <= demands,
-                                           np.sum(shifts, axis=1) < np.sum(tmp, axis=1)))
+        service_inefficiency = self.get_service_efficiency(demands, new_shifts)
+        condition = np.logical_and.reduce((np.sum(old_shifts, axis=1) < demands, np.sum(new_shifts, axis=1) <= demands,
+                                           np.sum(old_shifts, axis=1) < np.sum(new_shifts, axis=1)))
         sum_condition = np.sum(condition)
         if sum_condition == 0:
             return np.inf
         else:
             return service_inefficiency / sum_condition
 
+    def _get_service_inefficiency_for_agent_assignment(self, old_shifts: np.ndarray, new_shifts: np.ndarray,
+                                                       demands: np.ndarray):
+        """
+        divides the service inefficiency by the number of demand that can be covered additionaly. This is the
+        cost function that should be optimized. The lesser the added service inefficiency the better.
+
+        :return:
+        """
+        service_inefficiency = self.get_service_efficiency(demands, new_shifts)
+        condition = np.logical_and.reduce((np.sum(old_shifts, axis=1) < demands, np.sum(new_shifts, axis=1) <= demands,
+                                           np.sum(old_shifts, axis=1) < np.sum(new_shifts, axis=1)))
+        sum_condition = np.sum(condition)
+        if sum_condition == 0:
+            return np.inf
+        else:
+            return service_inefficiency / sum_condition
+
+
     @staticmethod
     def get_service_efficiency(demands: np.ndarray, shifts: np.ndarray):
+        """
+        calculates the service inefficency for a given demand and shift array
+
+        :param demands:
+        :param shifts:
+        :return:
+        """
         sum_shifts = np.sum(shifts)
         if sum_shifts == 0:
             return np.Inf
@@ -213,8 +329,8 @@ if __name__ == "__main__":
     agents_excel_sheet = [12, 12, 14, 21, 28, 22, 33, 36, 40, 41, 50, 50, 35, 46, 50, 50,
                           34, 38, 33, 26, 22, 21, 17, 17, 14, 10, 7]
 
-    scheduler = SchedulerSemiGreedy(number_agents_per_half_hour=agents_per_hour, lunch_time=1,
+    scheduler = SchedulerSemiGreedy(demands=agents_per_hour, lunch_time=2,
                                     number_intervals_per_agent=17)
-    shifts = scheduler.solve()
-    print(np.sum(shifts, axis=1))
-    print(scheduler.get_service_efficiency(demands=agents_per_hour, shifts=agents_excel_sheet))
+    resulting_shifts = scheduler.solve()
+    print(np.sum(resulting_shifts, axis=1))
+    print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=np.array(agents_excel_sheet)))

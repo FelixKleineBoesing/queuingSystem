@@ -11,7 +11,7 @@ class SchedulerSemiGreedyTester(unittest.TestCase):
                                 12, 12, 7, 10, 7]
 
     def test_construction(self):
-        scheduler = SchedulerSemiGreedy(number_agents_per_half_hour=self.agents_per_hour, lunch_time=1,
+        scheduler = SchedulerSemiGreedy(demands=self.agents_per_hour, lunch_time=1,
                                         number_intervals_per_agent=17, lunch_time_border=6)
         self.assertEqual(scheduler.number_agents_per_half_hour, self.agents_per_hour)
         self.assertEqual(scheduler.lunch_time, 1)
@@ -20,7 +20,7 @@ class SchedulerSemiGreedyTester(unittest.TestCase):
 
     def test_solve(self):
         start = datetime.datetime.now()
-        scheduler = SchedulerSemiGreedy(number_agents_per_half_hour=self.agents_per_hour, lunch_time=1,
+        scheduler = SchedulerSemiGreedy(demands=self.agents_per_hour, lunch_time=1,
                                         number_intervals_per_agent=17, lunch_time_border=6, verbose=False)
         shifts = scheduler.solve()
         duration = datetime.datetime.now() - start
@@ -34,9 +34,28 @@ class SchedulerSemiGreedyTester(unittest.TestCase):
 
     def test_check_number_of_lunch_times_to_assign(self):
         shifts = np.array([[1, 1, 1, 1, 1, 0, 0, 0], [0, 2, 2, 2, 2, 2, 0, 0], [0, 0, 4, 4, 4, 4, 4, 0]]).transpose()
-        scheduler = SchedulerSemiGreedy(number_agents_per_half_hour=self.agents_per_hour, lunch_time=1,
+        scheduler = SchedulerSemiGreedy(demands=self.agents_per_hour, lunch_time=1,
                                         number_intervals_per_agent=5, lunch_time_border=1, verbose=False)
         number_necessary_lunch_times = scheduler._check_number_of_lunch_times_to_assign(shifts=shifts)
+        self.assertTrue(isinstance(number_necessary_lunch_times, np.ndarray))
+        self.assertTrue(number_necessary_lunch_times.tolist(), [1, 2, 4])
 
+        shifts = np.array([[1, 1, 1, 0, 1, 0, 0, 0], [0, 2, 2, 0, 2, 2, 0, 0], [0, 0, 4, 4, 3, 1, 4, 0]]).transpose()
+        scheduler = SchedulerSemiGreedy(demands=self.agents_per_hour, lunch_time=1,
+                                        number_intervals_per_agent=5, lunch_time_border=1, verbose=False)
+        number_necessary_lunch_times = scheduler._check_number_of_lunch_times_to_assign(shifts=shifts)
+        self.assertTrue(isinstance(number_necessary_lunch_times, np.ndarray))
+        self.assertTrue(number_necessary_lunch_times.tolist(), [0, 0, 0])
 
+    def test_check_lunch_time_constraint(self):
+        shifts = np.array([[1, 1, 1, 1, 1, 0, 0, 0], [0, 2, 2, 2, 2, 2, 0, 0], [0, 0, 4, 4, 4, 4, 4, 0]]).transpose()
+        scheduler = SchedulerSemiGreedy(demands=self.agents_per_hour, lunch_time=1,
+                                        number_intervals_per_agent=5, lunch_time_border=1, verbose=False)
+        satisfied = scheduler._check_lunch_time_constraint(shifts=shifts)
+        self.assertFalse(satisfied)
 
+        shifts = np.array([[1, 1, 1, 0, 1, 0, 0, 0], [0, 2, 2, 0, 2, 2, 0, 0], [0, 0, 4, 4, 3, 1, 4, 0]]).transpose()
+        scheduler = SchedulerSemiGreedy(demands=self.agents_per_hour, lunch_time=1,
+                                        number_intervals_per_agent=5, lunch_time_border=1, verbose=False)
+        satisfied = scheduler._check_lunch_time_constraint(shifts=shifts)
+        self.assertTrue(satisfied)
