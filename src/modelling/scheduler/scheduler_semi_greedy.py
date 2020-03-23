@@ -119,11 +119,10 @@ class SchedulerSemiGreedy(Scheduler):
                     chosen_shifts.append(j)
                     tmp = shifts.copy()
                     tmp[i:(i+self.lunch_time), j] = tmp[i:(i+self.lunch_time), j] - 1
-                    service_ineffiency =
-                    results.append()
-
-
-
+                    service_ineffiency = self._get_service_inefficiency_for_lunch_time_assignment(old_shifts=shifts,
+                                                                                                  new_shifts=tmp,
+                                                                                                  demands=demands)
+                    results.append(service_ineffiency)
 
         return shifts
 
@@ -280,6 +279,7 @@ class SchedulerSemiGreedy(Scheduler):
 
         :return:
         """
+        # TODO add the different modes or weights  for the cost function.
         service_inefficiency = self.get_service_efficiency(demands, new_shifts)
         condition = np.logical_and.reduce((np.sum(old_shifts, axis=1) < demands, np.sum(new_shifts, axis=1) <= demands,
                                            np.sum(old_shifts, axis=1) < np.sum(new_shifts, axis=1)))
