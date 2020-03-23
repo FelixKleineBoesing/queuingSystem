@@ -52,6 +52,7 @@ class SchedulerSemiGreedy(Scheduler):
         # TODO add part times
 
         self.shifts = shifts
+        return shifts
 
     def _check_lunch_time_constraint(self, shifts: np.ndarray):
         """
