@@ -1,8 +1,8 @@
 import logging
-
 import numpy as np
 from typing import Dict, Tuple
 import datetime
+import plotly.graph_objects as go
 from src.modelling.scheduler.scheduler_base import Scheduler
 
 
@@ -39,7 +39,7 @@ class SchedulerSemiGreedy(Scheduler):
 
         :return:
         """
-        self.shifts = np.zeros((len(self.number_agents_per_half_hour), len(self.number_agents_per_half_hour)))
+        self.shifts = np.zeros((len(self.demands), len(self.demands)))
 
     def solve(self):
         """
@@ -47,7 +47,7 @@ class SchedulerSemiGreedy(Scheduler):
 
         :return:
         """
-        demands = np.array(self.number_agents_per_half_hour)
+        demands = np.array(self.demands)
         satisfied = False
         shifts = self.shifts
         while not satisfied:
@@ -57,7 +57,7 @@ class SchedulerSemiGreedy(Scheduler):
                 satisfied = True
             print(demands)
             print(np.sum(shifts, axis=1))
-        # TODO add lunch time
+        # TODO add multiple lunch times
         # TODO add part times
 
         self.shifts = shifts
@@ -247,23 +247,23 @@ class SchedulerSemiGreedy(Scheduler):
 
         :return:
         """
-        for i in range(len(self.number_agents_per_half_hour)):
+        for i in range(len(self.demands)):
             j = self._get_free_shift(shifts=shifts)
             condition_met = all(demands <= np.sum(shifts, axis=1))
             service_ineffiecency = self.get_service_efficiency(demands, shifts)
             self.log("Service Inefficiency is : {}".format(service_ineffiecency), "debug")
             self.log("Condition met: {}".format(condition_met), "debug")
             sum_agents = np.sum(shifts[i, :])
-            if sum_agents < self.number_agents_per_half_hour[i] and \
+            if sum_agents < self.demands[i] and \
                     i <= shifts.shape[0] - self.number_intervals_per_agent:
-                shifts[i:i + self.number_intervals_per_agent, j] = self.number_agents_per_half_hour[i] - sum_agents
+                shifts[i:i + self.number_intervals_per_agent, j] = self.demands[i] - sum_agents
             else:
-                if np.sum(shifts[i, :]) < self.number_agents_per_half_hour[i]:
+                if np.sum(shifts[i, :]) < self.demands[i]:
                     condition_met = False
                     while not condition_met:
                         shifts = self._get_optimal_next_agent(demands=demands, shifts=shifts)
                         self.get_service_efficiency(demands, shifts)
-                        if np.sum(shifts[i, :]) >= self.number_agents_per_half_hour[i]:
+                        if np.sum(shifts[i, :]) >= self.demands[i]:
                             condition_met = True
 
         return shifts
@@ -334,6 +334,21 @@ class SchedulerSemiGreedy(Scheduler):
         else:
             return 1 - (sum(demands) / sum_shifts)
 
+    def plot(self):
+        fig = go.Figure()
+        x = list(range(len(self.demands)))
+        fig.add_trace(go.Scatter(x=x, y=self.demands))
+        y = np.zeros((len(x, )))
+        for i in self._get_assigned_shifts(shifts=self.shifts):
+            y += self.shifts[:, i]
+            fig.add_trace(go.Scatter(x=x, y=y, fill="tozeroy"))
+
+        return fig
+
+
+
+
+
 
 if __name__ == "__main__":
     agents_per_hour = [12, 10, 13, 12, 15, 24, 22, 33, 36, 40, 31, 29, 24, 27, 22, 24, 31, 33, 34, 31, 24, 19, 10,
@@ -348,3 +363,5 @@ if __name__ == "__main__":
     print(np.sum(resulting_shifts, axis=1))
     print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=np.array(agents_excel_sheet)))
     print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=resulting_shifts))
+    fig = scheduler.plot()
+    fig.show()

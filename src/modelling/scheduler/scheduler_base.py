@@ -20,7 +20,7 @@ class Scheduler(abc.ABC):
         self.number_intervals_per_agent = number_intervals_per_agent
         self.lunch_time = lunch_time
         self.lunch_time_border = lunch_time_border
-        self.number_agents_per_half_hour = demands
+        self.demands = demands
         self.verbose = verbose
 
     @abc.abstractmethod

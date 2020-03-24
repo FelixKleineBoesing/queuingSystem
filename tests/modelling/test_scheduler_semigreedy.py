@@ -13,7 +13,7 @@ class SchedulerSemiGreedyTester(unittest.TestCase):
     def test_construction(self):
         scheduler = SchedulerSemiGreedy(demands=self.agents_per_hour, lunch_time=1,
                                         number_intervals_per_agent=17, lunch_time_border=6)
-        self.assertEqual(scheduler.number_agents_per_half_hour, self.agents_per_hour)
+        self.assertEqual(scheduler.demands, self.agents_per_hour)
         self.assertEqual(scheduler.lunch_time, 1)
         self.assertEqual(scheduler.number_intervals_per_agent, 17)
         self.assertEqual(scheduler.lunch_time_border, 6)
