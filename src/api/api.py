@@ -22,7 +22,4 @@ def run_app(app):
 
 
 if __name__ == "__main__":
-    app = get_app()
-    host = config.get_value("APP_HOST")
-    port = config.get_value("APP_PORT")
-    app.run(host=host, port=port, debug=True)
+    run_app(get_app())
