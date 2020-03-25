@@ -365,3 +365,16 @@ if __name__ == "__main__":
     print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=resulting_shifts))
     fig = scheduler.plot()
     fig.show()
+
+    agents_per_hour = [2,2,2,2,2,2,2,2,2,8,8,8,4,4,4,4,4,4,4,7]
+
+    start = datetime.datetime.now()
+    scheduler = SchedulerSemiGreedy(demands=agents_per_hour, lunch_time=2,
+                                    number_intervals_per_agent=17, lunch_time_border=6)
+    resulting_shifts = scheduler.solve()
+    print("Took {} time!".format(datetime.datetime.now() - start))
+    print(np.sum(resulting_shifts, axis=1))
+    print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=np.array(agents_excel_sheet)))
+    print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=resulting_shifts))
+    fig = scheduler.plot()
+    fig.show()
