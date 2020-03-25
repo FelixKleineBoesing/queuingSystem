@@ -318,7 +318,6 @@ class SchedulerSemiGreedy(Scheduler):
         else:
             return service_inefficiency / sum_condition
 
-
     @staticmethod
     def get_service_efficiency(demands: np.ndarray, shifts: np.ndarray):
         """
@@ -337,17 +336,16 @@ class SchedulerSemiGreedy(Scheduler):
     def plot(self):
         fig = go.Figure()
         x = list(range(len(self.demands)))
-        fig.add_trace(go.Scatter(x=x, y=self.demands))
+        fig.add_trace(go.Scatter(x=x, y=self.demands, name="Demands", line={"width": 10, "color": "black"}))
         y = np.zeros((len(x, )))
-        for i in self._get_assigned_shifts(shifts=self.shifts):
+        for index, i in enumerate(self._get_assigned_shifts(shifts=self.shifts)):
             y += self.shifts[:, i]
-            fig.add_trace(go.Scatter(x=x, y=y, fill="tozeroy"))
+            if index == 0:
+                fig.add_trace(go.Scatter(x=x, y=y, fill="tozeroy", name="Shift No. {}".format(index)))
+            else:
+                fig.add_trace(go.Scatter(x=x, y=y, fill="tonexty", name="Shift No. {}".format(index)))
 
         return fig
-
-
-
-
 
 
 if __name__ == "__main__":
