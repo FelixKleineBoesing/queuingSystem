@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+import pandas as pd
 from typing import Dict, Tuple
 import datetime
 import plotly.graph_objects as go
@@ -348,8 +349,8 @@ class SchedulerSemiGreedy(Scheduler):
 if __name__ == "__main__":
     agents_per_hour = [12, 10, 13, 12, 15, 24, 22, 33, 36, 40, 31, 29, 24, 27, 22, 24, 31, 33, 34, 31, 24, 19, 10,
                        12, 12, 7, 10, 7]
-    agents_excel_sheet = [12, 12, 14, 21, 28, 22, 33, 36, 40, 41, 50, 50, 35, 46, 50, 50,
-                          34, 38, 33, 26, 22, 21, 17, 17, 14, 10, 7]
+    agents_excel_sheet = [12, 12, 14, 21, 21, 28, 22, 33, 36, 40, 41, 50, 50, 35, 46, 50, 50, 34, 38, 33, 26, 22, 21,
+                          17, 17, 14, 10, 7]
     start = datetime.datetime.now()
     scheduler = SchedulerSemiGreedy(demands=agents_per_hour, lunch_time=2,
                                     number_intervals_per_agent=17, lunch_time_border=6)
@@ -361,15 +362,14 @@ if __name__ == "__main__":
     fig = scheduler.plot()
     fig.show()
 
-    agents_per_hour = [2,2,2,2,2,2,2,2,2,8,8,8,4,4,4,4,4,4,4,7]
+    agents_per_hour_new = [2, 2, 2, 2, 2, 2, 2, 2, 2, 8, 8, 8, 4, 4, 4, 4, 4, 4, 4, 7]
 
     start = datetime.datetime.now()
-    scheduler = SchedulerSemiGreedy(demands=agents_per_hour, lunch_time=2,
+    scheduler = SchedulerSemiGreedy(demands=agents_per_hour_new, lunch_time=2,
                                     number_intervals_per_agent=17, lunch_time_border=6)
-    resulting_shifts = scheduler.solve()
+    resulting_shifts_new = scheduler.solve()
     print("Took {} time!".format(datetime.datetime.now() - start))
-    print(np.sum(resulting_shifts, axis=1))
-    print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=np.array(agents_excel_sheet)))
-    print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=resulting_shifts))
+    print(np.sum(resulting_shifts_new, axis=1))
+    print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=resulting_shifts_new))
     figure = scheduler.plot()
     figure.show()
