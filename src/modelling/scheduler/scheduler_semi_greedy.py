@@ -173,16 +173,17 @@ class SchedulerSemiGreedy(Scheduler):
             lower = None
             upper = None
             for j in range(shifts.shape[0]):
+                k = shifts.shape[0] - 1 - j
                 if lower is None:
                     if shifts[j, i] > 0 and j == 0:
                         lower = j
                     elif shifts[j, i] == 0 and shifts[j + 1, i] > 0:
                         lower = j + 1
                 if upper is None:
-                    if shifts[j, i] > 0 and j == (shifts.shape[0] - 1):
-                        upper = j
-                    elif shifts[j, i] > 0 and shifts[j + 1, i] == 0:
-                        upper = j
+                    if shifts[k, i] > 0 and k == (shifts.shape[0] - 1):
+                        upper = k
+                    elif shifts[k, i] > 0 and shifts[k + 1, i] == 0:
+                        upper = k
                 if upper is not None and lower is not None:
                     break
             bounds[i] = (lower, upper)
@@ -198,47 +199,41 @@ class SchedulerSemiGreedy(Scheduler):
         """
         shifts = shifts.copy()
         results = []
-        shift_sums = np.sum(shifts, axis=0)
-        for i in range(shifts.shape[0]):
-            if shift_sums[i] > 0:
-                tmp = shifts.copy()
-                tmp[shifts[:, i] > 0, i] = tmp[shifts[:, i] > 0, i] + 1
-                service_inefficiency = self._get_cost_differential_for_agent_assignment(new_shifts=tmp, old_shifts=shifts,
-                                                                                        demands=demands)
-                results.append(service_inefficiency)
-            else:
-                results.append(np.NaN)
-
-        if np.all(~np.isfinite(results)):
-            shifts = self._assign_agent_to_existing_shift(demands=demands, shifts=shifts)
-        else:
-            index = np.nanargmin(results)
-            shifts[shifts[:, index] > 0, index] = shifts[shifts[:, index] > 0, index] + 1
-        return shifts
-
-    def _assign_agent_to_existing_shift(self, demands: np.ndarray, shifts: np.ndarray):
-        """
-        assigns one agent to an existing shift based on which shift adds least inefficiency
-
-        :param demands:
-        :param shifts:
-        :return:
-        """
-        results = []
+        chosen_indices = []
+        chosen_columns = []
+        bounds_shifts = self._get_bounds(shifts=shifts)
+        lower_bounds = {b[0]: key for key, b in bounds_shifts.items()}
         column = self._get_free_shift(shifts=shifts)
         for i in range(shifts.shape[0]):
-            if i <= shifts.shape[0] - self.number_intervals_per_agent:
-                indices = list(range(i, i + self.number_intervals_per_agent))
+            if i in lower_bounds:
+                j = lower_bounds[i]
                 tmp = shifts.copy()
-                tmp[indices, column] = tmp[indices, column] + 1
-                service_inefficiency = self._get_cost_differential_for_agent_assignment(new_shifts=tmp, old_shifts=shifts,
+                bounds = bounds_shifts[j]
+                tmp[bounds[0]:(bounds[1] + 1), j] += 1
+                service_inefficiency = self._get_cost_differential_for_agent_assignment(new_shifts=tmp,
+                                                                                        old_shifts=shifts,
                                                                                         demands=demands)
                 results.append(service_inefficiency)
+                chosen_indices.append(list(range(bounds[0], (bounds[1] + 1))))
+                chosen_columns.append(j)
             else:
-                results.append(np.NaN)
-        index = np.nanargmin(results)
-        shifts[index:index + self.number_intervals_per_agent, column] = \
-            shifts[index:index + self.number_intervals_per_agent, column] + 1
+                if i <= shifts.shape[0] - self.number_intervals_per_agent:
+                    indices = list(range(i, i + self.number_intervals_per_agent))
+                    tmp = shifts.copy()
+                    tmp[indices, column] = tmp[indices, column] + 1
+                    service_inefficiency = self._get_cost_differential_for_agent_assignment(new_shifts=tmp,
+                                                                                            old_shifts=shifts,
+                                                                                            demands=demands)
+                    results.append(service_inefficiency)
+                    chosen_indices.append(indices)
+                    chosen_columns.append(column)
+
+        index = int(np.nanargmin(results))
+        chosen_index = chosen_indices[index]
+        chosen_column = chosen_columns[index]
+
+        shifts[chosen_index, chosen_column] += 1
+
         return shifts
 
     def _assign_agents_until_satisfied(self, demands: np.ndarray, shifts: np.ndarray):
@@ -313,10 +308,7 @@ class SchedulerSemiGreedy(Scheduler):
         condition = np.logical_and.reduce((np.sum(old_shifts, axis=1) < demands, np.sum(new_shifts, axis=1) <= demands,
                                            np.sum(old_shifts, axis=1) < np.sum(new_shifts, axis=1)))
         sum_condition = np.sum(condition)
-        if sum_condition == 0:
-            return np.inf
-        else:
-            return service_inefficiency / sum_condition
+        return service_inefficiency - sum_condition
 
     @staticmethod
     def get_service_efficiency(demands: np.ndarray, shifts: np.ndarray):
@@ -334,6 +326,11 @@ class SchedulerSemiGreedy(Scheduler):
             return 1 - (sum(demands) / sum_shifts)
 
     def plot(self):
+        """
+        creates a plotly figure which can be shown with .plot().show()
+
+        :return:
+        """
         fig = go.Figure()
         x = list(range(len(self.demands)))
         fig.add_trace(go.Scatter(x=x, y=self.demands, name="Demands", line={"width": 10, "color": "black"}))
@@ -374,5 +371,5 @@ if __name__ == "__main__":
     print(np.sum(resulting_shifts, axis=1))
     print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=np.array(agents_excel_sheet)))
     print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=resulting_shifts))
-    fig = scheduler.plot()
-    fig.show()
+    figure = scheduler.plot()
+    figure.show()
