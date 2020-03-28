@@ -17,6 +17,6 @@ DEFAULT_VARIABLES = {
     "REDIS_PASSWORD": "?",
     "FLASK_HOST": "0.0.0.0",
     "FLASK_PORT": 5000,
-    "FRONTEND_API_QUEUE": "consumer_api_queue",
+    "MAIN_API_QUEUE": "consumer_api_queue",
     "NUMBER_PROCESSES_WORKER": 4
 }
