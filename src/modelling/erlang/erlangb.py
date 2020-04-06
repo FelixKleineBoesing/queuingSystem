@@ -1,9 +1,10 @@
 import numpy as np
 
+from src.modelling.erlang.optimizer import Optimizer
 from src.modelling.helpers import power_faculty
 
 
-class ErlangB:
+class ErlangB(Optimizer):
 
     def get_probability(self, number_agents: int, lambda_: float, mu: float):
         """

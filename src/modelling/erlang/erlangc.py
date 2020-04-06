@@ -1,9 +1,10 @@
 import math
 
+from src.modelling.erlang.optimizer import Optimizer
 from src.modelling.helpers import power_faculty
 
 
-class ErlangC:
+class ErlangC(Optimizer):
 
     def get_max_waiting_probability(self, lambda_: float, mu: float, number_agents: int, max_waiting_time: int):
         """

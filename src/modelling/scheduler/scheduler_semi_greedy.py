@@ -258,6 +258,7 @@ class SchedulerSemiGreedy(Scheduler):
                         shifts = self._get_optimal_next_agent(demands=demands, shifts=shifts)
                         self.get_service_efficiency(demands, shifts)
                         if np.sum(shifts[i, :]) >= self.demands[i]:
+
                             condition_met = True
 
         return shifts

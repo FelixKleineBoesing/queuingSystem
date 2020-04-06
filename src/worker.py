@@ -17,6 +17,8 @@ class Worker:
         self.semaphore = mp.Semaphore(self.number_processes)
         self.redis = redis_wrapper
         self.queue_name = config_manager.get_value("MAIN_API_QUEUE")
+        self._processes = []
+        self._current_number_processes = 0
 
     def run(self):
         """
@@ -25,13 +27,14 @@ class Worker:
         """
         while True:
             msg = self.redis.get_from_queue(self.queue_name)
-            if msg is not None:
+            if msg is not None and self._current_number_processes < self.number_processes:
+                queue = mp.Queue()
                 task_dict = json.loads(msg[1])
                 task = Task.deserialize(task=task_dict)
                 module = getattr(sys.modules[__name__], task.module)
                 func = getattr(module, task.function)
                 self.semaphore.acquire()
-                self.start_process(func=func, arguments=task.arguments, channel_id=task.id)
+                self.start_process(func=func, arguments=(task.arguments, queue), channel_id=task.id)
             time.sleep(0.5)
 
     def start_process(self, func, arguments, channel_id):
