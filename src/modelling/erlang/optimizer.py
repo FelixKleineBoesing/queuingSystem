@@ -29,7 +29,8 @@ class Optimizer:
         assert isinstance(target_value, (float, int)), "target value must be integer or float"
         assert isinstance(optim_argument_type, type)
         inspect.getfullargspec(method)
-        kwargs = copy.copy(kwargs)
+        # TODO inspect which datatype is annotated for given optimi_argument
+        kwargs = copy.deepcopy(kwargs)
 
         def optim_func(x):
             kwargs[optim_argument] = optim_argument_type(x)
