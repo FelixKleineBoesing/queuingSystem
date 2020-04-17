@@ -11,7 +11,6 @@ class ErlangB(Optimizer):
         calculates the probability that there are c number people in the system
 
         :param number_agents: number of available agents
-        :param workload: lambda / mu
         :param lambda_: average arrival time in times per second
         :param mu: average supply time in times per second
         :return: probability of a blocked queue
