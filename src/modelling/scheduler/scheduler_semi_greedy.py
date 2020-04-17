@@ -54,11 +54,8 @@ class SchedulerSemiGreedy(Scheduler):
             shifts = self._assign_lunch_times_until_satisfied(demands=demands, shifts=shifts)
             if self._check_demand_satisfied(shifts=shifts, demands=demands):
                 satisfied = True
-            print(demands)
-            print(np.sum(shifts, axis=1))
         # TODO add multiple lunch times
         # TODO add part times
-
         self.shifts = shifts
         return shifts
 
@@ -334,7 +331,7 @@ class SchedulerSemiGreedy(Scheduler):
         fig = go.Figure()
         x = list(range(len(self.demands)))
         fig.add_trace(go.Scatter(x=x, y=self.demands, name="Demands", line={"width": 10, "color": "black"}))
-        y = np.zeros((len(x, )))
+        y = np.zeros((len(x)))
         for index, i in enumerate(self._get_assigned_shifts(shifts=self.shifts)):
             y += self.shifts[:, i]
             if index == 0:
@@ -369,6 +366,6 @@ if __name__ == "__main__":
     resulting_shifts_new = scheduler.solve()
     print("Took {} time!".format(datetime.datetime.now() - start))
     print(np.sum(resulting_shifts_new, axis=1))
-    print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour), shifts=resulting_shifts_new))
+    print(scheduler.get_service_efficiency(demands=np.array(agents_per_hour_new), shifts=resulting_shifts_new))
     figure = scheduler.plot()
     figure.show()

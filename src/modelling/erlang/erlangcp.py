@@ -193,6 +193,7 @@ def get_prob_for_pn_in_mmckm_system(lambda_: float, mu: float, nu: float, number
     :return:
     """
     prob_zero = 0
+    number_agents = int(number_agents)
     for i in range(size_waiting_room + 1):
         prob_zero += get_cn_for_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents, n=i)
 
@@ -220,6 +221,7 @@ def get_cn_for_mmckm_system(lambda_: float, mu: float, nu: float, number_agents:
     :return:
     """
     a = lambda_ / mu
+    number_agents = int(number_agents)
     if n <= number_agents:
         return power_faculty(a, n)
     else:
@@ -235,6 +237,11 @@ if __name__ == "__main__":
                                              max_waiting_time=20))
     print(erlang.get_number_agents_for_service_level(lambda_=1/10, mu=1/240, nu=1/300, target_sla=0.8633721956843062,
                                                      size_waiting_room=80, max_waiting_time=20))
+    print(erlang.get_service_level(lambda_=1 / 10, mu=1 / 240, nu=1 / 300, number_agents=28,
+                                   size_waiting_room=80, max_waiting_time=20))
+    print(erlang.minimize(method=erlang.get_max_waiting_probability, kwargs=dict(lambda_=1/10, mu=1/240, nu=1/300,
+                                                                                 size_waiting_room=80, max_waiting_time=20),
+                          optim_argument="number_agents", target_value=0.8633721956843062, optim_argument_type=int))
     print(erlang.get_prob_for_abort(lambda_=1/10, mu=1/240, nu=1/30, number_agents=25, size_waiting_room=80))
     print(erlang.get_mean_queue_length(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, size_waiting_room=80))
     print(erlang.get_mean_number_customer_in_system(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28,
