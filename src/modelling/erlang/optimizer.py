@@ -33,6 +33,7 @@ class Optimizer:
         assert all([arg in args for arg in kwargs.keys()]), "One of the supplied arguments is not present inside the "
         assert all([isinstance(value, annotations[key]) for key, value in kwargs.items()]), \
             "One of the supplied arguments has the wrong return type!"
+        # TODO add another assetion that all other arguments need to be supplied
         target_type = annotations[optim_argument]
         kwargs = copy.deepcopy(kwargs)
 
