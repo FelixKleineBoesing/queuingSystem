@@ -5,7 +5,7 @@ from src.data_access.wrapper.postgres import PostgresWrapper
 from src.data_access.wrapper.redis import RedisWrapper
 
 
-class BaseController(abc.ABC):
+class BaseDataAccessor(abc.ABC):
 
     def __init__(self, mongo_wrapper: MongoWrapper, postgres_wrapper: PostgresWrapper, redis_wrapper: RedisWrapper):
         self.mongo = mongo_wrapper

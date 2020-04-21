@@ -210,8 +210,6 @@ if __name__ == "__main__":
     erlang = ErlangCP()
     print(erlang.get_max_waiting_probability(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, size_waiting_room=80,
                                              max_waiting_time=20))
-    print(erlang.get_number_agents_for_service_level(lambda_=1/10, mu=1/240, nu=1/300, target_sla=0.8633721956843062,
-                                                     size_waiting_room=80, max_waiting_time=20))
     print(erlang.get_service_level(lambda_=1 / 10, mu=1 / 240, nu=1 / 300, number_agents=28,
                                    size_waiting_room=80, max_waiting_time=20))
     print(erlang.minimize(method=erlang.get_max_waiting_probability, kwargs=dict(lambda_=1/10, mu=1/240, nu=1/300,

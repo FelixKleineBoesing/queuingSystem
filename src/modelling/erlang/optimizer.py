@@ -6,9 +6,11 @@ from scipy.optimize import minimize_scalar
 
 
 class Optimizer:
-
-    def __init__(self):
-        pass
+    """
+    The Optimizer is a helper class that can be inherited to any class to make any method of the origin class
+    optimizable in terms of finding a fitting value for the missing argument.
+    Therefore all arguments need a type annotation.
+    """
 
     def minimize(self, method: MethodType, kwargs: dict, optim_argument: str, target_value: Union[float, int]):
         """
@@ -29,11 +31,14 @@ class Optimizer:
         func_inspect = inspect.getfullargspec(method)
         args = func_inspect.args
         annotations = func_inspect.annotations
-        assert optim_argument in args, "The optim_argument '{}' is not an argument of the specified function!".format(optim_argument)
-        assert all([arg in args for arg in kwargs.keys()]), "One of the supplied arguments is not present inside the "
-        assert all([isinstance(value, annotations[key]) for key, value in kwargs.items()]), \
-            "One of the supplied arguments has the wrong return type!"
-        # TODO add another assetion that all other arguments need to be supplied
+        assert optim_argument in args, "The optim_argument '{}' is not an argument of the specified function!".\
+            format(optim_argument, method)
+        for arg in kwargs.keys():
+            assert arg in args, "The supplied argument {} is no argument of function {}!".format(arg, str(func_inspect.name))
+        for key, value in kwargs.items():
+            assert isinstance(value, annotations[key]), "The supplied value for {} is of type {} and not of type {}".\
+                format(key, type(value), annotations[key])
+
         target_type = annotations[optim_argument]
         kwargs = copy.deepcopy(kwargs)
 
@@ -43,5 +48,5 @@ class Optimizer:
             return res
 
         result = minimize_scalar(optim_func)
-        return result.x
+        return target_type(result.x) + 1
 

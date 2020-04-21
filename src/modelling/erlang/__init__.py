@@ -19,6 +19,10 @@ if __name__ == "__main__":
                                                max_waiting_time=max_waiting_time, size_waiting_room=size_waiting_room)
     print("Probability for a customer waiting the maximum time: {}".format(res))
 
+    print(erlangcp.minimize(method=erlangcp.get_max_waiting_probability,
+                            kwargs=dict(lambda_=1/10, mu=1/240, nu=1/300, size_waiting_room=80, max_waiting_time=20),
+                            optim_argument="number_agents", target_value=0.8633721956843062))
+
     res = erlangcp.get_prob_for_abort(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                       size_waiting_room=size_waiting_room)
     print("Probability for call abort: {}".format(res))
@@ -39,7 +43,3 @@ if __name__ == "__main__":
                                                       size_waiting_room=size_waiting_room)
     print("Average number customers in system: {}".format(res))
 
-    res = erlangcp.get_number_agents_for_service_level(lambda_=lambda_, mu=mu, nu=nu, target_sla=target_sla,
-                                                       size_waiting_room=size_waiting_room,
-                                                       max_waiting_time=max_waiting_time)
-    print("Get number of agents for expected service level: {}".format(res))
