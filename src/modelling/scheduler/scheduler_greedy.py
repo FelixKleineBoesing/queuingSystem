@@ -55,9 +55,12 @@ class SchedulerGreedy(Scheduler):
                 if bounds[j][1] >= i >= bounds[j][0] and np.all(shifts[i:(i+self.lunch_time), j] > 0):
                     tmp = shifts.copy()
                     tmp[i:(i+self.lunch_time), j] = tmp[i:(i+self.lunch_time), j] - 1
-                    service_ineffiency = self._get_cost_differential_for_lunch_time_assignment(old_shifts=shifts,
-                                                                                               new_shifts=tmp,
-                                                                                               demands=demands)
+                    if current_search_depth == self.search_depth:
+                        service_ineffiency = self._get_cost_differential_for_lunch_time_assignment(old_shifts=shifts,
+                                                                                                   new_shifts=tmp,
+                                                                                                   demands=demands)
+                    else:
+                        service_ineffiecency = self._get_next_optimal_lunch_time(demands=demands, shiftts=tmp, current_search_depth+1)
                     results.append(service_ineffiency)
                     chosen_shifts.append(j)
                     chosen_indices.append(i)
@@ -102,9 +105,12 @@ class SchedulerGreedy(Scheduler):
                 tmp = shifts.copy()
                 bounds = bounds_shifts[j]
                 tmp[bounds[0]:(bounds[1] + 1), j] += 1
-                service_inefficiency = self._get_cost_differential_for_agent_assignment(new_shifts=tmp,
-                                                                                        old_shifts=shifts,
-                                                                                        demands=demands)
+                if current_search_depth == self.search_depth:
+                    service_inefficiency = self._get_cost_differential_for_agent_assignment(new_shifts=tmp,
+                                                                                            old_shifts=shifts,
+                                                                                            demands=demands)
+                else:
+                    service_inefficiency = self._get_optimal_next_agent(demands=demands, shifts=tmp, current_search_depth+1)
                 results.append(service_inefficiency)
                 chosen_indices.append(list(range(bounds[0], (bounds[1] + 1))))
                 chosen_columns.append(j)
@@ -113,9 +119,13 @@ class SchedulerGreedy(Scheduler):
                     indices = list(range(i, i + self.number_intervals_per_agent))
                     tmp = shifts.copy()
                     tmp[indices, column] = tmp[indices, column] + 1
-                    service_inefficiency = self._get_cost_differential_for_agent_assignment(new_shifts=tmp,
-                                                                                            old_shifts=shifts,
-                                                                                            demands=demands)
+                    if current_search_depth == self.search_depth:
+                        service_inefficiency = self._get_cost_differential_for_agent_assignment(new_shifts=tmp,
+                                                                                                old_shifts=shifts,
+                                                                                                demands=demands)
+                    else:
+                        service_inefficiency = self._get_optimal_next_agent(demands=demands, shifts=tmp, current_search_depth+1)
+                results.append(service_inefficiency)
                     results.append(service_inefficiency)
                     chosen_indices.append(indices)
                     chosen_columns.append(column)
