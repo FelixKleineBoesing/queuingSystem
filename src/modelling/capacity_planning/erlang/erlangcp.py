@@ -1,7 +1,6 @@
 from scipy.stats import gamma
-from scipy.optimize import minimize_scalar
 
-from src.modelling.erlang.optimizer import Optimizer
+from src.modelling.capacity_planning.erlang import Optimizer
 from src.modelling.helpers import power_faculty
 
 
@@ -26,7 +25,8 @@ class ErlangCP(Optimizer):
         """
         return 1 - self.get_max_waiting_probability(lambda_, mu, nu, number_agents, max_waiting_time, size_waiting_room)
 
-    def get_max_waiting_probability(self, lambda_: float, mu: float, nu: float, number_agents: int,
+    @staticmethod
+    def get_max_waiting_probability(lambda_: float, mu: float, nu: float, number_agents: int,
                                     max_waiting_time: int, size_waiting_room: int = None):
         """
         get the probability that a customer must wait the maximum waiting time. This is often used as a service level
@@ -57,7 +57,8 @@ class ErlangCP(Optimizer):
                                                               number_agents=number_agents, n=n) * g
         return prob
 
-    def get_prob_for_abort(self,  lambda_: float, mu: float, nu: float, number_agents: int,
+    @staticmethod
+    def get_prob_for_abort(lambda_: float, mu: float, nu: float, number_agents: int,
                            size_waiting_room: int = None):
         """
         calculates the probability that a customer aborts his call.
@@ -79,7 +80,8 @@ class ErlangCP(Optimizer):
                    get_cn_for_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents, n=n)
         return res
 
-    def get_mean_number_customer_in_system(self,  lambda_: float, mu: float, nu: float, number_agents: int,
+    @staticmethod
+    def get_mean_number_customer_in_system(lambda_: float, mu: float, nu: float, number_agents: int,
                                            size_waiting_room: int = None):
         """
         calculates the average number of customers that are in the system
@@ -101,7 +103,8 @@ class ErlangCP(Optimizer):
                                                            number_agents=number_agents, n=n)
         return res
 
-    def get_mean_queue_length(self,  lambda_: float, mu: float, nu: float, number_agents: int,
+    @staticmethod
+    def get_mean_queue_length(lambda_: float, mu: float, nu: float, number_agents: int,
                               size_waiting_room: int = None):
         """
         calculates the average queue length
@@ -152,6 +155,9 @@ class ErlangCP(Optimizer):
         """
         return self.get_mean_number_customer_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                        size_waiting_room=size_waiting_room) / lambda_
+
+    def get_number_agent_for_chat(self):
+        pass
 
 
 def get_prob_for_pn_in_mmckm_system(lambda_: float, mu: float, nu: float, number_agents: int, size_waiting_room: int,

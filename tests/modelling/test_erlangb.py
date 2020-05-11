@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from src.modelling.erlang import ErlangB
+from src.modelling.capacity_planning.erlang import ErlangB
 
 
 class ErlangBTester(unittest.TestCase):

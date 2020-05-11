@@ -197,9 +197,9 @@ class Scheduler(abc.ABC):
         :return:
         """
         service_inefficiency = self.get_service_efficiency(demands, new_shifts)
-        condition = np.logical_and.reduce((np.sum(old_shifts, axis=1) < demands, np.sum(new_shifts, axis=1) <= demands,
-                                           np.sum(old_shifts, axis=1) < np.sum(new_shifts, axis=1)))
-        sum_condition = np.sum(condition)
+        open_demands = demands - np.sum(old_shifts, axis=1)
+        additional_agents = np.sum(new_shifts, axis=1) - np.sum(old_shifts, axis=1)
+        sum_condition = np.sum(np.min((additional_agents, open_demands), axis=0))
         return service_inefficiency - sum_condition
 
     @staticmethod

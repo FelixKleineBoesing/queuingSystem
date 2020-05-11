@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.modelling.erlang.optimizer import Optimizer
+from src.modelling.capacity_planning.erlang import Optimizer
 from src.modelling.helpers import power_faculty
 
 

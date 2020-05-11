@@ -1,6 +1,6 @@
 import unittest
 from src.modelling.helpers import power_faculty
-from src.modelling.erlang.erlangc import get_p0_for_mmc_system
+from src.modelling.capacity_planning.erlang import get_p0_for_mmc_system
 
 
 class ModellingHelpersTester(unittest.TestCase):

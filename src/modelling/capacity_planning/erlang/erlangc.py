@@ -1,6 +1,6 @@
 import math
 
-from src.modelling.erlang.optimizer import Optimizer
+from src.modelling.capacity_planning.erlang.optimizer import Optimizer
 from src.modelling.helpers import power_faculty
 
 
@@ -25,7 +25,8 @@ class ErlangC(Optimizer):
             return 1 - self.get_blocking_probability(lambda_=lambda_, mu=mu, number_agents=number_agents) * \
                    math.exp(-(number_agents - workload) * mu * max_waiting_time)
 
-    def get_blocking_probability(self, lambda_: float, mu: float, number_agents: int) -> float:
+    @staticmethod
+    def get_blocking_probability(lambda_: float, mu: float, number_agents: int) -> float:
         """
         get the probability that a customer must wait the maximum waiting time
 
@@ -74,6 +75,24 @@ class ErlangC(Optimizer):
         """
         return self.get_blocking_probability(lambda_=lambda_, mu=mu, number_agents=number_agents) / \
                (number_agents * mu - lambda_) + 1 / mu
+
+    def get_number_agents_for_chat(self, lambda_: float, mu: float, max_waiting_time: int, abort_prob: float,
+                                   max_sessions: int, share_sequential_work: float):
+        """
+
+        :param lambda_:
+        :param mu:
+        :param max_waiting_time:
+        :param max_sessions:
+        :param share_sequential_work:
+        :return:
+        """
+        aht = 1 / lambda_
+        number_agents = self.minimize(self.get_max_waiting_probability,
+                                      kwargs={"mu": mu, "max_waiting_time": max_waiting_time,
+                                              "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1))},
+                                      optim_argument="number_agents", target_value=abort_prob)
+        return number_agents / max_sessions
 
 
 def get_p0_for_mmc_system(workload: float, number_agents: int):

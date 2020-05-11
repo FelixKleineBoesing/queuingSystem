@@ -24,11 +24,17 @@ class SchedulerGreedy(Scheduler):
         demands = np.array(self.demands)
         satisfied = False
         shifts = self.shifts
+        n = 1
         while not satisfied:
+            print("{}th run!".format(n))
+            print("Start agents")
             shifts = self._assign_agents_until_satisfied(shifts=shifts, demands=demands)
+            print("Start lunch times")
             shifts = self._assign_lunch_times_until_satisfied(demands=demands, shifts=shifts)
             if self._check_demand_satisfied(shifts=shifts, demands=demands):
                 satisfied = True
+            n+=1
+        self.shifts = shifts
         return shifts
 
     def _get_next_optimal_lunch_time(self, demands: np.ndarray, shifts: np.ndarray, current_search_depth: int = 1):
@@ -55,12 +61,17 @@ class SchedulerGreedy(Scheduler):
                 if bounds[j][1] >= i >= bounds[j][0] and np.all(shifts[i:(i+self.lunch_time), j] > 0):
                     tmp = shifts.copy()
                     tmp[i:(i+self.lunch_time), j] = tmp[i:(i+self.lunch_time), j] - 1
-                    if current_search_depth == self.search_depth:
+                    if current_search_depth == self.search_depth or self._check_lunch_time_constraint(shifts=tmp):
                         service_ineffiency = self._get_cost_differential_for_lunch_time_assignment(old_shifts=shifts,
                                                                                                    new_shifts=tmp,
                                                                                                    demands=demands)
                     else:
-                        service_ineffiecency = self._get_next_optimal_lunch_time(demands=demands, shiftts=tmp, current_search_depth+1)
+                        optimal_shifts = self._get_next_optimal_lunch_time(demands=demands, shifts=tmp,
+                                                                           current_search_depth=current_search_depth+1)
+                        service_ineffiency = \
+                            self._get_cost_differential_for_lunch_time_assignment(demands=demands,
+                                                                                  new_shifts=optimal_shifts,
+                                                                                  old_shifts=shifts)
                     results.append(service_ineffiency)
                     chosen_shifts.append(j)
                     chosen_indices.append(i)
@@ -105,12 +116,16 @@ class SchedulerGreedy(Scheduler):
                 tmp = shifts.copy()
                 bounds = bounds_shifts[j]
                 tmp[bounds[0]:(bounds[1] + 1), j] += 1
-                if current_search_depth == self.search_depth:
+                if current_search_depth == self.search_depth or self._check_demand_satisfied(shifts=tmp,
+                                                                                             demands=demands):
                     service_inefficiency = self._get_cost_differential_for_agent_assignment(new_shifts=tmp,
                                                                                             old_shifts=shifts,
                                                                                             demands=demands)
                 else:
-                    service_inefficiency = self._get_optimal_next_agent(demands=demands, shifts=tmp, current_search_depth+1)
+                    optimal_shifts = self._get_optimal_next_agent(demands=demands, shifts=tmp,
+                                                                  current_search_depth=current_search_depth+1)
+                    service_inefficiency = self._get_cost_differential_for_agent_assignment(
+                        demands=demands, new_shifts=optimal_shifts, old_shifts=shifts)
                 results.append(service_inefficiency)
                 chosen_indices.append(list(range(bounds[0], (bounds[1] + 1))))
                 chosen_columns.append(j)
@@ -119,13 +134,16 @@ class SchedulerGreedy(Scheduler):
                     indices = list(range(i, i + self.number_intervals_per_agent))
                     tmp = shifts.copy()
                     tmp[indices, column] = tmp[indices, column] + 1
-                    if current_search_depth == self.search_depth:
+                    if current_search_depth == self.search_depth or self._check_demand_satisfied(shifts=tmp,
+                                                                                                 demands=demands):
                         service_inefficiency = self._get_cost_differential_for_agent_assignment(new_shifts=tmp,
                                                                                                 old_shifts=shifts,
                                                                                                 demands=demands)
                     else:
-                        service_inefficiency = self._get_optimal_next_agent(demands=demands, shifts=tmp, current_search_depth+1)
-                results.append(service_inefficiency)
+                        optimal_shifts = self._get_optimal_next_agent(demands=demands, shifts=tmp,
+                                                                      current_search_depth=current_search_depth+1)
+                        service_inefficiency = self._get_cost_differential_for_agent_assignment(
+                            demands=demands, new_shifts=optimal_shifts, old_shifts=shifts)
                     results.append(service_inefficiency)
                     chosen_indices.append(indices)
                     chosen_columns.append(column)
@@ -161,7 +179,8 @@ if __name__ == "__main__":
                           17, 17, 14, 10, 7]
     start = datetime.datetime.now()
     scheduler = SchedulerGreedy(demands=agents_per_hour, lunch_time=2,
-                                number_intervals_per_agent=17, lunch_time_border=6)
+                                number_intervals_per_agent=17, lunch_time_border=6,
+                                search_depth=1)
     resulting_shifts = scheduler.solve()
     print("Took {} time!".format(datetime.datetime.now() - start))
     print(np.sum(resulting_shifts, axis=1))
