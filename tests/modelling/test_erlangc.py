@@ -32,6 +32,14 @@ class ErlangCTester(unittest.TestCase):
         erlang = ErlangC()
         return erlang.get_mean_waiting_time(lambda_=lambda_, mu=mu, number_agents=number_agents)
 
+    def get_number_agents_for_chat(self, lambda_: float, mu: float, abort_prob: float, max_sessions: int,
+                                   share_sequential_work: float, max_waiting_time: int):
+        erlang = ErlangC()
+        return erlang.get_number_agents_for_chat(lambda_=lambda_, mu=mu,
+                                                 abort_prob=abort_prob, max_sessions=max_sessions,
+                                                 share_sequential_work=share_sequential_work,
+                                                 max_waiting_time=max_waiting_time)
+
     def test_get_max_waiting_probability(self):
         prob = self.get_max_waiting_probability(lambda_=0.1, mu=0.0033, number_agents=35, max_waiting_time=20)
         self.assertEqual(prob, 0.7710233599946846)
@@ -81,3 +89,6 @@ class ErlangCTester(unittest.TestCase):
 
         prob = self.get_blocking_probability(lambda_=0.1, mu=0.0033, number_agents=20)
         self.assertEqual(prob, 0)
+
+    def test_get_number_agents_for_chat(self):
+        number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, max_waitringabort_prob=0.2, max_sessions=2, share_sequential_work=0.15)

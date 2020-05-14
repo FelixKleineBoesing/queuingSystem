@@ -106,3 +106,10 @@ def get_p0_for_mmc_system(workload: float, number_agents: int):
         return 1 / result
     else:
         return 0
+
+
+if __name__ == "__main__":
+    erlang = ErlangC()
+    res = erlang.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, max_waiting_time=20,
+                                      abort_prob=0.2, max_sessions=2, share_sequential_work=0.15)
+    print(res)

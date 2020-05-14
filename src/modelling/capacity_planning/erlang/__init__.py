@@ -1,6 +1,7 @@
-from src.modelling.capacity_planning.erlang.erlangcp import ErlangCP
+
 
 if __name__ == "__main__":
+    from src.modelling.capacity_planning.erlang.erlangcp import ErlangCP
     # lambda, mu and nu are defined in 1/second. Therefore, lambda= 1/10 means each 10 seconds someone arrives.
 
     lambda_ = 1/10
@@ -41,3 +42,6 @@ if __name__ == "__main__":
                                                       size_waiting_room=size_waiting_room)
     print("Average number customers in system: {}".format(res))
 
+    res = erlangcp.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, max_waiting_time=20, nu=0.05/3,
+                                              abort_prob=0.2, max_sessions=2, share_sequential_work=0.15)
+    print("Number of agents for chat ".format(res))

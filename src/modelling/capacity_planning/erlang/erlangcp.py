@@ -1,6 +1,6 @@
 from scipy.stats import gamma
 
-from src.modelling.capacity_planning.erlang import Optimizer
+from src.modelling.capacity_planning.erlang.optimizer import Optimizer
 from src.modelling.helpers import power_faculty
 
 
@@ -41,7 +41,7 @@ class ErlangCP(Optimizer):
         :return:
         """
         if size_waiting_room is None:
-            size_waiting_room = 9e20
+            size_waiting_room = 1000
         prob_zero = get_prob_for_pn_in_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                     size_waiting_room=size_waiting_room, persons_in_system=0)
         if prob_zero == 0:
@@ -71,7 +71,7 @@ class ErlangCP(Optimizer):
         :return:
         """
         if size_waiting_room is None:
-            size_waiting_room = 9e20
+            size_waiting_room = 1000
         prob_zero = get_prob_for_pn_in_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                     size_waiting_room=size_waiting_room, persons_in_system=0)
         res = 0
@@ -94,7 +94,7 @@ class ErlangCP(Optimizer):
         :return:
         """
         if size_waiting_room is None:
-            size_waiting_room = 9e20
+            size_waiting_room = 1000
         prob_zero = get_prob_for_pn_in_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                     size_waiting_room=size_waiting_room, persons_in_system=0)
         res = 0
@@ -117,7 +117,7 @@ class ErlangCP(Optimizer):
         :return:
         """
         if size_waiting_room is None:
-            size_waiting_room = 9e20
+            size_waiting_room = 1000
         prob_zero = get_prob_for_pn_in_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                     size_waiting_room=size_waiting_room, persons_in_system=0)
         res = 0
@@ -156,8 +156,24 @@ class ErlangCP(Optimizer):
         return self.get_mean_number_customer_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                        size_waiting_room=size_waiting_room) / lambda_
 
-    def get_number_agent_for_chat(self):
-        pass
+    def get_number_agents_for_chat(self, lambda_: float, mu: float, nu: float, max_waiting_time: int, abort_prob: float,
+                                   max_sessions: int, share_sequential_work: float, size_waiting_room: int = None):
+        """
+
+        :param lambda_:
+        :param mu:
+        :param max_waiting_time:
+        :param max_sessions:
+        :param share_sequential_work:
+        :return:
+        """
+        aht = 1 / lambda_
+        number_agents = self.minimize(self.get_max_waiting_probability,
+                                      kwargs={"mu": mu, "max_waiting_time": max_waiting_time, "nu": nu,
+                                              "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1)),
+                                              "size_waiting_room": size_waiting_room},
+                                      optim_argument="number_agents", target_value=abort_prob)
+        return number_agents / max_sessions
 
 
 def get_prob_for_pn_in_mmckm_system(lambda_: float, mu: float, nu: float, number_agents: int, size_waiting_room: int,
@@ -175,6 +191,7 @@ def get_prob_for_pn_in_mmckm_system(lambda_: float, mu: float, nu: float, number
     """
     prob_zero = 0
     number_agents = int(number_agents)
+
     for i in range(size_waiting_room + 1):
         prob_zero += get_cn_for_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents, n=i)
 
@@ -229,3 +246,6 @@ if __name__ == "__main__":
                                        size_waiting_room=80))
     print(erlang.get_mean_staying_time(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28,
                                        size_waiting_room=80))
+    res = erlang.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, max_waiting_time=20, nu=0.05/3,
+                                      abort_prob=0.2, max_sessions=2, share_sequential_work=0.15)
+    print(res)
