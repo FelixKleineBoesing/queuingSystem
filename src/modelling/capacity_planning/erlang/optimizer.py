@@ -54,6 +54,7 @@ class Optimizer:
             except Exception as e:
                 print(e)
 
+        # TODO find a way to get brackets for optimizing / user other minimize method
         result = minimize_scalar(optim_func)
         return target_type(result.x)
 

@@ -251,8 +251,8 @@ if __name__ == "__main__":
     print(erlang.get_max_waiting_probability(lambda_=50/900, mu=1/180, nu=1/180, number_agents=14, max_waiting_time=10))
     print(erlang.get_max_waiting_probability(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, size_waiting_room=80,
                                              max_waiting_time=20))
-    print(erlang.minimize(method=erlang.get_max_waiting_probability, kwargs=dict(lambda_=1/10, mu=1/240, nu=1/300,
-                                                                                 size_waiting_room=80, max_waiting_time=20),
+    print(erlang.minimize(method=erlang.get_max_waiting_probability,
+                          kwargs=dict(lambda_=1/10, mu=1/240, nu=1/300, size_waiting_room=80, max_waiting_time=20),
                           optim_argument="number_agents", target_value=0.8633721956843062))
     print(erlang.get_prob_for_abort(lambda_=1/10, mu=1/240, nu=1/30, number_agents=25, size_waiting_room=80))
     print(erlang.get_mean_queue_length(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, size_waiting_room=80))
@@ -263,5 +263,5 @@ if __name__ == "__main__":
     print(erlang.get_mean_staying_time(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28,
                                        size_waiting_room=80))
     res = erlang.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, max_waiting_time=20, nu=0.05/3,
-                                      abort_prob=0.2, max_sessions=2, share_sequential_work=0.15)
+                                            abort_prob=0.2, max_sessions=2, share_sequential_work=0.15)
     print(res)
