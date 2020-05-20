@@ -113,3 +113,4 @@ if __name__ == "__main__":
     res = erlang.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, max_waiting_time=20,
                                       abort_prob=0.2, max_sessions=2, share_sequential_work=0.15)
     print(res)
+    print(erlang.get_max_waiting_probability(lambda_=50/900, mu=1/180, number_agents=14, max_waiting_time=10))

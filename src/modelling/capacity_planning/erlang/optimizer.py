@@ -1,5 +1,6 @@
 import copy
 import inspect
+import numpy as np
 from types import MethodType, FunctionType
 from typing import Union
 from scipy.optimize import minimize_scalar
@@ -36,7 +37,7 @@ class Optimizer:
         assert optim_argument in args, "The optim_argument '{}' is not an argument of the specified function!".\
             format(optim_argument, method)
         for arg in kwargs.keys():
-            assert arg in args, "The supplied argument {} is no argument of function {}!".format(arg, str(func_inspect.name))
+            assert arg in args, "The supplied argument {} is no argument of function {}!".format(arg, str(method))
         for key, value in kwargs.items():
             assert isinstance(value, annotations[key]), "The supplied value for {} is of type {} and not of type {}".\
                 format(key, type(value), annotations[key])
@@ -46,9 +47,13 @@ class Optimizer:
 
         def optim_func(x):
             kwargs[optim_argument] = target_type(x)
-            res = (target_value - method(**kwargs)) ** 2
-            return res
+            try:
+                return (target_value - method(**kwargs)) ** 2
+            except AssertionError:
+                return np.Inf
+            except Exception as e:
+                print(e)
 
         result = minimize_scalar(optim_func)
-        return target_type(result.x) + 1
+        return target_type(result.x)
 
