@@ -39,7 +39,8 @@ class InboundPhoneController:
         return number_agents
 
     def get_volume_for_service_level(self, interval: int, number_agents: int, aht: int, service_level: float,
-                                     service_time: float, size_room: int, patience: int, retrial: float):
+                                     service_time: float, size_room: int = None, patience: int = None,
+                                     retrial: float = None):
         """
         calculates the volume that are that the given agents are able to handle with the specified arguments
 
