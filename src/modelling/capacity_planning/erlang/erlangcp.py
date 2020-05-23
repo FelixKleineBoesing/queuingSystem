@@ -185,7 +185,7 @@ class ErlangCP(Optimizer):
         assert share_sequential_work > 0
         aht = 1 / lambda_
         kwargs = {"mu": mu, "max_waiting_time": max_waiting_time, "nu": nu,
-                                              "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1))}
+                  "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1))}
         if size_waiting_room is not None:
             kwargs["size_waiting_room"] = size_waiting_room
         number_agents = self.minimize(self.get_max_waiting_probability,
@@ -248,6 +248,10 @@ def get_cn_for_mmckm_system(lambda_: float, mu: float, nu: float, number_agents:
 
 if __name__ == "__main__":
     erlang = ErlangCP()
+    erlang.plot_cost_function(method=erlang.get_max_waiting_probability,
+                              kwargs=dict(lambda_=1/10, mu=1/240, nu=1/300, size_waiting_room=80, max_waiting_time=20),
+                              optim_argument="number_agents", target_value=0.8633721956843062,
+                              boundaries=(-50, 50), steps=1000).show()
     print(erlang.get_max_waiting_probability(lambda_=50/900, mu=1/180, nu=1/180, number_agents=14, max_waiting_time=10))
     print(erlang.get_max_waiting_probability(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, size_waiting_room=80,
                                              max_waiting_time=20))
