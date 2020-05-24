@@ -4,6 +4,8 @@ import numpy as np
 import plotly.graph_objs as go
 from types import MethodType, FunctionType
 from typing import Union
+
+from pulp import LpProblem, LpMinimize
 from scipy.optimize import minimize_scalar
 
 
@@ -37,6 +39,10 @@ class Optimizer:
         optim_func, target_type = self.get_optim_func(method=method, kwargs=kwargs, optim_argument=optim_argument,
                                                       target_value=target_value)
         # TODO add integer optimization for int target_tyspe
+
+        if target_type == int:
+            problem = LpProblem("Integer Optimization", LpMinimize)
+            
         result = minimize_scalar(optim_func)
         return target_type(result.x)
 
