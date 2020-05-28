@@ -5,8 +5,9 @@ import plotly.graph_objs as go
 from types import MethodType, FunctionType
 from typing import Union
 
-from pulp import LpProblem, LpMinimize, LpVariable
 from scipy.optimize import minimize_scalar
+
+from src.modelling.capacity_planning.erlang.helpers import ArgumentParams
 
 
 class Optimizer:
@@ -19,10 +20,11 @@ class Optimizer:
         """
 
         """
-        self.argument_bounds = {}
+        self.argument_params = {}
 
-    def get_bounds(self, arg):
-        pass
+    def get_argument_params(self, arg: str) -> Union[ArgumentParams, None]:
+        if arg in self.argument_params:
+            return self.argument_params[arg]
 
     def minimize(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
                  target_value: Union[float, int]):
@@ -46,7 +48,10 @@ class Optimizer:
         # TODO find a way to get brackets for optimizing / user other minimize method
         optim_func, target_type = self.get_optim_func(method=method, kwargs=kwargs, optim_argument=optim_argument,
                                                       target_value=target_value)
-
+        argument_params = self.get_argument_params(optim_argument)
+        kwargs = {}
+        if argument_params is None:
+            kwargs["bounds"] = (argument_params.lower_bound, argument_params.upper_bound)
         result = minimize_scalar(optim_func)
         return target_type(result.x)
 
@@ -102,3 +107,5 @@ class Optimizer:
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=input_values, y=results, name="Loss Values", line={"width": 10, "color": "black"}))
         return fig
+
+
