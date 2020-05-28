@@ -5,7 +5,7 @@ import plotly.graph_objs as go
 from types import MethodType, FunctionType
 from typing import Union
 
-from pulp import LpProblem, LpMinimize
+from pulp import LpProblem, LpMinimize, LpVariable
 from scipy.optimize import minimize_scalar
 
 
@@ -15,6 +15,14 @@ class Optimizer:
     optimizable in terms of finding a fitting value for the missing argument.
     Therefore all arguments need a type annotation.
     """
+    def __init__(self):
+        """
+
+        """
+        self.argument_bounds = {}
+
+    def get_bounds(self, arg):
+        pass
 
     def minimize(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
                  target_value: Union[float, int]):
@@ -38,11 +46,7 @@ class Optimizer:
         # TODO find a way to get brackets for optimizing / user other minimize method
         optim_func, target_type = self.get_optim_func(method=method, kwargs=kwargs, optim_argument=optim_argument,
                                                       target_value=target_value)
-        # TODO add integer optimization for int target_tyspe
 
-        if target_type == int:
-            problem = LpProblem("Integer Optimization", LpMinimize)
-            
         result = minimize_scalar(optim_func)
         return target_type(result.x)
 
