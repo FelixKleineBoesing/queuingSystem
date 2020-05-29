@@ -17,14 +17,16 @@ class ArgumentParams:
 
     @property
     def upper_bound(self):
-        if self._lower_bound is None:
+        if self._upper_bound is None:
             return np.Inf
         else:
-            return self._lower_bound
+            return self._upper_bound
 
     @property
     def start(self):
-        if self._start is None:
-            return 0
-        else:
-            return self._start
+        return self._start
+
+    @start.setter
+    def start(self, start):
+        self._start = start
+

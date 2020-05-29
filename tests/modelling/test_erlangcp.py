@@ -1,6 +1,6 @@
 import unittest
 
-from src.modelling.capacity_planning.erlang.erlangcp import ErlangCP
+from src.modelling.capacity_planning.erlang.erlanga import ErlangCP
 
 # TODO add the other methods to the tester
 

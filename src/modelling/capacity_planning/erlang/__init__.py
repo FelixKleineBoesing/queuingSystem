@@ -1,7 +1,7 @@
 
 
 if __name__ == "__main__":
-    from src.modelling.capacity_planning.erlang.erlangcp import ErlangCP
+    from src.modelling.capacity_planning.erlang.erlanga import ErlangCP
     # lambda, mu and nu are defined in 1/second. Therefore, lambda= 1/10 means each 10 seconds someone arrives.
 
     lambda_ = 1/10

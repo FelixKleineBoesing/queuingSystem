@@ -5,27 +5,17 @@ import plotly.graph_objs as go
 from types import MethodType, FunctionType
 from typing import Union
 
-from scipy.optimize import minimize_scalar
+from scipy.optimize import minimize_scalar, minimize
 
-from src.modelling.capacity_planning.erlang.helpers import ArgumentParams
+from src.modelling.capacity_planning.erlang.erlang_arguments_mixin import ErlangArgumentsMixin
 
 
-class Optimizer:
+class Optimizer(ErlangArgumentsMixin):
     """
     The Optimizer is a helper class that can be inherited to any class to make any method of the origin class
     optimizable in terms of finding a fitting value for the missing argument.
     Therefore all arguments need a type annotation.
     """
-    def __init__(self):
-        """
-
-        """
-        self.argument_params = {}
-
-    def get_argument_params(self, arg: str) -> Union[ArgumentParams, None]:
-        if arg in self.argument_params:
-            return self.argument_params[arg]
-
     def minimize(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
                  target_value: Union[float, int]):
         """
@@ -48,12 +38,18 @@ class Optimizer:
         # TODO find a way to get brackets for optimizing / user other minimize method
         optim_func, target_type = self.get_optim_func(method=method, kwargs=kwargs, optim_argument=optim_argument,
                                                       target_value=target_value)
-        argument_params = self.get_argument_params(optim_argument)
-        kwargs = {}
-        if argument_params is None:
-            kwargs["bounds"] = (argument_params.lower_bound, argument_params.upper_bound)
-        result = minimize_scalar(optim_func)
-        return target_type(result.x)
+        argument_params = self.get_argument_params(optim_argument, **kwargs)
+        minimize_args = {}
+        if argument_params is not None:
+            minimize_args["bounds"] = (argument_params.lower_bound, argument_params.upper_bound)
+            if argument_params.start is not None:
+                minimize_args["bracket"] = (argument_params.start, argument_params.start + 1)
+        result = minimize(optim_func, np.array((argument_params.start, )), method="Nelder-Mead")
+        value = target_type(result.x)
+        kwargs[optim_argument] = value
+        validation = method(**kwargs)
+
+        return value
 
     def get_optim_func(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
                        target_value: Union[float, int]):
@@ -83,7 +79,7 @@ class Optimizer:
         return optim_func, target_type
 
     def plot_cost_function(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
-                 target_value: Union[float, int], boundaries: tuple, steps: int = 100):
+                           target_value: Union[float, int], boundaries: tuple, steps: int = 100):
         """
         plots the cost function with the change of the optim arguments
 
@@ -91,6 +87,8 @@ class Optimizer:
         :param kwargs:
         :param optim_argument:
         :param target_value:
+        :param boundaries:
+        :param steps:
         :return:
         """
         optim_func, target_type = self.get_optim_func(method=method, kwargs=kwargs, optim_argument=optim_argument,

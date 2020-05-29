@@ -171,9 +171,13 @@ class ErlangCP(Optimizer):
 
         :param lambda_:
         :param mu:
+        :param nu;
         :param max_waiting_time:
+        :param abort_prob
         :param max_sessions:
         :param share_sequential_work:
+        :param size_waiting_room:
+
         :return:
         """
         assert lambda_ > 0
@@ -251,13 +255,17 @@ if __name__ == "__main__":
     erlang.plot_cost_function(method=erlang.get_max_waiting_probability,
                               kwargs=dict(lambda_=1/10, mu=1/240, nu=1/300, size_waiting_room=80, max_waiting_time=20),
                               optim_argument="number_agents", target_value=0.8633721956843062,
-                              boundaries=(-50, 50), steps=1000).show()
+                              boundaries=(1, 50), steps=1000).show()
     print(erlang.get_max_waiting_probability(lambda_=50/900, mu=1/180, nu=1/180, number_agents=14, max_waiting_time=10))
     print(erlang.get_max_waiting_probability(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, size_waiting_room=80,
                                              max_waiting_time=20))
     print(erlang.minimize(method=erlang.get_max_waiting_probability,
                           kwargs=dict(lambda_=1/10, mu=1/240, nu=1/300, size_waiting_room=80, max_waiting_time=20),
                           optim_argument="number_agents", target_value=0.8633721956843062))
+    print(erlang.minimize(method=erlang.get_max_waiting_probability,
+                          kwargs=dict(lambda_=50/900, mu=1/180, nu=1/180, size_waiting_room=80, max_waiting_time=20),
+                          optim_argument="number_agents", target_value=0.8633721956843062))
+
     print(erlang.get_prob_for_abort(lambda_=1/10, mu=1/240, nu=1/30, number_agents=25, size_waiting_room=80))
     print(erlang.get_mean_queue_length(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, size_waiting_room=80))
     print(erlang.get_mean_number_customer_in_system(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28,
