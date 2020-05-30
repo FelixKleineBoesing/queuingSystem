@@ -9,7 +9,7 @@ class CapacityPlanningInboundPhoneTester(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.controller = InboundPhoneController()
 
-    def test_get_number_agents_foadssr_service_level(self):
+    def test_get_number_agents_for_service_level(self):
         interval = 15 * 60
         volume = 50
         aht = 180
