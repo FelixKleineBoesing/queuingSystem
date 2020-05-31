@@ -46,6 +46,7 @@ class Optimizer(ErlangArgumentsMixin):
             minimize_args["bounds"] = (argument_params.lower_bound, argument_params.upper_bound)
             if argument_params.start is not None:
                 minimize_args["bracket"] = (argument_params.start, argument_params.start + 1)
+        # TODO use an algorithm that will fit the integer problem
         result = minimize(optim_func, argument_params.start, method="Nelder-Mead")
         value = target_type(result.x)
 
@@ -120,7 +121,8 @@ class Optimizer(ErlangArgumentsMixin):
                 else:
                     x_point, y_point = lower_key, lower_value
 
-                loss_difference = ((loss - y_point) / (kwargs[optim_argument] - x_point)) * (kwargs[optim_argument] - x)
+                loss_difference = ((loss - y_point) / abs(kwargs[optim_argument] - x_point)) * \
+                                  abs(kwargs[optim_argument] - x)
                 if np.isfinite(loss_difference):
                     loss = loss + loss_difference
 
