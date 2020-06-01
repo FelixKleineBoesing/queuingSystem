@@ -1,5 +1,7 @@
 import copy
 import inspect
+import traceback
+
 import numpy as np
 import logging
 import plotly.graph_objs as go
@@ -49,6 +51,8 @@ class Optimizer(ErlangArgumentsMixin):
         # TODO use an algorithm that will fit the integer problem
         result = minimize(optim_func, argument_params.start, method="Nelder-Mead")
         value = target_type(result.x)
+        if target_type is int:
+            value += 1
 
         valid, difference = self.validate_result(value=value, target_value=target_value, kwargs=kwargs,
                                                  optim_argument=optim_argument, method=method, tolerance=tolerance)
@@ -68,6 +72,7 @@ class Optimizer(ErlangArgumentsMixin):
         """
         kwargs[optim_argument] = value
         validation = method(**kwargs)
+        print(validation)
         return validation * (1 - tolerance) < target_value < validation * (1 + tolerance), (validation - value) / value
 
     def get_optim_func(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
@@ -103,14 +108,24 @@ class Optimizer(ErlangArgumentsMixin):
         losses = SortedDict()
 
         def optim_func(x):
-            kwargs[optim_argument] = target_type(x)
             try:
+                if target_type(x) + 1 not in losses:
+                    kwargs[optim_argument] = target_type(x) + 1
+                    loss = (target_value - method(**kwargs)) ** 2
+                    losses[kwargs[optim_argument]] = loss
+
+                if target_type(x) - 1 not in losses:
+                    kwargs[optim_argument] = target_type(x) - 1
+                    loss = (target_value - method(**kwargs)) ** 2
+                    losses[kwargs[optim_argument]] = loss
+
+                kwargs[optim_argument] = target_type(x)
                 if kwargs[optim_argument] not in losses:
-                    # TODO  calculate loss for neighbour integers and interpolate between to avoid wrong gradients
                     loss = (target_value - method(**kwargs)) ** 2
                     losses[kwargs[optim_argument]] = loss
                 else:
                     loss = losses[kwargs[optim_argument]]
+
                 index = losses.index(kwargs[optim_argument])
                 lower_key, lower_value = losses.peekitem(index - 1)
                 if index + 1 < len(losses):
@@ -125,13 +140,14 @@ class Optimizer(ErlangArgumentsMixin):
                 loss_difference = ((loss - y_point) / abs(kwargs[optim_argument] - x_point)) * \
                                   abs(kwargs[optim_argument] - x)
                 if np.isfinite(loss_difference):
-                    loss = loss + loss_difference
+                    loss = loss - loss_difference
 
                 return loss
             except AssertionError:
                 return np.Inf
             except Exception as e:
                 print(e)
+                print(traceback.format_exc())
         return optim_func
 
     def _get_float_optim_func(self, kwargs: dict, optim_argument: str, target_type: type, target_value: float, method):
@@ -144,6 +160,7 @@ class Optimizer(ErlangArgumentsMixin):
             except AssertionError:
                 return np.Inf
             except Exception as e:
+                print(traceback.format_exc())
                 print(e)
         return optim_func
 
