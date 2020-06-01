@@ -106,6 +106,7 @@ class Optimizer(ErlangArgumentsMixin):
             kwargs[optim_argument] = target_type(x)
             try:
                 if kwargs[optim_argument] not in losses:
+                    # TODO  calculate loss for neighbour integers and interpolate between to avoid wrong gradients
                     loss = (target_value - method(**kwargs)) ** 2
                     losses[kwargs[optim_argument]] = loss
                 else:

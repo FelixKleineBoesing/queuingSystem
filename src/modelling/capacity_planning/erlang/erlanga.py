@@ -255,7 +255,7 @@ if __name__ == "__main__":
     erlang.plot_cost_function(method=erlang.get_max_waiting_probability,
                               kwargs=dict(lambda_=1/10, mu=1/240, nu=1/300, size_waiting_room=80, max_waiting_time=20),
                               optim_argument="number_agents", target_value=0.8633721956843062,
-                              boundaries=(1, 50), steps=1000).show()
+                              boundaries=(1, 50), steps=100).show()
     print(erlang.get_max_waiting_probability(lambda_=50/900, mu=1/180, nu=1/180, number_agents=14, max_waiting_time=10))
     print(erlang.get_max_waiting_probability(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, size_waiting_room=80,
                                              max_waiting_time=20))
