@@ -30,7 +30,7 @@ class SchedulerSemiGreedyTester(unittest.TestCase):
                                                            32.0, 50.0, 46.0, 47.0, 40.0, 41.0, 45.0, 38.0, 38.0, 37.0,
                                                            35.0, 30.0, 26.0, 26.0, 17.0, 14.0, 10.0, 7.0])
 
-        self.assertTrue(duration.total_seconds() < 0.100, "Solve took longer than 100 milliseonds. "
+        self.assertTrue(duration.total_seconds() < 0.200, "Solve took longer than 200 milliseonds. "
                                                           "There must be something wrong with the algorithm!")
 
     def test_check_number_of_lunch_times_to_assign(self):
