@@ -8,53 +8,95 @@ class CapacityPlanningInboundPhoneTester(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.controller = InboundPhoneController()
+        cls.interval = [15 * 60, 10 * 60]
+        cls.volume = [50, 40]
+        cls.aht = [180, 170]
+        cls.service_level = [0.9, 0.85]
+        cls.service_time = [10, 15]
+        cls.size_room = [100, 120]
+        cls.patience = [180, 190]
+        cls.retrial = [0.15, 0.25]
+        cls.number_agents = [14, 15]
+        cls.asa = [50, 60]
 
-    def test_get_number_agents_for_service_level(self):
-        interval = 15 * 60
-        volume = 50
-        aht = 180
-        service_level = 0.9
-        service_time = 10
-        number_agents = self.controller.get_number_agents_for_service_level(interval=interval, volume=volume, aht=aht,
-                                                                            service_level=service_level,
-                                                                            service_time=service_time)
-        print(number_agents)
+    def test_get_number_agents_for_service_level_list(self):
+        number_agents = self.controller.get_number_agents_for_service_level(interval=self.interval,
+                                                                            volume=self.volume,
+                                                                            aht=self.aht,
+                                                                            service_level=self.service_level,
+                                                                            service_time=self.service_time)
+        self.assertTrue(isinstance(number_agents, list))
+        self.assertEqual(number_agents[0], 15)
+        self.assertEqual(number_agents[0], 16)
 
-        size_room = 100
-        patience = 180
-        retrial = 0.15
-        number_agents = self.controller.get_number_agents_for_service_level(interval=interval, volume=volume,
-                                                                            aht=aht, service_level=service_level,
-                                                                            service_time=service_time,
-                                                                            size_room=size_room, patience=patience,
-                                                                            retrial=retrial)
-        print(number_agents)
+        number_agents = self.controller.get_number_agents_for_service_level(interval=self.interval,
+                                                                            volume=self.volume,
+                                                                            aht=self.aht,
+                                                                            service_level=self.service_level,
+                                                                            service_time=self.service_time,
+                                                                            size_room=self.size_room,
+                                                                            patience=self.patience,
+                                                                            retrial=self.retrial)
+        self.assertTrue(isinstance(number_agents, list))
+        self.assertEqual(number_agents[0], 14)
+        self.assertEqual(number_agents[0], 15)
 
     def test_get_volume_for_service_level(self):
-        interval = 15 * 60
-        number_agents = 14
-        aht = 180
-        service_level = 0.9
-        service_time = 10
-        lambda_ = self.controller.get_volume_for_service_level(interval=interval, number_agents=number_agents,
-                                                               aht=aht,
-                                                               service_level=service_level,
-                                                               service_time=service_time)
-        print(lambda_)
+        volume = self.controller.get_volume_for_service_level(interval=self.interval,
+                                                              number_agents=self.number_agents,
+                                                              aht=self.aht,
+                                                              service_level=self.service_level,
+                                                              service_time=self.service_time)
+        print(volume)
 
-        size_room = 100
-        patience = 180
-        retrial = 0.15
-        lambda_ = self.controller.get_volume_for_service_level(interval=interval, number_agents=number_agents,
-                                                               aht=aht, service_level=service_level,
-                                                               service_time=service_time,
-                                                               size_room=size_room, patience=patience,
-                                                               retrial=retrial)
+        volume = self.controller.get_volume_for_service_level(interval=self.interval,
+                                                              number_agents=self.number_agents,
+                                                              aht=self.aht,
+                                                              service_level=self.service_level,
+                                                              service_time=self.service_time,
+                                                              size_room=self.size_room,
+                                                              patience=self.patience,
+                                                              retrial=self.retrial)
 
-        print(lambda_)
+        print(volume)
 
     def test_get_number_agents_for_average_waiting_time(self):
-        pass
+        number_agents = self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
+                                                                                   volume=self.volume,
+                                                                                   aht=self.aht,
+                                                                                   asa=self.asa)
+        self.assertTrue(isinstance(number_agents, list))
+        self.assertEqual(number_agents[0], 58)
+        self.assertEqual(number_agents[0], 58)
+
+        number_agents = self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
+                                                                                   volume=self.volume,
+                                                                                   aht=self.aht,
+                                                                                   asa=self.asa,
+                                                                                   size_room=self.size_room,
+                                                                                   patience=self.patience,
+                                                                                   retrial=self.retrial)
+        self.assertTrue(isinstance(number_agents, list))
+        self.assertEqual(number_agents[0], 8)
+        self.assertEqual(number_agents[0], 8)
 
     def test_get_volume_for_average_waiting_time(self):
-        pass
+        volume = self.controller.get_volume_for_average_waiting_time(interval=self.interval,
+                                                                     number_agents=self.number_agents,
+                                                                     aht=self.aht,
+                                                                     asa=self.asa,
+                                                                     service_level=self.service_level,
+                                                                     service_time=self.service_time)
+        print(volume)
+
+        volume = self.controller.get_volume_for_average_waiting_time(interval=self.interval,
+                                                                     number_agents=self.number_agents,
+                                                                     aht=self.aht,
+                                                                     asa=self.asa,
+                                                                     service_level=self.service_level,
+                                                                     service_time=self.service_time,
+                                                                     size_room=self.size_room,
+                                                                     patience=self.patience,
+                                                                     retrial=self.retrial)
+
+        print(volume)

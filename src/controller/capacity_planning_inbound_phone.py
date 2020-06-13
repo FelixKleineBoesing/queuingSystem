@@ -1,11 +1,19 @@
+import inspect
+from typing import Union, List
+
+from src.controller.helpers import IntList, FloatList, check_length_list_equality
+from src.misc.helper_functions import annotation_type_checker
 from src.modelling.capacity_planning import ErlangC, ErlangCP
 
 
 class InboundPhoneController:
 
-    def get_number_agents_for_service_level(self, interval: int, volume: float, aht: int, service_level: float,
-                                            service_time: float, size_room: int = None,
-                                            patience: int = None, retrial: float = None):
+    @annotation_type_checker
+    @check_length_list_equality
+    def get_number_agents_for_service_level(self, interval: IntList, volume: FloatList, aht: IntList,
+                                            service_level: FloatList, service_time: FloatList,
+                                            size_room: IntList = None, patience: IntList = None,
+                                            retrial: FloatList = None) -> IntList:
         """
         calculates the number of agents that are required to hit the specified values
 
@@ -17,30 +25,47 @@ class InboundPhoneController:
         :param size_room: size of the waiting room
         :param patience: average patience in seconds
         :param retrial: how many percent of the people dial
+
         :return:
         """
-        kwargs = {}
-        kwargs["lambda_"] = volume / interval
-        kwargs["mu"] = 1 / aht
-        kwargs["max_waiting_time"] = service_time
+        func_args = locals()
+        func_inspect = inspect.getfullargspec(self.get_number_agents_for_service_level).args
+        func_inspect.remove("self")
+        func_args = {key: value for key, value in func_args.items() if key in func_inspect and value is not None}
 
-        if patience is not None or size_room is not None or retrial is not None:
-            assert patience is not None, "patience has to be not none when size room is selected"
-            erlang = ErlangCP()
-            kwargs["nu"] = 1 / patience
-            if size_room is not None:
-                kwargs["size_waiting_room"] = size_room
-            #kwargs["retrial"] = retrial
+        def func(interval: int, volume: float, aht: int, service_level: float, service_time: float,
+                 size_room: int = None, patience: int = None, retrial: float = None):
+            kwargs = {"lambda_": volume / interval, "mu": 1 / aht, "max_waiting_time": service_time}
+
+            if patience is not None or size_room is not None or retrial is not None:
+                assert patience is not None, "patience has to be not none when size room is selected"
+                erlang = ErlangCP()
+                kwargs["nu"] = 1 / patience
+                if size_room is not None:
+                    kwargs["size_waiting_room"] = size_room
+                # kwargs["retrial"] = retrial
+            else:
+                erlang = ErlangC()
+            number_agents = erlang.minimize(erlang.get_max_waiting_probability, kwargs=kwargs,
+                                            optim_argument="number_agents", target_value=service_level)
+
+            return number_agents
+
+        if isinstance(interval, int):
+            return func(**func_args)
         else:
-            erlang = ErlangC()
-        number_agents = erlang.minimize(erlang.get_max_waiting_probability, kwargs=kwargs,
-                                        optim_argument="number_agents", target_value=service_level)
+            number_agents_list = []
+            for i in range(len(interval)):
+                args = {key: value[i] for key, value in func_args.items()}
+                number_agents_list.append(func(**args))
+            return number_agents_list
 
-        return number_agents
 
-    def get_volume_for_service_level(self, interval: int, number_agents: int, aht: int, service_level: float,
-                                     service_time: float, size_room: int = None, patience: int = None,
-                                     retrial: float = None):
+    @annotation_type_checker
+    @check_length_list_equality
+    def get_volume_for_service_level(self, interval: IntList, number_agents: IntList, aht: IntList,
+                                     service_level: FloatList, service_time: FloatList, size_room: IntList = None,
+                                     patience: IntList = None, retrial: FloatList = None):
         """
         calculates the volume that are that the given agents are able to handle with the specified arguments
 
@@ -52,29 +77,47 @@ class InboundPhoneController:
         :param size_room: size of the waiting room
         :param patience: average patience in seconds
         :param retrial: how many percent of the people dial
+
         :return:
         """
-        kwargs = {}
-        kwargs["number_agents"] = number_agents
-        kwargs["mu"] = 1 / aht
-        kwargs["max_waiting_time"] = service_time
-        max_waiting_target = 1 - service_level
+        func_args = locals()
+        func_inspect = inspect.getfullargspec(self.get_volume_for_service_level).args
+        func_inspect.remove("self")
+        func_args = {key: value for key, value in func_args.items() if key in func_inspect and value is not None}
 
-        if patience is not None or size_room is not None or retrial is not None:
-            assert patience is not None, "patience has to be not none when size room is selected"
-            erlang = ErlangCP()
-            kwargs["nu"] = 1 /patience
-            kwargs["size_waiting_room"] = size_room
-            #kwargs["retrial"] = retrial
+        def func(interval: int, number_agents: int, aht: int, service_level: float, service_time: float,
+                 size_room: int = None, patience: int = None, retrial: float = None):
+
+            kwargs = {"number_agents": number_agents, "mu": 1 / aht, "max_waiting_time": service_time}
+            max_waiting_target = 1 - service_level
+
+            if patience is not None or size_room is not None or retrial is not None:
+                assert patience is not None, "patience has to be not none when size room is selected"
+                erlang = ErlangCP()
+                kwargs["nu"] = 1 /patience
+                kwargs["size_waiting_room"] = size_room
+                #kwargs["retrial"] = retrial
+            else:
+                erlang = ErlangC()
+            lambda_ = erlang.minimize(erlang.get_max_waiting_probability, kwargs=kwargs,
+                                      optim_argument="lambda_", target_value=max_waiting_target)
+
+            return lambda_ * interval
+
+        if isinstance(interval, int):
+            return func(**func_args)
         else:
-            erlang = ErlangC()
-        lambda_ = erlang.minimize(erlang.get_max_waiting_probability, kwargs=kwargs,
-                                  optim_argument="lambda_", target_value=max_waiting_target)
+            volumes = []
+            for i in range(len(interval)):
+                args = {key: value[i] for key, value in func_args.items()}
+                volumes.append(func(**args))
+            return volumes
 
-        return lambda_ * interval
-
-    def get_number_agents_for_average_waiting_time(self, interval: int, volume: float, aht: int, asa: int,
-                                                size_room: int, patience: int, retrial: float):
+    @annotation_type_checker
+    @check_length_list_equality
+    def get_number_agents_for_average_waiting_time(self, interval: IntList, volume: FloatList, aht: IntList, asa: IntList,
+                                                   size_room: IntList = None, patience: IntList = None,
+                                                   retrial: FloatList = None):
         """
         calculates the number of agents that are required to hit the specified waiting time
 
@@ -85,27 +128,44 @@ class InboundPhoneController:
         :param size_room: size of the waiting room
         :param patience: average patience in seconds
         :param retrial: how many percent of the people dial
+
         :return:
         """
-        kwargs = {}
-        kwargs["lambda_"] = volume / interval
-        kwargs["mu"] = 1 / aht
+        func_args = locals()
+        func_inspect = inspect.getfullargspec(self.get_number_agents_for_average_waiting_time).args
+        func_inspect.remove("self")
+        func_args = {key: value for key, value in func_args.items() if key in func_inspect and value is not None}
 
-        if patience is not None or size_room is not None or retrial is not None:
-            assert patience is not None, "patience has to be not none when size room is selected"
-            erlang = ErlangCP()
-            kwargs["nu"] = 1 / patience
-            kwargs["size_waiting_room"] = size_room
-            #kwargs["retrial"] = retrial
+        def func(interval: int, volume: float, aht: int, asa: int, size_room: int = None, patience: int = None,
+                 retrial: float = None):
+            kwargs = {"lambda_": volume / interval, "mu": 1 / aht}
+
+            if patience is not None or size_room is not None or retrial is not None:
+                assert patience is not None, "patience has to be not none when size room is selected"
+                erlang = ErlangCP()
+                kwargs["nu"] = 1 / patience
+                kwargs["size_waiting_room"] = size_room
+                #kwargs["retrial"] = retrial
+            else:
+                erlang = ErlangC()
+            number_agents = erlang.minimize(erlang.get_mean_waiting_time, kwargs=kwargs,
+                                            optim_argument="number_agents", target_value=asa)
+
+            return number_agents
+
+        if isinstance(interval, int):
+            return func(**func_args)
         else:
-            erlang = ErlangC()
-        number_agents = erlang.minimize(erlang.get_mean_waiting_time, kwargs=kwargs,
-                                        optim_argument="number_agents", target_value=asa)
+            number_agents_list = []
+            for i in range(len(interval)):
+                args = {key: value[i] for key, value in func_args.items()}
+                number_agents_list.append(func(**args))
+            return number_agents_list
 
-        return number_agents
-
-    def get_volume_for_average_waiting_time(self, interval: int, number_agents: float, aht: int, asa: int,
-                                            size_room: int, patience: int, retrial: float):
+    @annotation_type_checker
+    @check_length_list_equality
+    def get_volume_for_average_waiting_time(self, interval: IntList, number_agents: IntList, aht: IntList,
+                                            asa: IntList, size_room: IntList, patience: IntList, retrial: FloatList):
         """
         calculates the volume that the
 
@@ -118,19 +178,34 @@ class InboundPhoneController:
         :param retrial: how many percent of the people dial
         :return:
         """
-        kwargs = {}
-        kwargs["number_agents"] = number_agents
-        kwargs["mu"] = 1 / aht
+        func_args = locals()
+        func_inspect = inspect.getfullargspec(self.get_volume_for_average_waiting_time).args
+        func_inspect.remove("self")
+        func_args = {key: value for key, value in func_args.items() if key in func_inspect and value is not None}
 
-        if patience is not None or size_room is not None or retrial is not None:
-            assert patience is not None, "patience has to be not none when size room is selected"
-            erlang = ErlangCP()
-            kwargs["nu"] = 1 / patience
-            kwargs["size_waiting_room"] = size_room
-            #kwargs["retrial"] = retrial
+        def func(interval: int, number_agents: int, aht: int, asa: int, size_room: int = None,
+                 patience: int = None, retrial: float = None):
+            kwargs = {"number_agents": number_agents, "mu": 1 / aht}
+
+            if patience is not None or size_room is not None or retrial is not None:
+                assert patience is not None, "patience has to be not none when size room is selected"
+                erlang = ErlangCP()
+                kwargs["nu"] = 1 / patience
+                kwargs["size_waiting_room"] = size_room
+                #kwargs["retrial"] = retrial
+            else:
+                erlang = ErlangC()
+            lambda_ = erlang.minimize(erlang.get_mean_waiting_time, kwargs=kwargs,
+                                      optim_argument="lambda_", target_value=asa)
+
+            return lambda_ * interval
+
+        if isinstance(interval, int):
+            return func(**func_args)
         else:
-            erlang = ErlangC()
-        lambda_ = erlang.minimize(erlang.get_mean_waiting_time, kwargs=kwargs,
-                                        optim_argument="lambda_", target_value=asa)
+            volumes = []
+            for i in range(len(interval)):
+                args = {key: value[i] for key, value in func_args.items()}
+                volumes.append(func(**args))
+            return volumes
 
-        return lambda_ * interval
