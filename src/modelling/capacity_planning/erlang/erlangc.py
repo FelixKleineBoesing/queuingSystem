@@ -37,8 +37,11 @@ class ErlangC(Optimizer):
         :return:
         """
         workload = lambda_ / mu
-        return power_faculty(workload, number_agents) * number_agents / (number_agents - workload) * \
-               get_p0_for_mmc_system(workload=workload, number_agents=number_agents)
+        p_zero = get_p0_for_mmc_system(workload=workload, number_agents=number_agents)
+        if p_zero != 0 and number_agents - workload != 0:
+            return power_faculty(workload, number_agents) * number_agents / (number_agents - workload) * p_zero
+        else:
+            return 0.0
 
     def get_mean_queue_length(self, lambda_: float, mu: float, number_agents: int) -> float:
         """
@@ -73,8 +76,11 @@ class ErlangC(Optimizer):
         :param number_agents:
         :return:
         """
-        return self.get_blocking_probability(lambda_=lambda_, mu=mu, number_agents=number_agents) / \
-               (number_agents * mu - lambda_) + 1 / mu
+        if (number_agents * mu - lambda_) == 0.0:
+            return 0.0
+        else:
+            return self.get_blocking_probability(lambda_=lambda_, mu=mu, number_agents=number_agents) / \
+                   (number_agents * mu - lambda_) + 1 / mu
 
     def get_number_agents_for_chat(self, lambda_: float, mu: float, max_waiting_time: int, abort_prob: float,
                                    max_sessions: int, share_sequential_work: float):
@@ -99,8 +105,8 @@ def get_p0_for_mmc_system(workload: float, number_agents: int):
     result = 0
     for i in range(number_agents):
         result += power_faculty(workload, i)
-
-    result += power_faculty(workload, number_agents) * number_agents / (number_agents - workload)
+    if number_agents - workload != 0.0:
+        result += power_faculty(workload, number_agents) * number_agents / (number_agents - workload)
 
     if result > 0:
         return 1 / result

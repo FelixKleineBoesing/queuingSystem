@@ -27,7 +27,7 @@ class CapacityPlanningInboundPhoneTester(unittest.TestCase):
                                                                             service_time=self.service_time)
         self.assertTrue(isinstance(number_agents, list))
         self.assertEqual(number_agents[0], 15)
-        self.assertEqual(number_agents[0], 16)
+        self.assertEqual(number_agents[1], 16)
 
         number_agents = self.controller.get_number_agents_for_service_level(interval=self.interval,
                                                                             volume=self.volume,
@@ -39,7 +39,7 @@ class CapacityPlanningInboundPhoneTester(unittest.TestCase):
                                                                             retrial=self.retrial)
         self.assertTrue(isinstance(number_agents, list))
         self.assertEqual(number_agents[0], 14)
-        self.assertEqual(number_agents[0], 15)
+        self.assertEqual(number_agents[1], 15)
 
     def test_get_volume_for_service_level(self):
         volume = self.controller.get_volume_for_service_level(interval=self.interval,
@@ -47,7 +47,9 @@ class CapacityPlanningInboundPhoneTester(unittest.TestCase):
                                                               aht=self.aht,
                                                               service_level=self.service_level,
                                                               service_time=self.service_time)
-        print(volume)
+        self.assertTrue(isinstance(volume, list))
+        self.assertEqual(volume[0], 68.578125)
+        self.assertEqual(volume[1], 51.49356617647059)
 
         volume = self.controller.get_volume_for_service_level(interval=self.interval,
                                                               number_agents=self.number_agents,
@@ -58,7 +60,9 @@ class CapacityPlanningInboundPhoneTester(unittest.TestCase):
                                                               patience=self.patience,
                                                               retrial=self.retrial)
 
-        print(volume)
+        self.assertTrue(isinstance(volume, list))
+        self.assertEqual(volume[0], 100.40624999999999)
+        self.assertEqual(volume[1], 71.6773897058823)
 
     def test_get_number_agents_for_average_waiting_time(self):
         number_agents = self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
@@ -67,7 +71,7 @@ class CapacityPlanningInboundPhoneTester(unittest.TestCase):
                                                                                    asa=self.asa)
         self.assertTrue(isinstance(number_agents, list))
         self.assertEqual(number_agents[0], 58)
-        self.assertEqual(number_agents[0], 58)
+        self.assertEqual(number_agents[1], 11)
 
         number_agents = self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
                                                                                    volume=self.volume,
@@ -78,25 +82,25 @@ class CapacityPlanningInboundPhoneTester(unittest.TestCase):
                                                                                    retrial=self.retrial)
         self.assertTrue(isinstance(number_agents, list))
         self.assertEqual(number_agents[0], 8)
-        self.assertEqual(number_agents[0], 8)
+        self.assertEqual(number_agents[1], 8)
 
     def test_get_volume_for_average_waiting_time(self):
-        volume = self.controller.get_volume_for_average_waiting_time(interval=self.interval,
-                                                                     number_agents=self.number_agents,
-                                                                     aht=self.aht,
-                                                                     asa=self.asa,
-                                                                     service_level=self.service_level,
-                                                                     service_time=self.service_time)
-        print(volume)
+        volumes = self.controller.get_volume_for_average_waiting_time(interval=self.interval,
+                                                                      number_agents=self.number_agents,
+                                                                      aht=self.aht,
+                                                                      asa=self.asa)
+        self.assertTrue(isinstance(volumes, list))
+        self.assertEqual(volumes[0], 70.0)
+        self.assertEqual(volumes[1], 52.94117647058823)
 
-        volume = self.controller.get_volume_for_average_waiting_time(interval=self.interval,
-                                                                     number_agents=self.number_agents,
-                                                                     aht=self.aht,
-                                                                     asa=self.asa,
-                                                                     service_level=self.service_level,
-                                                                     service_time=self.service_time,
-                                                                     size_room=self.size_room,
-                                                                     patience=self.patience,
-                                                                     retrial=self.retrial)
+        volumes = self.controller.get_volume_for_average_waiting_time(interval=self.interval,
+                                                                      number_agents=self.number_agents,
+                                                                      aht=self.aht,
+                                                                      asa=self.asa,
+                                                                      size_room=self.size_room,
+                                                                      patience=self.patience,
+                                                                      retrial=self.retrial)
 
-        print(volume)
+        self.assertTrue(isinstance(volumes, list))
+        self.assertEqual(volumes[0], 95.40234374999999)
+        self.assertEqual(volumes[1], 76.88878676470583)

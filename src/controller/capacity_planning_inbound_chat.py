@@ -6,7 +6,7 @@ from src.misc.helper_functions import annotation_type_checker
 from src.modelling.capacity_planning import ErlangC, ErlangCP
 
 
-class InboundPhoneController:
+class InboundChatController:
 
     @annotation_type_checker
     @check_length_list_equality
@@ -46,8 +46,7 @@ class InboundPhoneController:
                 # kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()
-            number_agents = erlang.minimize(erlang.get_max_waiting_probability, kwargs=kwargs,
-                                            optim_argument="number_agents", target_value=service_level)
+            number_agents = erlang.get_number_agents_for_chat(**kwargs)
 
             return number_agents
 

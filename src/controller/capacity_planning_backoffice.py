@@ -6,7 +6,7 @@ from src.misc.helper_functions import annotation_type_checker
 from src.modelling.capacity_planning import ErlangC, ErlangCP
 
 
-class InboundPhoneController:
+class BackOfficeController:
 
     @annotation_type_checker
     @check_length_list_equality
@@ -59,7 +59,6 @@ class InboundPhoneController:
                 args = {key: value[i] for key, value in func_args.items()}
                 number_agents_list.append(func(**args))
             return number_agents_list
-
 
     @annotation_type_checker
     @check_length_list_equality
