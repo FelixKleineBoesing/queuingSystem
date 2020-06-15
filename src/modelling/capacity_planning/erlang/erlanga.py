@@ -11,7 +11,7 @@ class ErlangCP(Optimizer):
     """
     @staticmethod
     def get_max_waiting_probability(lambda_: float, mu: float, nu: float, number_agents: int,
-                                    max_waiting_time: int, size_waiting_room: int = None):
+                                    max_waiting_time: int, size_waiting_room: int = None) -> float:
         """
         get the probability that a customer must wait the maximum waiting time. This is often used as a service level
         since it displays the probability that a customer could  be satisfied
@@ -48,7 +48,7 @@ class ErlangCP(Optimizer):
 
     @staticmethod
     def get_prob_for_abort(lambda_: float, mu: float, nu: float, number_agents: int,
-                           size_waiting_room: int = None):
+                           size_waiting_room: int = None) -> float:
         """
         calculates the probability that a customer aborts his call.
 
@@ -75,7 +75,7 @@ class ErlangCP(Optimizer):
 
     @staticmethod
     def get_mean_number_customer_in_system(lambda_: float, mu: float, nu: float, number_agents: int,
-                                           size_waiting_room: int = None):
+                                           size_waiting_room: int = None) -> float:
         """
         calculates the average number of customers that are in the system
 
@@ -102,7 +102,7 @@ class ErlangCP(Optimizer):
 
     @staticmethod
     def get_mean_queue_length(lambda_: float, mu: float, nu: float, number_agents: int,
-                              size_waiting_room: int = None):
+                              size_waiting_room: int = None) -> float:
         """
         calculates the average queue length
 
@@ -128,7 +128,7 @@ class ErlangCP(Optimizer):
         return res
 
     def get_mean_waiting_time(self,  lambda_: float, mu: float, nu: float, number_agents: int,
-                              size_waiting_room: int = None):
+                              size_waiting_room: int = None) -> float:
         """
         calculates the average waiting time
 
@@ -147,7 +147,7 @@ class ErlangCP(Optimizer):
                                           size_waiting_room=size_waiting_room) / lambda_
 
     def get_mean_staying_time(self,  lambda_: float, mu: float, nu: float, number_agents: int,
-                              size_waiting_room: int = None):
+                              size_waiting_room: int = None) -> float:
         """
         calculates the average time that a customer stays in the system
 
@@ -166,7 +166,8 @@ class ErlangCP(Optimizer):
                                                        size_waiting_room=size_waiting_room) / lambda_
 
     def get_number_agents_for_chat(self, lambda_: float, mu: float, nu: float, max_waiting_time: int, abort_prob: float,
-                                   max_sessions: int, share_sequential_work: float, size_waiting_room: int = None):
+                                   max_sessions: int, share_sequential_work: float,
+                                   size_waiting_room: int = None) -> int:
         """
 
         :param lambda_:
@@ -194,11 +195,37 @@ class ErlangCP(Optimizer):
             kwargs["size_waiting_room"] = size_waiting_room
         number_agents = self.minimize(self.get_max_waiting_probability,
                                       kwargs=kwargs, optim_argument="number_agents", target_value=abort_prob)
-        return number_agents / max_sessions
+        return int(number_agents / max_sessions) + 1
+
+    def get_average_waiting_time_for_chat(self, lambda_: float, mu: float, nu: float, max_sessions: int,
+                                          share_sequential_work: float, size_waiting_room: int = None) -> float:
+        """
+
+        :param lambda_:
+        :param mu:
+        :param nu:
+        :param max_sessions:
+        :param share_sequential_work:
+        :param size_waiting_room:
+
+        :return:
+        """
+        assert lambda_ > 0
+        assert mu > 0
+        assert nu > 0
+        assert max_sessions > 0
+        assert share_sequential_work > 0
+        aht = 1 / lambda_
+        kwargs = {"mu": mu, "nu": nu,
+                  "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1))}
+        if size_waiting_room is not None:
+            kwargs["size_waiting_room"] = size_waiting_room
+        average_waiting_time = self.get_mean_waiting_time(**kwargs)
+        return average_waiting_time / max_sessions
 
 
 def get_prob_for_pn_in_mmckm_system(lambda_: float, mu: float, nu: float, number_agents: int, size_waiting_room: int,
-                                    persons_in_system: int):
+                                    persons_in_system: int) -> float:
     """
     calculatzes the probability that there are n persons in a M/M/c/K/m system
 
@@ -222,13 +249,13 @@ def get_prob_for_pn_in_mmckm_system(lambda_: float, mu: float, nu: float, number
         return prob_zero
     else:
         if persons_in_system > size_waiting_room:
-            return 0
+            return 0.0
         else:
             return get_cn_for_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                            n=persons_in_system) * prob_zero
 
 
-def get_cn_for_mmckm_system(lambda_: float, mu: float, nu: float, number_agents: int, n: int):
+def get_cn_for_mmckm_system(lambda_: float, mu: float, nu: float, number_agents: int, n: int) -> float:
     """
 
 

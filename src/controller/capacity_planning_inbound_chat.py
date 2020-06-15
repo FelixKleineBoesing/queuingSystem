@@ -11,9 +11,9 @@ class InboundChatController:
     @annotation_type_checker
     @check_length_list_equality
     def get_number_agents_for_service_level(self, interval: IntList, volume: FloatList, aht: IntList,
-                                            service_level: FloatList, service_time: FloatList,
-                                            size_room: IntList = None, patience: IntList = None,
-                                            retrial: FloatList = None) -> IntList:
+                                            service_level: FloatList, service_time: FloatList, max_sessions: IntList,
+                                            share_sequential_work: FloatList, size_room: IntList = None,
+                                            patience: IntList = None, retrial: FloatList = None) -> IntList:
         """
         calculates the number of agents that are required to hit the specified values
 
@@ -22,6 +22,8 @@ class InboundChatController:
         :param aht: average handling time
         :param service_level: level of service (percentage of satisfied customers)
         :param service_time: time in seconds in which % percent (service time) customer call must be
+        :param max_sessions: the number of sessions that can at max maintained by a person
+        :param share_sequential_work: the share of work that the agents work in one session
         :param size_room: size of the waiting room
         :param patience: average patience in seconds
         :param retrial: how many percent of the people dial
@@ -33,9 +35,12 @@ class InboundChatController:
         func_inspect.remove("self")
         func_args = {key: value for key, value in func_args.items() if key in func_inspect and value is not None}
 
-        def func(interval: int, volume: float, aht: int, service_level: float, service_time: float,
-                 size_room: int = None, patience: int = None, retrial: float = None):
-            kwargs = {"lambda_": volume / interval, "mu": 1 / aht, "max_waiting_time": service_time}
+        def func(interval: int, volume: float, aht: int, service_level: float, service_time: float, max_sessions: int,
+                 share_sequential_work: float, size_room: int = None, patience: int = None, retrial: float = None):
+            abort_prob = 1 - service_level
+            kwargs = {"lambda_": volume / interval, "mu": 1 / aht, "max_waiting_time": service_time,
+                      "abort_prob": abort_prob, "share_sequential_work": share_sequential_work,
+                      "max_sessions": max_sessions}
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
@@ -59,11 +64,11 @@ class InboundChatController:
                 number_agents_list.append(func(**args))
             return number_agents_list
 
-
     @annotation_type_checker
     @check_length_list_equality
     def get_volume_for_service_level(self, interval: IntList, number_agents: IntList, aht: IntList,
-                                     service_level: FloatList, service_time: FloatList, size_room: IntList = None,
+                                     service_level: FloatList, service_time: FloatList, max_sessions: IntList,
+                                     share_sequential_work: FloatList, size_room: IntList = None,
                                      patience: IntList = None, retrial: FloatList = None):
         """
         calculates the volume that are that the given agents are able to handle with the specified arguments
@@ -73,6 +78,8 @@ class InboundChatController:
         :param aht: average handling time
         :param service_level: level of service (percentage of satisfied customers)
         :param service_time: time in seconds in which % percent (service time) customer call must be
+        :param max_sessions: the number of sessions that can at max maintained by a person
+        :param share_sequential_work: the share of work that the agents work in one session
         :param size_room: size of the waiting room
         :param patience: average patience in seconds
         :param retrial: how many percent of the people dial
@@ -85,10 +92,12 @@ class InboundChatController:
         func_args = {key: value for key, value in func_args.items() if key in func_inspect and value is not None}
 
         def func(interval: int, number_agents: int, aht: int, service_level: float, service_time: float,
+                 max_sessions: int, share_sequential_work: float,
                  size_room: int = None, patience: int = None, retrial: float = None):
-
-            kwargs = {"number_agents": number_agents, "mu": 1 / aht, "max_waiting_time": service_time}
-            max_waiting_target = 1 - service_level
+            abort_prob = 1 - service_level
+            kwargs = {"mu": 1 / aht, "max_waiting_time": service_time,
+                      "abort_prob": abort_prob, "share_sequential_work": share_sequential_work,
+                      "max_sessions": max_sessions}
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
@@ -98,8 +107,8 @@ class InboundChatController:
                 #kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()
-            lambda_ = erlang.minimize(erlang.get_max_waiting_probability, kwargs=kwargs,
-                                      optim_argument="lambda_", target_value=max_waiting_target)
+            lambda_ = erlang.minimize(erlang.get_number_agents_for_chat, kwargs=kwargs,
+                                      optim_argument="lambda_", target_value=number_agents)
 
             return lambda_ * interval
 
@@ -114,7 +123,8 @@ class InboundChatController:
 
     @annotation_type_checker
     @check_length_list_equality
-    def get_number_agents_for_average_waiting_time(self, interval: IntList, volume: FloatList, aht: IntList, asa: IntList,
+    def get_number_agents_for_average_waiting_time(self, interval: IntList, volume: FloatList, aht: IntList,
+                                                   asa: IntList, max_sessions: IntList, share_sequential_work: FloatList,
                                                    size_room: IntList = None, patience: IntList = None,
                                                    retrial: FloatList = None):
         """
@@ -124,6 +134,8 @@ class InboundChatController:
         :param volume: the number of agents that are used in this interval
         :param aht: average handling time
         :param asa: average waiting time
+        :param max_sessions: the number of sessions that can at max maintained by a person
+        :param share_sequential_work: the share of work that the agents work in one session
         :param size_room: size of the waiting room
         :param patience: average patience in seconds
         :param retrial: how many percent of the people dial
@@ -135,9 +147,10 @@ class InboundChatController:
         func_inspect.remove("self")
         func_args = {key: value for key, value in func_args.items() if key in func_inspect and value is not None}
 
-        def func(interval: int, volume: float, aht: int, asa: int, size_room: int = None, patience: int = None,
-                 retrial: float = None):
-            kwargs = {"lambda_": volume / interval, "mu": 1 / aht}
+        def func(interval: int, volume: float, aht: int, asa: int, max_sessions: int,
+                 share_sequential_work: float, size_room: int = None, patience: int = None, retrial: float = None):
+            kwargs = {"lambda_": volume / interval, "mu": 1 / aht, "share_sequential_work": share_sequential_work,
+                      "max_sessions": max_sessions}
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
@@ -164,7 +177,8 @@ class InboundChatController:
     @annotation_type_checker
     @check_length_list_equality
     def get_volume_for_average_waiting_time(self, interval: IntList, number_agents: IntList, aht: IntList,
-                                            asa: IntList, size_room: IntList = None, patience: IntList = None,
+                                            asa: IntList, max_sessions: IntList, share_sequential_work: FloatList,
+                                            size_room: IntList = None, patience: IntList = None,
                                             retrial: FloatList = None):
         """
         calculates the volume that the
@@ -173,6 +187,8 @@ class InboundChatController:
         :param number_agents: the number of agents that are used in this interval
         :param aht: average handling time
         :param asa: average waitinasg time
+        :param max_sessions: the number of sessions that can at max maintained by a person
+        :param share_sequential_work: the share of work that the agents work in one session
         :param size_room: size of the waiting room
         :param patience: average patience in seconds
         :param retrial: how many percent of the people dial
@@ -183,9 +199,10 @@ class InboundChatController:
         func_inspect.remove("self")
         func_args = {key: value for key, value in func_args.items() if key in func_inspect and value is not None}
 
-        def func(interval: int, number_agents: int, aht: int, asa: int, size_room: int = None,
-                 patience: int = None, retrial: float = None):
-            kwargs = {"number_agents": number_agents, "mu": 1 / aht}
+        def func(interval: int, number_agents: int, aht: int, asa: int, max_sessions: int,
+                 share_sequential_work: float, size_room: int = None, patience: int = None, retrial: float = None):
+            kwargs = {"number_agents": number_agents, "mu": 1 / aht, "share_sequential_work": share_sequential_work,
+                      "max_sessions": max_sessions}
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"

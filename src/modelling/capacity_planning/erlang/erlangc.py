@@ -54,7 +54,7 @@ class ErlangC(Optimizer):
         """
         workload = lambda_ / mu
         return int(self.get_blocking_probability(lambda_=lambda_, mu=mu, number_agents=number_agents) * workload / \
-               (number_agents - workload)) + 1
+                   (number_agents - workload)) + 1
 
     def get_mean_number_customers_in_system(self, lambda_: float, mu: float, number_agents: int) -> int:
         """
@@ -65,7 +65,7 @@ class ErlangC(Optimizer):
         :return:
         """
         return int(self.get_blocking_probability(lambda_=lambda_, mu=mu, number_agents=number_agents) / \
-               (number_agents * mu - lambda_)) + 1
+                   (number_agents * mu - lambda_)) + 1
 
     def get_mean_waiting_time(self, lambda_: float, mu: float, number_agents: int) -> float:
         """
@@ -98,7 +98,22 @@ class ErlangC(Optimizer):
                                       kwargs={"mu": mu, "max_waiting_time": max_waiting_time,
                                               "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1))},
                                       optim_argument="number_agents", target_value=abort_prob)
-        return number_agents / max_sessions
+        return int(number_agents / max_sessions) + 1
+
+    def get_average_waiting_time_for_chat(self, lambda_: float, mu: float, max_sessions: int,
+                                          share_sequential_work: float):
+        """
+
+        :param lambda_:
+        :param mu:
+        :param max_sessions:
+        :param share_sequential_work:
+        :return:
+        """
+        aht = 1 / lambda_
+        kwargs = {"mu": mu,  "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1))}
+        average_waiting_time = self.get_mean_waiting_time(**kwargs)
+        return average_waiting_time / max_sessions
 
 
 def get_p0_for_mmc_system(workload: float, number_agents: int):
@@ -117,6 +132,6 @@ def get_p0_for_mmc_system(workload: float, number_agents: int):
 if __name__ == "__main__":
     erlang = ErlangC()
     res = erlang.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, max_waiting_time=20,
-                                      abort_prob=0.2, max_sessions=2, share_sequential_work=0.15)
+                                            abort_prob=0.2, max_sessions=2, share_sequential_work=0.15)
     print(res)
     print(erlang.get_max_waiting_probability(lambda_=50/900, mu=1/180, number_agents=14, max_waiting_time=10))
