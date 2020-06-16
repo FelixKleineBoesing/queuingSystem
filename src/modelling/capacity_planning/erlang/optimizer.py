@@ -30,6 +30,8 @@ class Optimizer(ErlangArgumentsMixin):
         :param kwargs: the fixed parameters
         :param optim_argument: the parameter that should be estimated
         :param target_value: the value of the method that should be the result
+        :param tolerance: the tolerance in percent by which the result may differ the requested value
+        
         :return:
         """
         assert isinstance(method, (MethodType, FunctionType)), "the parameter method must be of type " \
@@ -39,16 +41,19 @@ class Optimizer(ErlangArgumentsMixin):
         assert isinstance(optim_argument, str), "optim_argument must be of type str"
         assert isinstance(target_value, (float, int)), "target value must be integer or float"
 
-        # TODO find a way to get brackets for optimizing / user other minimize method
         optim_func, target_type = self.get_optim_func(method=method, kwargs=kwargs, optim_argument=optim_argument,
                                                       target_value=target_value)
-        argument_params = self.get_argument_params(optim_argument, **kwargs)
+        argument_params_kwargs = copy.deepcopy(kwargs)
+        if hasattr(method, "return_variable"):
+            argument_params_kwargs[method.return_variable] = target_value
+
+        argument_params = self.get_argument_params(optim_argument, **argument_params_kwargs)
         minimize_args = {}
         if argument_params is not None:
             minimize_args["bounds"] = (argument_params.lower_bound, argument_params.upper_bound)
             if argument_params.start is not None:
                 minimize_args["bracket"] = (argument_params.start, argument_params.start + 1)
-        # TODO use an algorithm that will fit the integer problem
+        # TODO add custom integer optim algorithm
         result = minimize(optim_func, argument_params.start, method="Nelder-Mead")
         value = target_type(result.x)
         if target_type is int:

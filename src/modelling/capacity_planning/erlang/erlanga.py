@@ -74,8 +74,8 @@ class ErlangCP(Optimizer):
         return res
 
     @staticmethod
-    def get_mean_number_customer_in_system(lambda_: float, mu: float, nu: float, number_agents: int,
-                                           size_waiting_room: int = None) -> float:
+    def get_average_number_customers_in_system(lambda_: float, mu: float, nu: float, number_agents: int,
+                                               size_waiting_room: int = None) -> float:
         """
         calculates the average number of customers that are in the system
 
@@ -101,8 +101,8 @@ class ErlangCP(Optimizer):
         return res
 
     @staticmethod
-    def get_mean_queue_length(lambda_: float, mu: float, nu: float, number_agents: int,
-                              size_waiting_room: int = None) -> float:
+    def get_average_queue_length(lambda_: float, mu: float, nu: float, number_agents: int,
+                                 size_waiting_room: int = None) -> float:
         """
         calculates the average queue length
 
@@ -127,8 +127,8 @@ class ErlangCP(Optimizer):
                                                                              number_agents=number_agents, n=n)
         return res
 
-    def get_mean_waiting_time(self,  lambda_: float, mu: float, nu: float, number_agents: int,
-                              size_waiting_room: int = None) -> float:
+    def get_average_waiting_time(self, lambda_: float, mu: float, nu: float, number_agents: int,
+                                 size_waiting_room: int = None) -> float:
         """
         calculates the average waiting time
 
@@ -143,11 +143,11 @@ class ErlangCP(Optimizer):
         assert mu > 0
         assert nu > 0
         assert number_agents > 0
-        return self.get_mean_queue_length(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
-                                          size_waiting_room=size_waiting_room) / lambda_
+        return self.get_average_queue_length(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
+                                             size_waiting_room=size_waiting_room) / lambda_
 
-    def get_mean_staying_time(self,  lambda_: float, mu: float, nu: float, number_agents: int,
-                              size_waiting_room: int = None) -> float:
+    def get_average_staying_time(self, lambda_: float, mu: float, nu: float, number_agents: int,
+                                 size_waiting_room: int = None) -> float:
         """
         calculates the average time that a customer stays in the system
 
@@ -162,8 +162,8 @@ class ErlangCP(Optimizer):
         assert mu > 0
         assert nu > 0
         assert number_agents > 0
-        return self.get_mean_number_customer_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
-                                                       size_waiting_room=size_waiting_room) / lambda_
+        return self.get_average_number_customers_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
+                                                           size_waiting_room=size_waiting_room) / lambda_
 
     def get_number_agents_for_chat(self, lambda_: float, mu: float, nu: float, max_waiting_time: int, abort_prob: float,
                                    max_sessions: int, share_sequential_work: float,
@@ -179,7 +179,7 @@ class ErlangCP(Optimizer):
         :param share_sequential_work:
         :param size_waiting_room:
 
-        :return:
+        :return: number_agents
         """
         assert lambda_ > 0
         assert mu > 0
@@ -220,8 +220,17 @@ class ErlangCP(Optimizer):
                   "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1))}
         if size_waiting_room is not None:
             kwargs["size_waiting_room"] = size_waiting_room
-        average_waiting_time = self.get_mean_waiting_time(**kwargs)
+        average_waiting_time = self.get_average_waiting_time(**kwargs)
         return average_waiting_time / max_sessions
+
+    get_average_waiting_time_for_chat.return_variable = "asa"
+    get_number_agents_for_chat.return_variable = "number_agents"
+    get_average_staying_time.return_variable = "average_staying_time"
+    get_average_waiting_time.return_variable = "asa"
+    get_average_number_customers_in_system.return_variable = "average_number_customers"
+    get_max_waiting_probability.return_variable = "abort_prob"
+    get_prob_for_abort.return_variable = "abort_prob"
+    get_average_queue_length.return_variable = "average_queue_length"
 
 
 def get_prob_for_pn_in_mmckm_system(lambda_: float, mu: float, nu: float, number_agents: int, size_waiting_room: int,
@@ -294,13 +303,13 @@ if __name__ == "__main__":
                           optim_argument="number_agents", target_value=0.8633721956843062))
 
     print(erlang.get_prob_for_abort(lambda_=1/10, mu=1/240, nu=1/30, number_agents=25, size_waiting_room=80))
-    print(erlang.get_mean_queue_length(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, size_waiting_room=80))
-    print(erlang.get_mean_number_customer_in_system(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28,
-                                                    size_waiting_room=80))
-    print(erlang.get_mean_waiting_time(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28,
-                                       size_waiting_room=80))
-    print(erlang.get_mean_staying_time(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28,
-                                       size_waiting_room=80))
+    print(erlang.get_average_queue_length(lambda_=1 / 10, mu=1 / 240, nu=1 / 300, number_agents=28, size_waiting_room=80))
+    print(erlang.get_average_number_customers_in_system(lambda_=1 / 10, mu=1 / 240, nu=1 / 300, number_agents=28,
+                                                        size_waiting_room=80))
+    print(erlang.get_average_waiting_time(lambda_=1 / 10, mu=1 / 240, nu=1 / 300, number_agents=28,
+                                          size_waiting_room=80))
+    print(erlang.get_average_staying_time(lambda_=1 / 10, mu=1 / 240, nu=1 / 300, number_agents=28,
+                                          size_waiting_room=80))
     res = erlang.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, max_waiting_time=20, nu=0.05/3,
                                             abort_prob=0.2, max_sessions=2, share_sequential_work=0.15)
     print(res)

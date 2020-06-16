@@ -160,7 +160,7 @@ class InboundChatController:
                 #kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()
-            number_agents = erlang.minimize(erlang.get_mean_waiting_time, kwargs=kwargs,
+            number_agents = erlang.minimize(erlang.get_average_waiting_time, kwargs=kwargs,
                                             optim_argument="number_agents", target_value=asa)
 
             return number_agents
@@ -212,7 +212,7 @@ class InboundChatController:
                 #kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()
-            lambda_ = erlang.minimize(erlang.get_mean_waiting_time, kwargs=kwargs,
+            lambda_ = erlang.minimize(erlang.get_average_waiting_time, kwargs=kwargs,
                                       optim_argument="lambda_", target_value=asa)
 
             return lambda_ * interval

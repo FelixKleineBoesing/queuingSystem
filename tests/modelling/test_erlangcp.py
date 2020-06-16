@@ -26,20 +26,20 @@ class ErlangCPTester(unittest.TestCase):
     def get_mean_staying_time(self, lambda_: float, mu: float, number_agents: int,
                               nu: float, size_waiting_room: int):
         erlang = ErlangCP()
-        return erlang.get_mean_staying_time(lambda_=lambda_, mu=mu, number_agents=number_agents, nu=nu,
-                                            size_waiting_room=size_waiting_room)
+        return erlang.get_average_staying_time(lambda_=lambda_, mu=mu, number_agents=number_agents, nu=nu,
+                                               size_waiting_room=size_waiting_room)
 
     def get_mean_queue_length(self, lambda_: float, mu: float, number_agents: int,
                               nu: float, size_waiting_room: int):
         erlang = ErlangCP()
-        return erlang.get_mean_queue_length(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
-                                            size_waiting_room=size_waiting_room)
+        return erlang.get_average_queue_length(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
+                                               size_waiting_room=size_waiting_room)
 
     def get_mean_number_customer_in_system(self, lambda_: float, mu: float, number_agents: int,
                                            nu: float, size_waiting_room: int):
         erlang = ErlangCP()
-        return erlang.get_mean_number_customer_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
-                                                         size_waiting_room=size_waiting_room)
+        return erlang.get_average_number_customers_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
+                                                             size_waiting_room=size_waiting_room)
 
     def get_number_agents_for_service_level(self, target_sla: float, lambda_: float, mu: float, max_waiting_time: int,
                                             nu: float, size_waiting_room: int):

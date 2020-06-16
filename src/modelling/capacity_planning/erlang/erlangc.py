@@ -43,7 +43,7 @@ class ErlangC(Optimizer):
         else:
             return 0.0
 
-    def get_mean_queue_length(self, lambda_: float, mu: float, number_agents: int) -> float:
+    def get_average_queue_length(self, lambda_: float, mu: float, number_agents: int) -> float:
         """
         calculates the average queue length
 
@@ -56,7 +56,7 @@ class ErlangC(Optimizer):
         return int(self.get_blocking_probability(lambda_=lambda_, mu=mu, number_agents=number_agents) * workload / \
                    (number_agents - workload)) + 1
 
-    def get_mean_number_customers_in_system(self, lambda_: float, mu: float, number_agents: int) -> int:
+    def get_average_number_customers_in_system(self, lambda_: float, mu: float, number_agents: int) -> int:
         """
         calculates the mean number of customers in the system based on the workload and number of agents
         :param lambda_:
@@ -67,7 +67,7 @@ class ErlangC(Optimizer):
         return int(self.get_blocking_probability(lambda_=lambda_, mu=mu, number_agents=number_agents) / \
                    (number_agents * mu - lambda_)) + 1
 
-    def get_mean_waiting_time(self, lambda_: float, mu: float, number_agents: int) -> float:
+    def get_average_waiting_time(self, lambda_: float, mu: float, number_agents: int) -> float:
         """
         calculates the mean waiting time
 
@@ -112,8 +112,16 @@ class ErlangC(Optimizer):
         """
         aht = 1 / lambda_
         kwargs = {"mu": mu,  "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1))}
-        average_waiting_time = self.get_mean_waiting_time(**kwargs)
+        average_waiting_time = self.get_average_waiting_time(**kwargs)
         return average_waiting_time / max_sessions
+
+    get_average_waiting_time_for_chat.return_variable = "asa"
+    get_number_agents_for_chat.return_variable = "number_agents"
+    get_average_waiting_time.return_variable = "asa"
+    get_average_number_customers_in_system.return_variable = "average_number_customers"
+    get_max_waiting_probability.return_variable = "abort_prob"
+    get_blocking_probability.return_variable = "blocking_probability"
+    get_average_queue_length.return_variable = "average_queue_length"
 
 
 def get_p0_for_mmc_system(workload: float, number_agents: int):

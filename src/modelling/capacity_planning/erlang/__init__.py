@@ -26,20 +26,20 @@ if __name__ == "__main__":
                                       size_waiting_room=size_waiting_room)
     print("Probability for call abort: {}".format(res))
 
-    res = erlangcp.get_mean_staying_time(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
-                                         size_waiting_room=size_waiting_room)
+    res = erlangcp.get_average_staying_time(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
+                                            size_waiting_room=size_waiting_room)
     print("average staying time: {}".format(res))
 
-    res = erlangcp.get_mean_waiting_time(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
-                                         size_waiting_room=size_waiting_room)
+    res = erlangcp.get_average_waiting_time(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
+                                            size_waiting_room=size_waiting_room)
     print("Average waiting time: {}".format(res))
 
-    res = erlangcp.get_mean_queue_length(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
-                                         size_waiting_room=size_waiting_room)
+    res = erlangcp.get_average_queue_length(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
+                                            size_waiting_room=size_waiting_room)
     print("Avearage queue length: {}".format(res))
 
-    res = erlangcp.get_mean_number_customer_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
-                                                      size_waiting_room=size_waiting_room)
+    res = erlangcp.get_average_number_customers_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
+                                                          size_waiting_room=size_waiting_room)
     print("Average number customers in system: {}".format(res))
 
     res = erlangcp.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, max_waiting_time=20, nu=0.05/3,

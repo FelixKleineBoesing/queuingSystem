@@ -21,15 +21,15 @@ class ErlangCTester(unittest.TestCase):
 
     def get_mean_queue_length(self, lambda_: float, mu: float, number_agents: int):
         erlang = ErlangC()
-        return erlang.get_mean_queue_length(lambda_=lambda_, mu=mu, number_agents=number_agents)
+        return erlang.get_average_queue_length(lambda_=lambda_, mu=mu, number_agents=number_agents)
 
     def get_mean_number_customers_in_system(self, lambda_: float, mu: float, number_agents: int):
         erlang = ErlangC()
-        return erlang.get_mean_number_customers_in_system(lambda_=lambda_, mu=mu, number_agents=number_agents)
+        return erlang.get_average_number_customers_in_system(lambda_=lambda_, mu=mu, number_agents=number_agents)
 
     def get_mean_waiting_time(self, lambda_: float, mu: float, number_agents: int):
         erlang = ErlangC()
-        return erlang.get_mean_waiting_time(lambda_=lambda_, mu=mu, number_agents=number_agents)
+        return erlang.get_average_waiting_time(lambda_=lambda_, mu=mu, number_agents=number_agents)
 
     def get_number_agents_for_chat(self, lambda_: float, mu: float, abort_prob: float, max_sessions: int,
                                    share_sequential_work: float, max_waiting_time: int):
