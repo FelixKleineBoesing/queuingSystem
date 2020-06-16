@@ -102,7 +102,7 @@ class InboundChatController:
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
                 erlang = ErlangCP()
-                kwargs["nu"] = 1 /patience
+                kwargs["nu"] = 1 / patience
                 kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial
             else:
@@ -160,7 +160,7 @@ class InboundChatController:
                 #kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()
-            number_agents = erlang.minimize(erlang.get_average_waiting_time, kwargs=kwargs,
+            number_agents = erlang.minimize(erlang.get_average_waiting_time_for_chat, kwargs=kwargs,
                                             optim_argument="number_agents", target_value=asa)
 
             return number_agents
@@ -212,7 +212,7 @@ class InboundChatController:
                 #kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()
-            lambda_ = erlang.minimize(erlang.get_average_waiting_time, kwargs=kwargs,
+            lambda_ = erlang.minimize(erlang.get_average_waiting_time_for_chat, kwargs=kwargs,
                                       optim_argument="lambda_", target_value=asa)
 
             return lambda_ * interval

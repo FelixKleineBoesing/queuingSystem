@@ -77,8 +77,8 @@ class Optimizer(ErlangArgumentsMixin):
         """
         kwargs[optim_argument] = value
         validation = method(**kwargs)
-        print(validation)
-        return validation * (1 - tolerance) < target_value < validation * (1 + tolerance), (validation - value) / value
+
+        return validation * (1 - tolerance) < target_value < validation * (1 + tolerance), 1 - (validation - value) / value
 
     def get_optim_func(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
                        target_value: Union[float, int]):

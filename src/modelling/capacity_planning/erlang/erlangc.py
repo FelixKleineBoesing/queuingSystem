@@ -100,7 +100,7 @@ class ErlangC(Optimizer):
                                       optim_argument="number_agents", target_value=abort_prob)
         return int(number_agents / max_sessions) + 1
 
-    def get_average_waiting_time_for_chat(self, lambda_: float, mu: float, max_sessions: int,
+    def get_average_waiting_time_for_chat(self, lambda_: float, mu: float, max_sessions: int, number_agents: int,
                                           share_sequential_work: float):
         """
 
@@ -111,7 +111,8 @@ class ErlangC(Optimizer):
         :return:
         """
         aht = 1 / lambda_
-        kwargs = {"mu": mu,  "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1))}
+        kwargs = {"mu": mu,  "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1)),
+                  "number_agents": number_agents}
         average_waiting_time = self.get_average_waiting_time(**kwargs)
         return average_waiting_time / max_sessions
 

@@ -197,8 +197,9 @@ class ErlangCP(Optimizer):
                                       kwargs=kwargs, optim_argument="number_agents", target_value=abort_prob)
         return int(number_agents / max_sessions) + 1
 
-    def get_average_waiting_time_for_chat(self, lambda_: float, mu: float, nu: float, max_sessions: int,
-                                          share_sequential_work: float, size_waiting_room: int = None) -> float:
+    def get_average_waiting_time_for_chat(self, lambda_: float, mu: float, nu: float, number_agents: int,
+                                          max_sessions: int, share_sequential_work: float,
+                                          size_waiting_room: int = None) -> float:
         """
 
         :param lambda_:
@@ -216,7 +217,7 @@ class ErlangCP(Optimizer):
         assert max_sessions > 0
         assert share_sequential_work > 0
         aht = 1 / lambda_
-        kwargs = {"mu": mu, "nu": nu,
+        kwargs = {"mu": mu, "nu": nu, "number_agents": number_agents,
                   "lambda_": 1 / (aht * share_sequential_work * (max_sessions - 1))}
         if size_waiting_room is not None:
             kwargs["size_waiting_room"] = size_waiting_room
