@@ -3,7 +3,7 @@ from typing import Union, List
 
 from src.controller.helpers import IntList, FloatList, check_length_list_equality
 from src.misc.helper_functions import annotation_type_checker
-from src.modelling.capacity_planning import ErlangC, ErlangCP
+from src.modelling.capacity_planning import ErlangC, ErlangA
 
 
 class InboundChatController:
@@ -37,14 +37,13 @@ class InboundChatController:
 
         def func(interval: int, volume: float, aht: int, service_level: float, service_time: float, max_sessions: int,
                  share_sequential_work: float, size_room: int = None, patience: int = None, retrial: float = None):
-            abort_prob = 1 - service_level
             kwargs = {"lambda_": volume / interval, "mu": 1 / aht, "max_waiting_time": service_time,
-                      "abort_prob": abort_prob, "share_sequential_work": share_sequential_work,
+                      "service_level": service_level, "share_sequential_work": share_sequential_work,
                       "max_sessions": max_sessions}
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
                 if size_room is not None:
                     kwargs["size_waiting_room"] = size_room
@@ -94,14 +93,13 @@ class InboundChatController:
         def func(interval: int, number_agents: int, aht: int, service_level: float, service_time: float,
                  max_sessions: int, share_sequential_work: float,
                  size_room: int = None, patience: int = None, retrial: float = None):
-            abort_prob = 1 - service_level
             kwargs = {"mu": 1 / aht, "max_waiting_time": service_time,
-                      "abort_prob": abort_prob, "share_sequential_work": share_sequential_work,
+                      "service_level": service_level, "share_sequential_work": share_sequential_work,
                       "max_sessions": max_sessions}
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
                 kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial
@@ -154,7 +152,7 @@ class InboundChatController:
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
                 kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial
@@ -206,7 +204,7 @@ class InboundChatController:
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
                 kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial

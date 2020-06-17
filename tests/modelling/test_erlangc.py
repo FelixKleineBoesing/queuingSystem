@@ -1,6 +1,6 @@
 import unittest
 
-from src.modelling.capacity_planning.erlang.erlangc import ErlangC
+from src.modelling.capacity_planning.erlang.erlangc import ErlangC, get_p0_for_mmc_system
 
 # TODO add the other method to the tester
 
@@ -30,6 +30,10 @@ class ErlangCTester(unittest.TestCase):
     def get_mean_waiting_time(self, lambda_: float, mu: float, number_agents: int):
         erlang = ErlangC()
         return erlang.get_average_waiting_time(lambda_=lambda_, mu=mu, number_agents=number_agents)
+
+    def get_mean_staying_time(self, lambda_: float, mu: float, number_agents: int):
+        erlang = ErlangC()
+        return erlang.get_average_staying_time(lambda_=lambda_, mu=mu, number_agents=number_agents)
 
     def get_number_agents_for_chat(self, lambda_: float, mu: float, abort_prob: float, max_sessions: int,
                                    share_sequential_work: float, max_waiting_time: int):
@@ -65,6 +69,9 @@ class ErlangCTester(unittest.TestCase):
         self.assertEqual(prob, 0)
 
     def test_get_blocking_probability(self):
+        prob = self.get_blocking_probability(lambda_=7, mu=1, number_agents=9)
+        self.assertEqual(prob, 0.38494709415676875)
+
         prob = self.get_blocking_probability(lambda_=0.1, mu=0.0033, number_agents=35)
         self.assertEqual(prob, 0.3121925015328496)
 
@@ -112,8 +119,24 @@ class ErlangCTester(unittest.TestCase):
 
         number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, abort_prob=0.2,
                                                         max_sessions=10, share_sequential_work=0.05, max_waiting_time=60)
-        self.assertEqual(number_agents, 1.0)
+        self.assertEqual(number_agents, 2.0)
 
         number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=3/180, abort_prob=0.3,
                                                         max_sessions=2, share_sequential_work=0.15, max_waiting_time=10)
         self.assertEqual(number_agents, 2.0)
+
+    def test_get_mean_queue_length(self):
+        mean_queue_length = self.get_mean_queue_length(lambda_=7, mu=1, number_agents=9)
+        self.assertEqual(mean_queue_length, 1.3473148295486905)
+
+    def test_get_mean_number_customers_in_system(self):
+        mean_cust_system = self.get_mean_number_customers_in_system(lambda_=7, mu=1, number_agents=9)
+        self.assertEqual(mean_cust_system, 8.34731482954869)
+
+    def test_get_mean_waiting_time(self):
+        mean_waiting_time = self.get_mean_waiting_time(lambda_=0.1, mu=1/300, number_agents=35)
+        self.assertEqual(mean_waiting_time, 17.07494774481045)
+
+    def test_get_mean_staying_time(self):
+        mean_staying_time = self.get_mean_staying_time(lambda_=0.1, mu=1/300, number_agents=35)
+        self.assertEqual(mean_staying_time, 317.07494774481045)

@@ -3,7 +3,7 @@ from typing import Union, List
 
 from src.controller.helpers import IntList, FloatList, check_length_list_equality
 from src.misc.helper_functions import annotation_type_checker
-from src.modelling.capacity_planning import ErlangC, ErlangCP
+from src.modelling.capacity_planning import ErlangC, ErlangA
 
 
 class OutboundPhoneController:
@@ -39,7 +39,7 @@ class OutboundPhoneController:
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
                 if size_room is not None:
                     kwargs["size_waiting_room"] = size_room
@@ -93,7 +93,7 @@ class OutboundPhoneController:
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 /patience
                 kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial
@@ -142,7 +142,7 @@ class OutboundPhoneController:
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
                 kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial
@@ -190,7 +190,7 @@ class OutboundPhoneController:
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
                 kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial

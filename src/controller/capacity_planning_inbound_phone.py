@@ -3,7 +3,7 @@ from typing import Union, List
 
 from src.controller.helpers import IntList, FloatList, check_length_list_equality
 from src.misc.helper_functions import annotation_type_checker
-from src.modelling.capacity_planning import ErlangC, ErlangCP
+from src.modelling.capacity_planning import ErlangC, ErlangA
 
 
 class InboundPhoneController:
@@ -39,7 +39,7 @@ class InboundPhoneController:
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
                 if size_room is not None:
                     kwargs["size_waiting_room"] = size_room
@@ -59,7 +59,6 @@ class InboundPhoneController:
                 args = {key: value[i] for key, value in func_args.items()}
                 number_agents_list.append(func(**args))
             return number_agents_list
-
 
     @annotation_type_checker
     @check_length_list_equality
@@ -89,18 +88,17 @@ class InboundPhoneController:
                  size_room: int = None, patience: int = None, retrial: float = None):
 
             kwargs = {"number_agents": number_agents, "mu": 1 / aht, "max_waiting_time": service_time}
-            max_waiting_target = 1 - service_level
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 /patience
                 kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()
             lambda_ = erlang.minimize(erlang.get_max_waiting_probability, kwargs=kwargs,
-                                      optim_argument="lambda_", target_value=max_waiting_target)
+                                      optim_argument="lambda_", target_value=service_level)
 
             return lambda_ * interval
 
@@ -142,7 +140,7 @@ class InboundPhoneController:
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
                 kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial
@@ -190,7 +188,7 @@ class InboundPhoneController:
 
             if patience is not None or size_room is not None or retrial is not None:
                 assert patience is not None, "patience has to be not none when size room is selected"
-                erlang = ErlangCP()
+                erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
                 kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial

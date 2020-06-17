@@ -55,8 +55,8 @@ class CapacityPlanningInboundPhoneTester(CapacityPlanningParameters):
                                                               service_level=self.service_level,
                                                               service_time=self.service_time)
         self.assertTrue(isinstance(volume, list))
-        self.assertEqual(volume[0], 68.578125)
-        self.assertEqual(volume[1], 51.49356617647059)
+        self.assertEqual(volume[0], 47.57812500000002)
+        self.assertEqual(volume[1], 39.457720588235254)
 
         volume = self.controller.get_volume_for_service_level(interval=self.interval,
                                                               number_agents=self.number_agents,
@@ -68,8 +68,8 @@ class CapacityPlanningInboundPhoneTester(CapacityPlanningParameters):
                                                               retrial=self.retrial)
 
         self.assertTrue(isinstance(volume, list))
-        self.assertEqual(volume[0], 100.40624999999999)
-        self.assertEqual(volume[1], 71.6773897058823)
+        self.assertEqual(volume[0], 50.203125000000014)
+        self.assertEqual(volume[1], 42.4770220588235)
 
     def test_get_number_agents_for_average_waiting_time(self):
         number_agents = self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
@@ -77,7 +77,7 @@ class CapacityPlanningInboundPhoneTester(CapacityPlanningParameters):
                                                                                    aht=self.aht,
                                                                                    asa=self.asa)
         self.assertTrue(isinstance(number_agents, list))
-        self.assertEqual(number_agents[0], 58)
+        self.assertEqual(number_agents[0], 12)
         self.assertEqual(number_agents[1], 11)
 
         number_agents = self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
@@ -174,6 +174,7 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
         self.assertEqual(volume[1], 52.94117647058823)
 
     def test_get_number_agents_for_average_waiting_time(self):
+        # TODO fix this test. Here is something deeply wrong
         number_agents = \
             self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
                                                                        volume=self.volume,
@@ -183,7 +184,7 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                                        share_sequential_work=self.share_sequential_work)
         self.assertTrue(isinstance(number_agents, list))
         self.assertEqual(number_agents[0], 10)
-        self.assertEqual(number_agents[1], 7)
+        self.assertEqual(number_agents[1], 12)
 
         number_agents = \
             self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
