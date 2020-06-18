@@ -21,7 +21,7 @@ class Optimizer(ErlangArgumentsMixin):
     Therefore all arguments need a type annotation.
     """
     def minimize(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
-                 target_value: Union[float, int], tolerance: float = 0.02):
+                 target_value: Union[float, int], tolerance: float = 0.05):
         """
         minimizes the squared error of any given method with given parameters and one optim_argument which
         should be estimated
@@ -48,14 +48,11 @@ class Optimizer(ErlangArgumentsMixin):
             argument_params_kwargs[method.return_variable] = target_value
 
         argument_params = self.get_argument_params(optim_argument, **argument_params_kwargs)
-        minimize_args = {}
-        if argument_params is not None:
-            minimize_args["bounds"] = (argument_params.lower_bound, argument_params.upper_bound)
-            if argument_params.start is not None:
-                minimize_args["bracket"] = (argument_params.start, argument_params.start + 1)
-        # TODO add custom integer optim algorithm
-        result = minimize(optim_func, argument_params.start, method="Nelder-Mead")
-        value = target_type(result.x)
+        if target_type is int:
+            value = integer_minimize_function_increase(method, kwargs, target_type, target_value, optim_argument)
+        else:
+            result = minimize(optim_func, argument_params.start, method="Nelder-Mead")
+            value = target_type(result.x)
         if target_type is int:
             value += 1
 
@@ -78,7 +75,8 @@ class Optimizer(ErlangArgumentsMixin):
         kwargs[optim_argument] = value
         validation = method(**kwargs)
 
-        return validation * (1 - tolerance) < target_value < validation * (1 + tolerance), ((validation - value) / value) - 1
+        return validation * (1 - tolerance) < target_value < validation * (1 + tolerance), \
+               abs((validation - value) / value)
 
     def get_optim_func(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
                        target_value: Union[float, int]):
@@ -196,5 +194,52 @@ class Optimizer(ErlangArgumentsMixin):
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=input_values, y=results, name="Loss Values", line={"width": 10, "color": "black"}))
         return fig
+
+
+def integer_minimize_function_increase(method, kwargs: dict, target_type: type, target_value, optim_argument,
+                                       tolerance: float = 0.05):
+
+    def optim_func(x):
+        kwargs[optim_argument] = target_type(x)
+        value = method(**kwargs)
+        try:
+            loss = (target_value - value) ** 2
+            return loss, value
+        except AssertionError:
+            return np.Inf
+        except Exception as e:
+            print(traceback.format_exc())
+            print(e)
+
+    satisfied = False
+    losses = SortedDict()
+    guess = 1
+    last_loss = 0
+    loss_increasing_since = 0
+    while not satisfied:
+        loss, value = optim_func(guess)
+        losses[guess] = loss
+        if value != 0:
+            diff = abs((target_value - value) / value)
+        else:
+            diff = np.Inf
+        if diff < tolerance:
+            satisfied = True
+        else:
+            guess += 1
+        if loss > last_loss and loss_increasing_since == 0:
+            last_loss = loss
+            loss_increasing_since = 1
+        elif loss > last_loss:
+            loss_increasing_since += 1
+
+        if loss_increasing_since >= 5:
+            satisfied = True
+            guess = losses.index(min(losses.values()))
+
+    return guess
+
+
+
 
 

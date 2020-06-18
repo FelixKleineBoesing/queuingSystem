@@ -127,8 +127,8 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                                 max_sessions=self.max_sessions,
                                                                 share_sequential_work=self.share_sequential_work)
         self.assertTrue(isinstance(number_agents, list))
-        self.assertEqual(number_agents[0], 4)
-        self.assertEqual(number_agents[1], 1)
+        self.assertEqual(number_agents[0], 5)
+        self.assertEqual(number_agents[1], 2)
 
         number_agents = \
             self.controller.get_number_agents_for_service_level(interval=self.interval,
@@ -142,11 +142,14 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                                 patience=self.patience,
                                                                 retrial=self.retrial)
         self.assertTrue(isinstance(number_agents, list))
-        self.assertEqual(number_agents[0], 3)
-        self.assertEqual(number_agents[1], 1)
+        self.assertEqual(number_agents[0], 5)
+        self.assertEqual(number_agents[1], 2)
 
     def test_get_volume_for_service_level(self):
         # TODO this execution is slow as fuck
+        import cProfile
+        profile = cProfile.Profile()
+        profile.enable()
         volume = self.controller.get_volume_for_service_level(interval=self.interval,
                                                               number_agents=self.number_agents,
                                                               aht=self.aht,
@@ -154,8 +157,10 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                               service_time=self.service_time,
                                                               max_sessions=self.max_sessions,
                                                               share_sequential_work=self.share_sequential_work)
+        profile.disable()
+        profile.getstats()
         self.assertTrue(isinstance(volume, list))
-        self.assertEqual(volume[0], 73.5)
+        self.assertEqual(volume[0], 70.0)
         self.assertEqual(volume[1], 52.94117647058823)
 
         volume = self.controller.get_volume_for_service_level(interval=self.interval,
@@ -170,11 +175,10 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                               retrial=self.retrial)
 
         self.assertTrue(isinstance(volume, list))
-        self.assertEqual(volume[0], 70)
+        self.assertEqual(volume[0], 73.5)
         self.assertEqual(volume[1], 52.94117647058823)
 
     def test_get_number_agents_for_average_waiting_time(self):
-        # TODO fix this test. Here is something deeply wrong
         number_agents = \
             self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
                                                                        volume=self.volume,
@@ -184,7 +188,7 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                                        share_sequential_work=self.share_sequential_work)
         self.assertTrue(isinstance(number_agents, list))
         self.assertEqual(number_agents[0], 10)
-        self.assertEqual(number_agents[1], 12)
+        self.assertEqual(number_agents[1], 8)
 
         number_agents = \
             self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
@@ -210,7 +214,7 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                                 share_sequential_work=self.share_sequential_work)
         self.assertTrue(isinstance(volumes, list))
         self.assertEqual(volumes[0], 70.0)
-        self.assertEqual(volumes[1], 90.66111845128668)
+        self.assertEqual(volumes[1], 91.38686236213228)
 
         volumes = \
             self.controller.get_volume_for_average_waiting_time(interval=self.interval,

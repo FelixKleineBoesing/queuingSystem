@@ -24,6 +24,11 @@ class ErlangA(Optimizer):
         :param size_waiting_room: size of a waiting room. If None it is infinite
         :return:
         """
+        assert lambda_ > 0
+        assert mu > 0
+        assert nu > 0
+        assert number_agents > 0
+        assert size_waiting_room > 0
         if size_waiting_room is None:
             size_waiting_room = 1000
         prob_zero = get_prob_for_pn_in_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
@@ -54,6 +59,11 @@ class ErlangA(Optimizer):
         :param size_waiting_room: size of a waiting room. If None it is infinite
         :return:
         """
+        assert lambda_ > 0
+        assert number_agents > 0
+        assert mu > 0
+        assert nu > 0
+        assert size_waiting_room > 0
         if size_waiting_room is None:
             size_waiting_room = 1000
         prob_zero = get_prob_for_pn_in_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
@@ -77,6 +87,12 @@ class ErlangA(Optimizer):
         :param size_waiting_room: size of a waiting room. If None it is infinite
         :return:
         """
+        assert lambda_ > 0
+        assert number_agents > 0
+        assert mu > 0
+        assert nu > 0
+        assert number_agents > 0
+        assert size_waiting_room > 0
         if size_waiting_room is None:
             size_waiting_room = 1000
         prob_zero = get_prob_for_pn_in_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
@@ -100,6 +116,11 @@ class ErlangA(Optimizer):
         :param size_waiting_room: size of a waiting room. If None it is infinite
         :return:
         """
+        assert lambda_ > 0
+        assert number_agents > 0
+        assert mu > 0
+        assert nu > 0
+        assert size_waiting_room > 0
         if size_waiting_room is None:
             size_waiting_room = 1000
         prob_zero = get_prob_for_pn_in_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
@@ -122,6 +143,11 @@ class ErlangA(Optimizer):
         :param size_waiting_room: size of a waiting room. If None it is infinite
         :return:
         """
+        assert lambda_ > 0
+        assert number_agents > 0
+        assert mu > 0
+        assert nu > 0
+        assert size_waiting_room > 0
         return self.get_average_queue_length(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                              size_waiting_room=size_waiting_room) / lambda_
 
@@ -137,6 +163,11 @@ class ErlangA(Optimizer):
         :param size_waiting_room: size of a waiting room. If None it is infinite
         :return:
         """
+        assert lambda_ > 0
+        assert mu > 0
+        assert nu > 0
+        assert number_agents > 0
+        assert size_waiting_room > 0
         return self.get_average_number_customers_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                            size_waiting_room=size_waiting_room) / lambda_
 
@@ -149,16 +180,23 @@ class ErlangA(Optimizer):
         :param mu:
         :param nu;
         :param max_waiting_time:
-        :param abort_prob
+        :param service_level
         :param max_sessions:
         :param share_sequential_work:
         :param size_waiting_room:
 
         :return: number_agents
         """
+        assert lambda_ > 0
+        assert 0 <= service_level <= 1
+        assert mu > 0
+        assert nu > 0
+        assert max_sessions > 0
+        assert 0 <= share_sequential_work <= 1
+        assert size_waiting_room > 0
         aht = 1 / lambda_
         kwargs = {"mu": mu, "max_waiting_time": max_waiting_time, "nu": nu,
-                  "lambda_": 1 / (aht * share_sequential_work * min(1, (max_sessions - 1)))}
+                  "lambda_": 1 / (aht * share_sequential_work * max(1, (max_sessions - 1)))}
         if size_waiting_room is not None:
             kwargs["size_waiting_room"] = size_waiting_room
         number_agents = self.minimize(self.get_max_waiting_probability,
@@ -173,15 +211,22 @@ class ErlangA(Optimizer):
         :param lambda_:
         :param mu:
         :param nu:
+        :param number_agents
         :param max_sessions:
         :param share_sequential_work:
         :param size_waiting_room:
 
         :return:
         """
+        assert lambda_ > 0
+        assert number_agents > 0
+        assert mu > 0
+        assert max_sessions > 0
+        assert 0 <= share_sequential_work <= 1
+        assert size_waiting_room > 0
         aht = 1 / lambda_
         kwargs = {"mu": mu, "nu": nu, "number_agents": number_agents,
-                  "lambda_": 1 / (aht * share_sequential_work * min(1, (max_sessions - 1)))}
+                  "lambda_": 1 / (aht * share_sequential_work * max(1, (max_sessions - 1)))}
         if size_waiting_room is not None:
             kwargs["size_waiting_room"] = size_waiting_room
         average_waiting_time = self.get_average_waiting_time(**kwargs)

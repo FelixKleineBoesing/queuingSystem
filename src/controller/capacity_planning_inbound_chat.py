@@ -101,7 +101,8 @@ class InboundChatController:
                 assert patience is not None, "patience has to be not none when size room is selected"
                 erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
-                kwargs["size_waiting_room"] = size_room
+                if size_room is not None:
+                    kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()
@@ -154,7 +155,8 @@ class InboundChatController:
                 assert patience is not None, "patience has to be not none when size room is selected"
                 erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
-                kwargs["size_waiting_room"] = size_room
+                if size_room is not None:
+                    kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()
@@ -206,7 +208,8 @@ class InboundChatController:
                 assert patience is not None, "patience has to be not none when size room is selected"
                 erlang = ErlangA()
                 kwargs["nu"] = 1 / patience
-                kwargs["size_waiting_room"] = size_room
+                if size_room is not None:
+                    kwargs["size_waiting_room"] = size_room
                 #kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()

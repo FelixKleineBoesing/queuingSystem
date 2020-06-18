@@ -35,11 +35,11 @@ class ErlangCTester(unittest.TestCase):
         erlang = ErlangC()
         return erlang.get_average_staying_time(lambda_=lambda_, mu=mu, number_agents=number_agents)
 
-    def get_number_agents_for_chat(self, lambda_: float, mu: float, abort_prob: float, max_sessions: int,
+    def get_number_agents_for_chat(self, lambda_: float, mu: float, service_level: float, max_sessions: int,
                                    share_sequential_work: float, max_waiting_time: int):
         erlang = ErlangC()
         return erlang.get_number_agents_for_chat(lambda_=lambda_, mu=mu,
-                                                 abort_prob=abort_prob, max_sessions=max_sessions,
+                                                 service_level=service_level, max_sessions=max_sessions,
                                                  share_sequential_work=share_sequential_work,
                                                  max_waiting_time=max_waiting_time)
 
@@ -97,31 +97,31 @@ class ErlangCTester(unittest.TestCase):
         self.assertEqual(prob, 0)
 
     def test_get_number_agents_for_chat(self):
-        number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, abort_prob=0.2,
+        number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, service_level=0.8,
+                                                        max_sessions=2, share_sequential_work=0.15, max_waiting_time=20)
+        self.assertEqual(number_agents, 4.0)
+
+        number_agents = self.get_number_agents_for_chat(lambda_=20/3600, mu=2/180, service_level=0.5,
                                                         max_sessions=2, share_sequential_work=0.15, max_waiting_time=20)
         self.assertEqual(number_agents, 3.0)
 
-        number_agents = self.get_number_agents_for_chat(lambda_=20/3600, mu=2/180, abort_prob=0.2,
-                                                        max_sessions=2, share_sequential_work=0.15, max_waiting_time=20)
-        self.assertEqual(number_agents, 3.0)
-
-        number_agents = self.get_number_agents_for_chat(lambda_=2/3600, mu=3/180, abort_prob=0.2,
+        number_agents = self.get_number_agents_for_chat(lambda_=2/3600, mu=3/180, service_level=0.8,
                                                         max_sessions=2, share_sequential_work=0.15, max_waiting_time=20)
         self.assertEqual(number_agents, 1.0)
 
-        number_agents = self.get_number_agents_for_chat(lambda_=24/3600, mu=1/180, abort_prob=0.1,
+        number_agents = self.get_number_agents_for_chat(lambda_=24/3600, mu=1/180, service_level=0.9,
                                                         max_sessions=2, share_sequential_work=0.15, max_waiting_time=20)
-        self.assertEqual(number_agents, 5.0)
+        self.assertEqual(number_agents, 7.0)
 
-        number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, abort_prob=0.15,
+        number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, service_level=0.85,
                                                         max_sessions=2, share_sequential_work=0.25, max_waiting_time=35)
-        self.assertEqual(number_agents, 2.0)
+        self.assertEqual(number_agents, 3.0)
 
-        number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, abort_prob=0.2,
+        number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, service_level=0.8,
                                                         max_sessions=10, share_sequential_work=0.05, max_waiting_time=60)
-        self.assertEqual(number_agents, 2.0)
+        self.assertEqual(number_agents, 1.0)
 
-        number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=3/180, abort_prob=0.3,
+        number_agents = self.get_number_agents_for_chat(lambda_=12/3600, mu=3/180, service_level=0.7,
                                                         max_sessions=2, share_sequential_work=0.15, max_waiting_time=10)
         self.assertEqual(number_agents, 2.0)
 

@@ -329,3 +329,9 @@ class PostgresWrapper:
             sql_objects = []
             order_string = ""
         return order_string, sql_objects
+
+
+if __name__ == "__main__":
+    postgres_wrapper = PostgresWrapper(host="localhost", port=5432, user="felix", password="felix", dbname="test")
+    dummy_df = pd.DataFrame()
+    postgres_wrapper.insert_from_df(data=dummy_df, table_name="Testdata")
