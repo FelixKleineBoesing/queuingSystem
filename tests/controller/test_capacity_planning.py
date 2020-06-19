@@ -46,7 +46,7 @@ class CapacityPlanningInboundPhoneTester(CapacityPlanningParameters):
                                                                             retrial=self.retrial)
         self.assertTrue(isinstance(number_agents, list))
         self.assertEqual(number_agents[0], 14)
-        self.assertEqual(number_agents[1], 15)
+        self.assertEqual(number_agents[1], 14)
 
     def test_get_volume_for_service_level(self):
         volume = self.controller.get_volume_for_service_level(interval=self.interval,
@@ -176,7 +176,7 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                               retrial=self.retrial)
 
         self.assertTrue(isinstance(volume, list))
-        self.assertEqual(volume[0], 73.5)
+        self.assertEqual(volume[0], 70.0)
         self.assertEqual(volume[1], 52.94117647058823)
 
     def test_get_number_agents_for_average_waiting_time(self):

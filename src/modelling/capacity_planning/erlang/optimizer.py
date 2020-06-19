@@ -218,7 +218,7 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
     loss_increasing_since = 0
     loss_decreased_once = False
     i = 0
-
+    print(kwargs)
     while not satisfied:
         loss, value = optim_func(guess)
         if last_loss is None:
