@@ -188,8 +188,8 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                                        max_sessions=self.max_sessions,
                                                                        share_sequential_work=self.share_sequential_work)
         self.assertTrue(isinstance(number_agents, list))
-        self.assertEqual(number_agents[0], 10)
-        self.assertEqual(number_agents[1], 8)
+        self.assertEqual(number_agents[0], 18)
+        self.assertEqual(number_agents[1], 7)
 
         number_agents = \
             self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,

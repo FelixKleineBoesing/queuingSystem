@@ -223,6 +223,11 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
         if last_loss is None:
             last_loss = loss
         losses[guess] = loss
+
+        if loss < last_loss:
+            loss_decreased_once = True
+            loss_increasing_since = 0
+
         if value != 0:
             diff = abs((target_value - value) / value)
         else:
@@ -245,9 +250,6 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
                 if v == min_loss:
                     guess = k
 
-        if loss < last_loss:
-            loss_decreased_once = True
-            loss_increasing_since = 0
 
     return guess
 
