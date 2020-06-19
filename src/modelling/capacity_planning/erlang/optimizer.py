@@ -214,10 +214,14 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
     satisfied = False
     losses = SortedDict()
     guess = 1
-    last_loss = 0
+    last_loss = None
     loss_increasing_since = 0
+    loss_decreased_once = False
+
     while not satisfied:
         loss, value = optim_func(guess)
+        if last_loss is None:
+            last_loss = loss
         losses[guess] = loss
         if value != 0:
             diff = abs((target_value - value) / value)
@@ -228,14 +232,19 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
         else:
             guess += 1
         if loss > last_loss and loss_increasing_since == 0:
-            last_loss = loss
             loss_increasing_since = 1
+            last_loss = loss
+
         elif loss > last_loss:
             loss_increasing_since += 1
 
-        if loss_increasing_since >= 5:
+        if loss_increasing_since >= 5 and loss_decreased_once:
             satisfied = True
             guess = losses.index(min(losses.values()))
+
+        if loss < last_loss:
+            loss_decreased_once = True
+            loss_increasing_since = 0
 
     return guess
 

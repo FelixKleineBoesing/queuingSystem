@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 cd ./tests
 test_output="$(coverage run -m --source="../src" pytest)"
 tail_output=$(echo "$test_output" | tail -n -1)

@@ -158,7 +158,8 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                               max_sessions=self.max_sessions,
                                                               share_sequential_work=self.share_sequential_work)
         profile.disable()
-        profile.getstats()
+        profile.dump_stats("cProfile.cprof")
+        print(profile.getstats())
         self.assertTrue(isinstance(volume, list))
         self.assertEqual(volume[0], 70.0)
         self.assertEqual(volume[1], 52.94117647058823)
