@@ -8,7 +8,7 @@ import plotly.graph_objs as go
 from types import MethodType, FunctionType
 from typing import Union
 
-from scipy.optimize import minimize_scalar, minimize
+from scipy.optimize import minimize
 from sortedcontainers import SortedDict
 
 from src.modelling.capacity_planning.erlang.erlang_arguments_mixin import ErlangArgumentsMixin
@@ -53,8 +53,8 @@ class Optimizer(ErlangArgumentsMixin):
         else:
             result = minimize(optim_func, argument_params.start, method="Nelder-Mead")
             value = target_type(result.x)
-        if target_type is int:
-            value += 1
+            if target_type is int:
+                value += 1
 
         valid, difference = self.validate_result(value=value, target_value=target_value, kwargs=kwargs,
                                                  optim_argument=optim_argument, method=method, tolerance=tolerance)
@@ -212,7 +212,7 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
             print(e)
 
     satisfied = False
-    losses = SortedDict()
+    losses = {}
     guess = 1
     last_loss = None
     loss_increasing_since = 0
@@ -232,7 +232,7 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
         else:
             guess += 1
         # TODO last loss should be set new
-        if loss > last_loss and loss_increasing_since == 0:
+        if loss < last_loss and loss_increasing_since == 0:
             loss_increasing_since = 1
             last_loss = loss
         elif loss > last_loss and loss_increasing_since > 0:
@@ -240,7 +240,10 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
 
         if loss_increasing_since >= 5 and loss_decreased_once:
             satisfied = True
-            guess = losses.index(min(losses.values()))
+            min_loss = min(losses.values())
+            for k, v in losses.items():
+                if v == min_loss:
+                    guess = k
 
         if loss < last_loss:
             loss_decreased_once = True
