@@ -231,11 +231,11 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
             satisfied = True
         else:
             guess += 1
+        # TODO last loss should be set new
         if loss > last_loss and loss_increasing_since == 0:
             loss_increasing_since = 1
             last_loss = loss
-
-        elif loss > last_loss:
+        elif loss > last_loss and loss_increasing_since > 0:
             loss_increasing_since += 1
 
         if loss_increasing_since >= 5 and loss_decreased_once:
