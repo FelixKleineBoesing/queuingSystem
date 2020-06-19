@@ -212,11 +212,12 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
             print(e)
 
     satisfied = False
-    losses = {}
+    losses ={}
     guess = 1
     last_loss = None
     loss_increasing_since = 0
     loss_decreased_once = False
+    i = 0
 
     while not satisfied:
         loss, value = optim_func(guess)
@@ -236,12 +237,15 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
             satisfied = True
         else:
             guess += 1
-        # TODO last loss should be set new
+
         if loss < last_loss and loss_increasing_since == 0:
             loss_increasing_since = 1
             last_loss = loss
         elif loss > last_loss and loss_increasing_since > 0:
             loss_increasing_since += 1
+        elif loss > last_loss and i == 1:
+            loss_increasing_since += 1
+            loss_decreased_once = True
 
         if loss_increasing_since >= 5 and loss_decreased_once:
             satisfied = True
@@ -249,6 +253,8 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
             for k, v in losses.items():
                 if v == min_loss:
                     guess = k
+
+        i += 1
 
 
     return guess

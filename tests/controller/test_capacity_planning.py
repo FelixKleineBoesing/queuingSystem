@@ -33,8 +33,8 @@ class CapacityPlanningInboundPhoneTester(CapacityPlanningParameters):
                                                                             service_level=self.service_level,
                                                                             service_time=self.service_time)
         self.assertTrue(isinstance(number_agents, list))
-        self.assertEqual(number_agents[0], 15)
-        self.assertEqual(number_agents[1], 16)
+        self.assertEqual(number_agents[0], 14)
+        self.assertEqual(number_agents[1], 15)
 
         number_agents = self.controller.get_number_agents_for_service_level(interval=self.interval,
                                                                             volume=self.volume,
@@ -78,7 +78,7 @@ class CapacityPlanningInboundPhoneTester(CapacityPlanningParameters):
                                                                                    asa=self.asa)
         self.assertTrue(isinstance(number_agents, list))
         self.assertEqual(number_agents[0], 12)
-        self.assertEqual(number_agents[1], 11)
+        self.assertEqual(number_agents[1], 13)
 
         number_agents = self.controller.get_number_agents_for_average_waiting_time(interval=self.interval,
                                                                                    volume=self.volume,
@@ -161,7 +161,7 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
         profile.dump_stats("cProfile.cprof")
         print(profile.getstats())
         self.assertTrue(isinstance(volume, list))
-        self.assertEqual(volume[0], 70.0)
+        self.assertEqual(volume[0], 73.5)
         self.assertEqual(volume[1], 52.94117647058823)
 
         volume = self.controller.get_volume_for_service_level(interval=self.interval,
@@ -202,8 +202,8 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                                        patience=self.patience,
                                                                        retrial=self.retrial)
         self.assertTrue(isinstance(number_agents, list))
-        self.assertEqual(number_agents[0], 3)
-        self.assertEqual(number_agents[1], 3)
+        self.assertEqual(number_agents[0], 1)
+        self.assertEqual(number_agents[1], 1)
 
     def test_get_volume_for_average_waiting_time(self):
         volumes = \
