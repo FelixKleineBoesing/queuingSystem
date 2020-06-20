@@ -2,7 +2,7 @@ import inspect
 import copy
 from typing import Union
 from typeguard import check_type
-
+import datetime
 
 def annotation_type_checker(func):
     """
@@ -125,3 +125,19 @@ def _check_if_arg_is_union(annotation):
         return annotation.__origin__._name == "Union"
     except:
         return False
+
+
+def time_it(func):
+    """
+    decorator which measures the time for execution
+
+    :param func:
+    :return:
+    """
+    def wrapper(*args, **kwargs):
+        start = datetime.datetime.now()
+        res = func(*args, **kwargs)
+        duration = datetime.datetime.now() - start
+        print("The execution took: {}".format(duration))
+        return res
+    return wrapper

@@ -109,7 +109,7 @@ class CapacityPlanningInboundPhoneTester(CapacityPlanningParameters):
                                                                       retrial=self.retrial)
 
         self.assertTrue(isinstance(volumes, list))
-        self.assertEqual(volumes[0], 95.40234374999999)
+        self.assertEqual(volumes[0], 95.42968749999999)
         self.assertEqual(volumes[1], 76.88878676470583)
 
 
@@ -157,9 +157,7 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                               service_time=self.service_time,
                                                               max_sessions=self.max_sessions,
                                                               share_sequential_work=self.share_sequential_work)
-        profile.disable()
-        profile.dump_stats("cProfile.cprof")
-        print(profile.getstats())
+
         self.assertTrue(isinstance(volume, list))
         self.assertEqual(volume[0], 73.5)
         self.assertEqual(volume[1], 52.94117647058823)
@@ -178,6 +176,9 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
         self.assertTrue(isinstance(volume, list))
         self.assertEqual(volume[0], 70.0)
         self.assertEqual(volume[1], 52.94117647058823)
+        profile.disable()
+        profile.dump_stats("cProfile.cprof")
+        profile.print_stats()
 
     def test_get_number_agents_for_average_waiting_time(self):
         number_agents = \
@@ -215,7 +216,7 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                                 share_sequential_work=self.share_sequential_work)
         self.assertTrue(isinstance(volumes, list))
         self.assertEqual(volumes[0], 70.0)
-        self.assertEqual(volumes[1], 91.38686236213228)
+        self.assertEqual(volumes[1], 91.38556985294107)
 
         volumes = \
             self.controller.get_volume_for_average_waiting_time(interval=self.interval,

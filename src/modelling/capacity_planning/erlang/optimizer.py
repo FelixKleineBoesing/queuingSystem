@@ -51,7 +51,7 @@ class Optimizer(ErlangArgumentsMixin):
         if target_type is int:
             value = integer_minimize_function_increase(method, kwargs, target_type, target_value, optim_argument)
         else:
-            result = minimize(optim_func, argument_params.start, method="Nelder-Mead")
+            result = minimize(optim_func, argument_params.start, method="Nelder-Mead", options={"ftol": tolerance})
             value = target_type(result.x)
             if target_type is int:
                 value += 1
