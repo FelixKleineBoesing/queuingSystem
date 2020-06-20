@@ -106,6 +106,9 @@ class InboundChatController:
                 #kwargs["retrial"] = retrial
             else:
                 erlang = ErlangC()
+            # I need to rethink the minimization mechanic. One argument must be searched, but inside this function
+            # is another minimization call which minimize another argument. Thats unnecessary and should be
+            # calculated side tasks
             lambda_ = erlang.minimize(erlang.get_number_agents_for_chat, kwargs=kwargs,
                                       optim_argument="lambda_", target_value=number_agents)
 

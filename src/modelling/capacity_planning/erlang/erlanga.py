@@ -28,9 +28,9 @@ class ErlangA(Optimizer):
         assert mu > 0
         assert nu > 0
         assert number_agents > 0
-        assert size_waiting_room > 0
         if size_waiting_room is None:
             size_waiting_room = 1000
+            assert size_waiting_room > 0
         prob_zero = get_prob_for_pn_in_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                     size_waiting_room=size_waiting_room, persons_in_system=0)
         if prob_zero == 0:
@@ -210,6 +210,7 @@ class ErlangA(Optimizer):
                   "lambda_": 1 / (aht * share_sequential_work * max(1, (max_sessions - 1)))}
         if size_waiting_room is not None:
             kwargs["size_waiting_room"] = size_waiting_room
+        print(lambda_)
         number_agents = self.minimize(self.get_max_waiting_probability,
                                       kwargs=kwargs, optim_argument="number_agents", target_value=service_level)
         return int(number_agents / max_sessions) + 1
@@ -311,9 +312,11 @@ def get_cn_for_mmckm_system(lambda_: float, mu: float, nu: float, number_agents:
 if __name__ == "__main__":
     erlang = ErlangA()
     aht = 900/50
-    kwargs = {"mu": 180 / 900, "max_waiting_time": 10, "nu": 180 / 900, "lambda_": 1 / (aht * 0.15 * max(1, (5 - 1))),
-              "size_waiting_room": 100}
-    erlang.plot_cost_function(method=erlang.get_max_waiting_probability,
+
+    kwargs = {"mu": 1 / 180, "max_waiting_time": 10, "nu": 1/180,
+              "size_waiting_room": 100, "service_level": 0.9, "max_sessions": 5, "share_sequential_work": 0.15}
+    print(erlang.get_number_agents_for_chat(lambda_=50/900, **kwargs))
+    erlang.plot_cost_function(method=erlang.get_number_agents_for_chat,
                               kwargs=kwargs,
-                              optim_argument="number_agents", target_value=0.9,
-                              boundaries=(0, 100), steps=2000).show()
+                              optim_argument="lambda_", target_value=14,
+                              boundaries=(0, 0.2), steps=1000).show()

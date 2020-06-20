@@ -4,6 +4,7 @@ from typing import Union
 from typeguard import check_type
 import datetime
 
+
 def annotation_type_checker(func):
     """
     this decorator can be used for automatic type checking of the function arguments

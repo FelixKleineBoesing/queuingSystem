@@ -49,12 +49,12 @@ class ErlangATester(unittest.TestCase):
         return erlang.get_average_number_customers_in_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                              size_waiting_room=size_waiting_room)
 
-    def get_number_agents_for_service_level(self, target_sla: float, lambda_: float, mu: float, max_waiting_time: int,
+    def get_number_agents_for_service_level(self, service_level: float, lambda_: float, mu: float, max_waiting_time: int,
                                             nu: float, size_waiting_room: int):
         erlang = ErlangA()
-        return erlang.get_number_agents_for_service_level(lambda_=lambda_, mu=mu, nu=nu, target_sla=target_sla,
-                                                          size_waiting_room=size_waiting_room,
-                                                          max_waiting_time=max_waiting_time)
+        return erlang.get_number_agents_for_chat(lambda_=lambda_, mu=mu, nu=nu, service_level=service_level,
+                                                 size_waiting_room=size_waiting_room,
+                                                 max_waiting_time=max_waiting_time)
 
     def test_get_prob_for_pn_in_mmckm_system(self):
         prob = get_prob_for_pn_in_mmckm_system(lambda_=0.1, mu=1/240, nu=1/300, number_agents=28,
