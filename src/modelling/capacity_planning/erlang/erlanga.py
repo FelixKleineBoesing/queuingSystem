@@ -43,12 +43,13 @@ class ErlangA(Optimizer):
         satisfied = False
         while not satisfied:
             x = (number_agents * mu + nu) * max_waiting_time
-            # TODO something here is pretty slow
+            # TODO gamma.cdf is pretty slow
             g = 1 - gamma.cdf(x=x, a=n - number_agents + 1)
             prob -= prob_zero * get_cn_for_mmckm_system(lambda_=lambda_, mu=mu, nu=nu,
                                                         number_agents=number_agents, n=n) * g
             if last_prob is not None:
-                if abs((last_prob - prob) / last_prob) < 0.00000001:
+                difference = abs(last_prob - prob)
+                if difference < 1e-10:
                     satisfied = True
             last_prob = prob
             n += 1
@@ -309,31 +310,10 @@ def get_cn_for_mmckm_system(lambda_: float, mu: float, nu: float, number_agents:
 
 if __name__ == "__main__":
     erlang = ErlangA()
-    print(erlang.get_max_waiting_probability(lambda_=50/900, mu=1/200, number_agents=19, max_waiting_time=10, nu=1/10000))
-    print(erlang.get_max_waiting_probability(lambda_=50/900, mu=1/180, nu=1/1000, number_agents=14,
-                                             max_waiting_time=10))
+    aht = 900/50
+    kwargs = {"mu": 180 / 900, "max_waiting_time": 10, "nu": 180 / 900, "lambda_": 1 / (aht * 0.15 * max(1, (5 - 1))),
+              "size_waiting_room": 100}
     erlang.plot_cost_function(method=erlang.get_max_waiting_probability,
-                              kwargs=dict(number_agents=13, mu=1/180, nu=1/180, size_waiting_room=80, max_waiting_time=20),
-                              optim_argument="lambda_", target_value=0.8633721956843062,
-                              boundaries=(0, 2), steps=2000).show()
-    print(erlang.get_max_waiting_probability(lambda_=50/900, mu=1/180, nu=1/180, number_agents=14, max_waiting_time=10))
-    print(erlang.get_max_waiting_probability(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, size_waiting_room=80,
-                                             max_waiting_time=20))
-    print(erlang.minimize(method=erlang.get_max_waiting_probability,
-                          kwargs=dict(lambda_=1/10, mu=1/240, nu=1/300, size_waiting_room=80, max_waiting_time=20),
-                          optim_argument="number_agents", target_value=0.8633721956843062))
-    print(erlang.minimize(method=erlang.get_max_waiting_probability,
-                          kwargs=dict(lambda_=50/900, mu=1/180, nu=1/180, size_waiting_room=80, max_waiting_time=20),
-                          optim_argument="number_agents", target_value=0.8633721956843062))
-
-    print(erlang.get_prob_for_abort(lambda_=1/10, mu=1/240, nu=1/30, number_agents=25, size_waiting_room=80))
-    print(erlang.get_average_queue_length(lambda_=1 / 10, mu=1 / 240, nu=1 / 300, number_agents=28, size_waiting_room=80))
-    print(erlang.get_average_number_customers_in_system(lambda_=1 / 10, mu=1 / 240, nu=1 / 300, number_agents=28,
-                                                        size_waiting_room=80))
-    print(erlang.get_average_waiting_time(lambda_=1 / 10, mu=1 / 240, nu=1 / 300, number_agents=28,
-                                          size_waiting_room=80))
-    print(erlang.get_average_staying_time(lambda_=1 / 10, mu=1 / 240, nu=1 / 300, number_agents=28,
-                                          size_waiting_room=80))
-    res = erlang.get_number_agents_for_chat(lambda_=12/3600, mu=1/180, max_waiting_time=20, nu=0.05/3,
-                                            abort_prob=0.2, max_sessions=2, share_sequential_work=0.15)
-    print(res)
+                              kwargs=kwargs,
+                              optim_argument="number_agents", target_value=0.9,
+                              boundaries=(0, 100), steps=2000).show()

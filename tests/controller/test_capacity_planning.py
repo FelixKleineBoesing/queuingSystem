@@ -118,17 +118,17 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
     controller = InboundChatController()
 
     def test_get_number_agents_for_service_level(self):
-        number_agents = \
-            self.controller.get_number_agents_for_service_level(interval=self.interval,
-                                                                volume=self.volume,
-                                                                aht=self.aht,
-                                                                service_level=self.service_level,
-                                                                service_time=self.service_time,
-                                                                max_sessions=self.max_sessions,
-                                                                share_sequential_work=self.share_sequential_work)
-        self.assertTrue(isinstance(number_agents, list))
-        self.assertEqual(number_agents[0], 5)
-        self.assertEqual(number_agents[1], 2)
+        # number_agents = \
+        #     self.controller.get_number_agents_for_service_level(interval=self.interval,
+        #                                                         volume=self.volume,
+        #                                                         aht=self.aht,
+        #                                                         service_level=self.service_level,
+        #                                                         service_time=self.service_time,
+        #                                                         max_sessions=self.max_sessions,
+        #                                                         share_sequential_work=self.share_sequential_work)
+        # self.assertTrue(isinstance(number_agents, list))
+        # self.assertEqual(number_agents[0], 5)
+        # self.assertEqual(number_agents[1], 2)
 
         number_agents = \
             self.controller.get_number_agents_for_service_level(interval=self.interval,

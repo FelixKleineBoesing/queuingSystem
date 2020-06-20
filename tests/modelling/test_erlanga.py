@@ -64,16 +64,16 @@ class ErlangATester(unittest.TestCase):
     def test_get_max_waiting_probability(self):
         prob = self.get_max_waiting_probability(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, max_waiting_time=20,
                                                 size_waiting_room=80)
-        self.assertEqual(prob, 0.8633721956843062)
+        self.assertEqual(prob, 0.863372195753652)
 
         prob = self.get_max_waiting_probability(lambda_=1/11, mu=1/240, nu=1 / 300, number_agents=28,
                                                 max_waiting_time=20,
                                                 size_waiting_room=80)
-        self.assertEqual(prob, 0.9419524522175644)
+        self.assertEqual(prob, 0.9419524522725311)
 
         prob = self.get_max_waiting_probability(lambda_=1/10, mu=1/240, nu=1/280, number_agents=27, max_waiting_time=22,
                                                 size_waiting_room=79)
-        self.assertEqual(prob, 0.8275267870257028)
+        self.assertEqual(prob, 0.8275267870588185)
 
         prob = self.get_max_waiting_probability(lambda_=1/10, mu=1/250, nu=1/290, number_agents=24, max_waiting_time=10,
                                                 size_waiting_room=60)

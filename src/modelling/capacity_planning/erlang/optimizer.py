@@ -51,7 +51,7 @@ class Optimizer(ErlangArgumentsMixin):
         if target_type is int:
             value = integer_minimize_function_increase(method, kwargs, target_type, target_value, optim_argument)
         else:
-            result = minimize(optim_func, argument_params.start, method="Nelder-Mead", options={"ftol": tolerance})
+            result = minimize(optim_func, argument_params.start, method="Nelder-Mead", options={"fatol": tolerance})
             value = target_type(result.x)
             if target_type is int:
                 value += 1
@@ -212,7 +212,7 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
             print(e)
 
     satisfied = False
-    losses ={}
+    losses = {}
     guess = 1
     last_loss = None
     loss_increasing_since = 0
@@ -256,10 +256,4 @@ def integer_minimize_function_increase(method, kwargs: dict, target_type: type, 
 
         i += 1
 
-
     return guess
-
-
-
-
-
