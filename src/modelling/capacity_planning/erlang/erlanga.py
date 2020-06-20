@@ -31,7 +31,6 @@ class ErlangA(Optimizer):
         assert size_waiting_room > 0
         if size_waiting_room is None:
             size_waiting_room = 1000
-        # TODO something here is pretty slow
         prob_zero = get_prob_for_pn_in_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                     size_waiting_room=size_waiting_room, persons_in_system=0)
         if prob_zero == 0:
@@ -39,12 +38,22 @@ class ErlangA(Optimizer):
         else:
             prob = 1 - prob_zero * get_cn_for_mmckm_system(lambda_=lambda_, mu=mu, nu=nu, number_agents=number_agents,
                                                            n=size_waiting_room)
-
-        for n in range(number_agents, size_waiting_room):
+        last_prob = None
+        n = number_agents
+        satisfied = False
+        while not satisfied:
             x = (number_agents * mu + nu) * max_waiting_time
+            # TODO something here is pretty slow
             g = 1 - gamma.cdf(x=x, a=n - number_agents + 1)
-            prob = prob - prob_zero * get_cn_for_mmckm_system(lambda_=lambda_, mu=mu, nu=nu,
-                                                              number_agents=number_agents, n=n) * g
+            prob -= prob_zero * get_cn_for_mmckm_system(lambda_=lambda_, mu=mu, nu=nu,
+                                                        number_agents=number_agents, n=n) * g
+            if last_prob is not None:
+                if abs((last_prob - prob) / last_prob) < 0.00000001:
+                    satisfied = True
+            last_prob = prob
+            n += 1
+            if n == size_waiting_room:
+                satisfied = True
         return prob
 
     @staticmethod
