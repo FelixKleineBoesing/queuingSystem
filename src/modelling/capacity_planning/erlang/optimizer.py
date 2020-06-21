@@ -21,7 +21,7 @@ class Optimizer(ErlangArgumentsMixin):
     Therefore all arguments need a type annotation.
     """
     def minimize(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
-                 target_value: Union[float, int], tolerance: float = 0.05):
+                 target_value: Union[float, int], tolerance: float = 0.01):
         """
         minimizes the squared error of any given method with given parameters and one optim_argument which
         should be estimated
@@ -51,7 +51,7 @@ class Optimizer(ErlangArgumentsMixin):
         if target_type is int:
             value = integer_minimize_function_increase(method, kwargs, target_type, target_value, optim_argument)
         else:
-            result = minimize(optim_func, argument_params.start, method="Nelder-Mead", options={"fatol": tolerance})
+            result = minimize(optim_func, argument_params.start, method="Nelder-Mead")
             value = target_type(result.x)
             if target_type is int:
                 value += 1

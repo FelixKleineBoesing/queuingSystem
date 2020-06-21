@@ -205,12 +205,13 @@ class ErlangA(Optimizer):
         assert max_sessions > 0
         assert 0 <= share_sequential_work <= 1
         assert size_waiting_room > 0
-        aht = 1 / lambda_
-        kwargs = {"mu": mu, "max_waiting_time": max_waiting_time, "nu": nu,
-                  "lambda_": 1 / (aht * share_sequential_work * max(1, (max_sessions - 1)))}
+        aht = 1 / mu
+        kwargs = {"lambda_": lambda_, "max_waiting_time": max_waiting_time, "nu": nu,
+                  "mu": 1 / (aht * share_sequential_work * max(1, (max_sessions - 1)))}
         if size_waiting_room is not None:
             kwargs["size_waiting_room"] = size_waiting_room
         print(lambda_)
+        # TODO an idea is to return the loss from this function instead of the value that should be returned
         number_agents = self.minimize(self.get_max_waiting_probability,
                                       kwargs=kwargs, optim_argument="number_agents", target_value=service_level)
         return int(number_agents / max_sessions) + 1

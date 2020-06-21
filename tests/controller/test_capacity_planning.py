@@ -109,7 +109,7 @@ class CapacityPlanningInboundPhoneTester(CapacityPlanningParameters):
                                                                       retrial=self.retrial)
 
         self.assertTrue(isinstance(volumes, list))
-        self.assertEqual(volumes[0], 95.42968749999999)
+        self.assertEqual(volumes[0], 95.40234374999999)
         self.assertEqual(volumes[1], 76.88878676470583)
 
 
@@ -142,8 +142,8 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                                 patience=self.patience,
                                                                 retrial=self.retrial)
         self.assertTrue(isinstance(number_agents, list))
-        self.assertEqual(number_agents[0], 5)
-        self.assertEqual(number_agents[1], 2)
+        self.assertEqual(number_agents[0], 2)
+        self.assertEqual(number_agents[1], 3)
 
     def test_get_volume_for_service_level(self):
         # TODO this execution is slow as fuck
@@ -216,7 +216,7 @@ class CapacityPlanningInboundChat(CapacityPlanningParameters):
                                                                 share_sequential_work=self.share_sequential_work)
         self.assertTrue(isinstance(volumes, list))
         self.assertEqual(volumes[0], 70.0)
-        self.assertEqual(volumes[1], 91.38556985294107)
+        self.assertEqual(volumes[1], 91.38686236213228)
 
         volumes = \
             self.controller.get_volume_for_average_waiting_time(interval=self.interval,
