@@ -1,4 +1,5 @@
 from scipy.stats import gamma
+from scipy.special import gdtr
 
 from src.modelling.capacity_planning.erlang.optimizer import Optimizer
 from src.modelling.helpers import power_faculty
@@ -44,7 +45,7 @@ class ErlangA(Optimizer):
         while not satisfied:
             x = (number_agents * mu + nu) * max_waiting_time
             # TODO gamma.cdf is pretty slow
-            g = 1 - gamma.cdf(x=x, a=n - number_agents + 1)
+            g = 1 - gdtr(1, n-number_agents + 1, x)
             prob -= prob_zero * get_cn_for_mmckm_system(lambda_=lambda_, mu=mu, nu=nu,
                                                         number_agents=number_agents, n=n) * g
             if last_prob is not None:
