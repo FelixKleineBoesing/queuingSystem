@@ -11,10 +11,10 @@ from typing import Union
 from scipy.optimize import minimize
 from sortedcontainers import SortedDict
 
-from src.modelling.capacity_planning.erlang.erlang_arguments_mixin import ErlangArgumentsMixin
+from src.modelling.capacity_planning.optimizer_arguments import OptimizerArguments
 
 
-class Optimizer(ErlangArgumentsMixin):
+class Optimizer(OptimizerArguments):
     """
     The Optimizer is a helper class that can be inherited to any class to make any method of the origin class
     optimizable in terms of finding a fitting value for the missing argument.

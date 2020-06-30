@@ -60,7 +60,6 @@ class OutboundPhoneController:
                 number_agents_list.append(func(**args))
             return number_agents_list
 
-
     @annotation_type_checker
     @check_length_list_equality
     def get_volume_for_service_level(self, interval: IntList, number_agents: IntList, aht: IntList,

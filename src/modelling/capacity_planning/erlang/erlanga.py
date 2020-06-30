@@ -1,7 +1,6 @@
-from scipy.stats import gamma
 from scipy.special import gdtr
 
-from src.modelling.capacity_planning.erlang.optimizer import Optimizer
+from modelling.capacity_planning.optimizer import Optimizer
 from src.modelling.helpers import power_faculty
 
 

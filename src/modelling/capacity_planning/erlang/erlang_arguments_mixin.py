@@ -18,6 +18,7 @@ class ErlangArgumentsMixin:
             "share_sequential_work": ArgumentParams(lower_bound=0, upper_bound=1),
             "max_sessions": ArgumentParams(lower_bound=1)
         }
+        
         self._start_functions = {
             "lambda_": self.get_lambda_start,
             "mu": self.get_mu_start,
