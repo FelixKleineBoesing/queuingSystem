@@ -1,8 +1,4 @@
-import logging
-import inspect
-from typing import Union
-
-from src.modelling.capacity_planning.erlang.helpers import ArgumentParams
+from modelling.capacity_planning.optimizer_arguments import ArgumentParams
 
 
 class ErlangArgumentsMixin:
@@ -29,30 +25,6 @@ class ErlangArgumentsMixin:
             "share_sequential_work": self.get_share_sequential_work_start,
             "max_sessions": self.get_max_sessions_start
         }
-
-    def get_argument_params(self, arg: str, **kwargs) -> Union[ArgumentParams, None]:
-        """
-
-        :param arg: argument for which the params should be exported
-        :param kwargs:
-        :return:
-        """
-        if arg in self.argument_params:
-            argument_params = self.argument_params[arg]
-            if arg in self._start_functions:
-                start_function = self._start_functions[arg]
-                args = inspect.getfullargspec(start_function).args
-                kwargs = {key: value for key, value in kwargs.items() if key in args}
-                try:
-                    start = start_function(**kwargs)
-                    argument_params.start = start
-                except TypeError as e:
-                    logging.debug("Starting value couldn´t be calculated because there is a value missing in "
-                                  "the function. Supply it please. This is the message: {}".format(e))
-                except Exception as e:
-                    raise RuntimeError("There occurred an error in the calculation of the starting value! "
-                                       "Exception: {}".format(e))
-            return argument_params
 
     def get_number_agents_start(self, lambda_: float, mu: float):
         """

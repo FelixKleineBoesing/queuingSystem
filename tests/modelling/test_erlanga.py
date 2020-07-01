@@ -11,6 +11,7 @@ class ErlangATester(unittest.TestCase):
 
     def test_erlangb_construction(self):
         erlang = ErlangA()
+        self.assertTrue(isinstance(erlang, ErlangA))
 
     def get_max_waiting_probability(self, lambda_: float, mu: float, number_agents: int, max_waiting_time: int,
                                     nu: float, size_waiting_room: int):
