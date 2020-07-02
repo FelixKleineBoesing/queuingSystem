@@ -3,10 +3,17 @@ from modelling.capacity_planning.optimizer import Optimizer
 
 class OutboundCalculator(Optimizer):
 
-    def get_number_agents(self, lambda_: float, dialing_time: int, netto_contact_rate: float,
-                          right_person_contact_rate: float, mu_right_person: float, mu_wrong_person: float):
-        ((netto_contact_rate * right_person_contact_rate) / lambda_) * ((1 / mu_right_person + dialing_time))
-        pass
+    def get_number_agents(self, lambda_: float, dialing_time: float, netto_contact_rate: float,
+                          right_person_contact_rate: float, mu_correct: float, mu_wrong: float):
+        val = (netto_contact_rate * right_person_contact_rate * lambda_) * (1 / mu_correct + 1 / dialing_time) + \
+              ((lambda_ * netto_contact_rate) - (netto_contact_rate * right_person_contact_rate * lambda_)) *\
+              (1 / mu_wrong + 1 / dialing_time)
+        return val
 
-    def get_number_contacts(self):
-        pass
+    def get_volume(self, dialing_time: float, netto_contact_rate: float, right_person_contact_rate: float,
+                   mu_correct: float, mu_wrong: float, number_agents: float):
+        # TODO transform the equation to eliminate interval
+        val = (number_agents / ((netto_contact_rate * right_person_contact_rate) * (1 / mu_correct + 1 / dialing_time))) - \
+              ((number_agents / netto_contact_rate * right_person_contact_rate) * (1 / mu_wrong + 1 / dialing_time))
+
+        return val
