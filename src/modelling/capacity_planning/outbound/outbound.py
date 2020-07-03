@@ -13,7 +13,7 @@ class OutboundCalculator(Optimizer):
     def get_volume(self, dialing_time: float, netto_contact_rate: float, right_person_contact_rate: float,
                    mu_correct: float, mu_wrong: float, number_agents: float):
         # TODO transform the equation to eliminate interval
-        val = (number_agents / ((netto_contact_rate * right_person_contact_rate) * (1 / mu_correct + 1 / dialing_time))) - \
-              ((number_agents / netto_contact_rate * right_person_contact_rate) * (1 / mu_wrong + 1 / dialing_time))
+        val = number_agents / (((netto_contact_rate * right_person_contact_rate) * (1 / mu_correct + 1 / dialing_time)) +
+                               (netto_contact_rate - netto_contact_rate * right_person_contact_rate) * (1 / dialing_time + 1 / mu_wrong))
 
         return val

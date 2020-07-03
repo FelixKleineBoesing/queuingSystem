@@ -38,5 +38,6 @@ class CapacityPlanningOutboundTester(CapacityPlanningParameters):
                                           netto_contact_rate=self.netto_contract_rate,
                                           right_person_contact_rate=self.right_person_contact_rate)
         self.assertTrue(isinstance(volume, list))
-        self.assertTrue(isinstance(volume[0], ))
-        self.assertTrue(isinstance(volume[1], ))
+        print(volume)
+        self.assertEqual(volume[0], 19.999999999999996)
+        self.assertEqual(volume[1], 7.843137254901961)
