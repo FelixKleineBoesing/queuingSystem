@@ -1,3 +1,4 @@
+import logging
 import os
 import dotenv
 from src import DEFAULT_VARIABLES
@@ -18,7 +19,7 @@ class ConfigManager:
         if os.path.isfile(env_file):
             dotenv.load_dotenv(env_file)
         else:
-            raise FileNotFoundError("env file is not found")
+            logging.error("env file is not found")
 
     def get_value(self, key: str):
         if key in ConfigManager.variables:

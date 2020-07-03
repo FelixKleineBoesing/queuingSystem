@@ -1,7 +1,7 @@
 import unittest
 
-from api.server import Server
-from data_access.wrapper.redis import RedisWrapper
+from src.api.server import Server
+from src.data_access.wrapper.redis import RedisWrapper
 
 
 class ServerTester(unittest.TestCase):
