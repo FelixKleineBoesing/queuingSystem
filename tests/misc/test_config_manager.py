@@ -1,6 +1,6 @@
 import unittest
 
-from misc.config_manager import ConfigManager
+from src.misc.config_manager import ConfigManager
 
 
 class ConfigManagerTester(unittest.TestCase):
