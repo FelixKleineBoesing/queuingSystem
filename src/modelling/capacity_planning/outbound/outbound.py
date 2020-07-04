@@ -1,4 +1,4 @@
-from modelling.capacity_planning.optimizer import Optimizer
+from src.modelling.capacity_planning.optimizer import Optimizer
 
 
 class OutboundCalculator(Optimizer):

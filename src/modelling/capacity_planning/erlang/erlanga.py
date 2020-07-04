@@ -1,6 +1,6 @@
 from scipy.special import gdtr
 
-from modelling.capacity_planning.optimizer import Optimizer
+from src.modelling.capacity_planning.optimizer import Optimizer
 from src.modelling.helpers import power_faculty
 
 

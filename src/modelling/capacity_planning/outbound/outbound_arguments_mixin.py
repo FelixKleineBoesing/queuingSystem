@@ -1,4 +1,4 @@
-from modelling.capacity_planning.optimizer_arguments import OptimizerArguments, ArgumentParams
+from src.modelling.capacity_planning.optimizer_arguments import OptimizerArguments, ArgumentParams
 
 
 class OutboundArgumentsMixin(OptimizerArguments):

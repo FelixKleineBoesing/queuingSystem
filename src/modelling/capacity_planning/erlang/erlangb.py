@@ -1,6 +1,6 @@
 import numpy as np
 
-from modelling.capacity_planning.optimizer import Optimizer
+from src.modelling.capacity_planning.optimizer import Optimizer
 from src.modelling.helpers import power_faculty
 
 
