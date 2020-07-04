@@ -1,11 +1,10 @@
 import math
 
-from src.modelling.capacity_planning.erlang.erlang_arguments_mixin import ErlangArgumentsMixin
-from src.modelling.capacity_planning.optimizer import Optimizer
+from src.modelling.capacity_planning.erlang.erlang_base import ErlangBase
 from src.modelling.helpers import power_faculty
 
 
-class ErlangC(Optimizer, ErlangArgumentsMixin):
+class ErlangC(ErlangBase):
 
     def get_max_waiting_probability(self, lambda_: float, mu: float, number_agents: int, max_waiting_time: int) \
             -> float:

@@ -14,12 +14,15 @@ from sortedcontainers import SortedDict
 from src.modelling.capacity_planning.optimizer_arguments import OptimizerArguments
 
 
-class Optimizer(OptimizerArguments):
+class Optimizer:
     """
     The Optimizer is a helper class that can be inherited to any class to make any method of the origin class
     optimizable in terms of finding a fitting value for the missing argument.
     Therefore all arguments need a type annotation.
     """
+    def __init__(self, optimizer_arguments: OptimizerArguments):
+        self.optimizer_arguments = optimizer_arguments
+
     def minimize(self, method: Union[MethodType, FunctionType], kwargs: dict, optim_argument: str,
                  target_value: Union[float, int], tolerance: float = 0.01):
         """
@@ -47,7 +50,7 @@ class Optimizer(OptimizerArguments):
         if hasattr(method, "return_variable"):
             argument_params_kwargs[method.return_variable] = target_value
 
-        argument_params = self.get_argument_params(optim_argument, **argument_params_kwargs)
+        argument_params = self.optimizer_arguments.get_argument_params(arg=optim_argument, **argument_params_kwargs)
         if target_type is int:
             value = integer_minimize_function_increase(method, kwargs, target_type, target_value, optim_argument)
         else:

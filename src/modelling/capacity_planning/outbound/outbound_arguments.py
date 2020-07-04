@@ -1,7 +1,7 @@
 from src.modelling.capacity_planning.optimizer_arguments import OptimizerArguments, ArgumentParams
 
 
-class OutboundArgumentsMixin(OptimizerArguments):
+class OutboundArguments(OptimizerArguments):
 
     def __init__(self):
         self._start_functions = {}

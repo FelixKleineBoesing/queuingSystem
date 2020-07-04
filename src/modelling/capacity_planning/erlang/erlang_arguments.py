@@ -1,7 +1,7 @@
-from src.modelling.capacity_planning.optimizer_arguments import ArgumentParams
+from src.modelling.capacity_planning.optimizer_arguments import ArgumentParams, OptimizerArguments
 
 
-class ErlangArgumentsMixin:
+class ErlangArguments(OptimizerArguments):
 
     def __init__(self):
         self.argument_params = {
@@ -25,6 +25,7 @@ class ErlangArgumentsMixin:
             "share_sequential_work": self.get_share_sequential_work_start,
             "max_sessions": self.get_max_sessions_start
         }
+        super().__init__()
 
     def get_number_agents_start(self, lambda_: float, mu: float):
         """

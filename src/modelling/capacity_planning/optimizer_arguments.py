@@ -42,10 +42,12 @@ class OptimizerArguments(abc.ABC):
     def __init__(self):
         # This dictionary stores the Function of your class that retrieve the starting point for a parameter search
         # These function get all the other arguments of the minimize function.
-        self._start_functions = {}
+        if not hasattr(self, "_start_functions"):
+            self._start_functions = {}
         # this dictionary should stores objects of the class ArgumentParams for each parameter that is used in the
         # models that should be mixed in with this class
-        self.argument_params = {}
+        if not hasattr(self, "argument_params"):
+            self.argument_params = {}
 
     def get_argument_params(self, arg: str, **kwargs) -> Union[ArgumentParams, None]:
         """
