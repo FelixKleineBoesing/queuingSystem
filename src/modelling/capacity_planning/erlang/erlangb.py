@@ -1,10 +1,11 @@
 import numpy as np
 
+from src.modelling.capacity_planning.erlang.erlang_arguments_mixin import ErlangArgumentsMixin
 from src.modelling.capacity_planning.optimizer import Optimizer
 from src.modelling.helpers import power_faculty
 
 
-class ErlangB(Optimizer):
+class ErlangB(Optimizer, ErlangArgumentsMixin):
 
     def get_probability(self, number_agents: int, lambda_: float, mu: float):
         """

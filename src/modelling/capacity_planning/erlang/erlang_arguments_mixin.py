@@ -1,4 +1,4 @@
-from modelling.capacity_planning.optimizer_arguments import ArgumentParams
+from src.modelling.capacity_planning.optimizer_arguments import ArgumentParams
 
 
 class ErlangArgumentsMixin:

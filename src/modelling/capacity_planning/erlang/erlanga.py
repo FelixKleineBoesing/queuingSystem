@@ -1,10 +1,11 @@
 from scipy.special import gdtr
 
+from src.modelling.capacity_planning.erlang.erlang_arguments_mixin import ErlangArgumentsMixin
 from src.modelling.capacity_planning.optimizer import Optimizer
 from src.modelling.helpers import power_faculty
 
 
-class ErlangA(Optimizer):
+class ErlangA(Optimizer, ErlangArgumentsMixin):
 
     """
     erlang c but with patience and finite size of waiting roomm

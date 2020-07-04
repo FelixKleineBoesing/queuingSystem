@@ -1,7 +1,8 @@
 from src.modelling.capacity_planning.optimizer import Optimizer
+from src.modelling.capacity_planning.outbound.outbound_arguments_mixin import OutboundArgumentsMixin
 
 
-class OutboundCalculator(Optimizer):
+class OutboundCalculator(Optimizer, OutboundArgumentsMixin):
 
     def get_number_agents(self, lambda_: float, dialing_time: float, netto_contact_rate: float,
                           right_person_contact_rate: float, mu_correct: float, mu_wrong: float):
