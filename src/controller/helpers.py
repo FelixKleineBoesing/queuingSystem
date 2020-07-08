@@ -3,6 +3,8 @@ from typing import Union, List
 
 FloatList = Union[float, List[float]]
 IntList = Union[int, List[int]]
+ListIntList = Union[List[IntList], IntList]
+ListFloatList = Union[List[FloatList], FloatList]
 
 
 def check_length_list_equality(func):
