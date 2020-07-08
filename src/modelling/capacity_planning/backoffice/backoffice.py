@@ -25,7 +25,7 @@ class BackOfficeCalculator:
         assert 0 < occupancy <= 1
         open_volumes = np.array(lambdas)
         backlog_prioritized = np.zeros((len(open_volumes), ))
-        backlog_prioritized[:backlog_within + 1] = backlog_sum / backlog_within
+        backlog_prioritized[:backlog_within] = backlog_sum / backlog_within
         volumes_sum = open_volumes + backlog_prioritized
         required_agents = (volumes_sum * np.array(ahts)) / occupancy
         return required_agents.tolist()
