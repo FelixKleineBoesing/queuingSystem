@@ -27,32 +27,32 @@ class BackOfficeTester(unittest.TestCase):
 
     def test_get_required_agents(self):
         backoffice = BackOfficeCalculator()
-        number_agents = backoffice.get_required_agents(lambdas=self.lambdas[0], ahts=self.ahts[0],
-                                                       backlog_sum=self.backlog_sums[0],
-                                                       backlog_within=self.backlog_within[0],
-                                                       occupancy=self.occupancy[0])
+        number_agents = backoffice.get_number_agents(lambdas=self.lambdas[0], ahts=self.ahts[0],
+                                                     backlog_sum=self.backlog_sums[0],
+                                                     backlog_within=self.backlog_within[0],
+                                                     occupancy=self.occupancy[0])
         self.assertTrue(isinstance(number_agents, list))
         for i, item in enumerate(number_agents):
             self.assertAlmostEqual(self.number_agents[0][i], item, places=8)
 
-        number_agents = backoffice.get_required_agents(lambdas=self.lambdas[1], ahts=self.ahts[1],
-                                                       backlog_sum=self.backlog_sums[1],
-                                                       backlog_within=self.backlog_within[1],
-                                                       occupancy=self.occupancy[1])
+        number_agents = backoffice.get_number_agents(lambdas=self.lambdas[1], ahts=self.ahts[1],
+                                                     backlog_sum=self.backlog_sums[1],
+                                                     backlog_within=self.backlog_within[1],
+                                                     occupancy=self.occupancy[1])
         self.assertTrue(isinstance(number_agents, list))
         for i, item in enumerate(number_agents):
             self.assertAlmostEqual(self.number_agents[1][i], item, places=8)
 
     def test_get_possible_volume(self):
         backoffice = BackOfficeCalculator()
-        volume = backoffice.get_possible_volume(available_agents=self.number_agents[0], ahts=self.ahts[0],
-                                                backlog_within=self.backlog_within[0], occupancy=self.occupancy[0])
+        volume = backoffice.get_volume(number_agents=self.number_agents[0], ahts=self.ahts[0],
+                                       backlog_within=self.backlog_within[0], occupancy=self.occupancy[0])
         self.assertTrue(isinstance(volume, list))
         for i, item in enumerate(volume):
             self.assertAlmostEqual(self.lambdas_with_backlog[0][i], volume[i], places=8)
 
-        volume = backoffice.get_possible_volume(available_agents=self.number_agents[1], ahts=self.ahts[1],
-                                                backlog_within=self.backlog_within[1], occupancy=self.occupancy[1])
+        volume = backoffice.get_volume(number_agents=self.number_agents[1], ahts=self.ahts[1],
+                                       backlog_within=self.backlog_within[1], occupancy=self.occupancy[1])
 
         self.assertTrue(isinstance(volume, list))
         for i, item in enumerate(volume):

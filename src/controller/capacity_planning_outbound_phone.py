@@ -30,8 +30,8 @@ class OutboundPhoneController:
         func_inspect.remove("self")
         func_args = {key: value for key, value in func_args.items() if key in func_inspect and value is not None}
 
-        def func(interval: IntList, volume: FloatList, dialing_time: float, aht_correct: IntList, aht_wrong: IntList,
-                 netto_contact_rate: FloatList, right_person_contact_rate: FloatList):
+        def func(interval: int, volume: float, dialing_time: float, aht_correct: int, aht_wrong: int,
+                 netto_contact_rate: float, right_person_contact_rate: float):
             kwargs = {"lambda_": volume / interval, "mu_wrong": 1 / aht_wrong,
                       "mu_correct": 1 / aht_correct, "netto_contact_rate": netto_contact_rate,
                       "right_person_contact_rate": right_person_contact_rate, "dialing_time": 1 / dialing_time}
@@ -72,8 +72,8 @@ class OutboundPhoneController:
         func_inspect.remove("self")
         func_args = {key: value for key, value in func_args.items() if key in func_inspect and value is not None}
 
-        def func(interval: IntList, number_agents: IntList, dialing_time: float, aht_correct: IntList, aht_wrong: IntList,
-                 netto_contact_rate: FloatList, right_person_contact_rate: FloatList):
+        def func(interval: int, number_agents: int, dialing_time: float, aht_correct: int, aht_wrong: int,
+                 netto_contact_rate: float, right_person_contact_rate: float):
             kwargs = {"mu_wrong": 1 / aht_wrong, "mu_correct": 1 / aht_correct, "netto_contact_rate": netto_contact_rate,
                       "right_person_contact_rate": right_person_contact_rate, "dialing_time": 1 / dialing_time,
                       "number_agents": number_agents}
