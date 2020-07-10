@@ -102,4 +102,4 @@ class ErlangATester(unittest.TestCase):
     def test_get_staying_time(self):
         mean_staying_time = self.get_mean_staying_time(lambda_=0.1, mu=1/240, nu=1/300, number_agents=28,
                                                        size_waiting_room=80)
-        self.assertAlmostEqual(mean_staying_time, 241.36670294643133, places=4)
+        self.assertAlmostEqual(mean_staying_time, 241.36665236767172, places=4)
