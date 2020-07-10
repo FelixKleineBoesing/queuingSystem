@@ -1,5 +1,7 @@
 from scipy.special import gdtr
-
+# import pyximport
+# pyximport.install()
+# from src.modelling.capacity_planning.erlang import erlang
 from src.modelling.capacity_planning.erlang.erlang_base import ErlangBase
 from src.modelling.helpers import power_faculty
 
