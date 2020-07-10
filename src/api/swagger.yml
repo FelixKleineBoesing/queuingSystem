@@ -18,6 +18,228 @@ tags:
 - name: scheduling
   description: All functions for scheduling tasks and calculations
 paths:
-  /capacity:
-    get:
-components: {}
+  /capacity/inbound/phone/number-agents-for-service-level:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents to reach a service level
+      operationId: src.api.endpoints.capacity.get_number_agents_for_service_level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InboundPhone'
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/inbound/phone/volume-for-service-level:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.frontend_api.endpoints.player.get_profile
+      parameters:
+      - name: player_id
+        in: query
+        description: player id (steam id)
+        required: true
+        schema:
+          type: string
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/inbound/phone/number-agents-for-average-waiting-time:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.frontend_api.endpoints.player.get_profile
+      parameters:
+      - name: player_id
+        in: query
+        description: player id (steam id)
+        required: true
+        schema:
+          type: string
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/inbound/phone/volume-for-average-waiting-time:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.frontend_api.endpoints.player.get_profile
+      parameters:
+      - name: player_id
+        in: query
+        description: player id (steam id)
+        required: true
+        schema:
+          type: string
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+
+components:
+  schemas:
+    IntList:
+      oneOf:
+        - type: array
+          items:
+            type: integer
+        - type: integer
+
+    FloatList:
+      oneOf:
+        - type: array
+          items:
+            type: number
+        - type: number
+
+    ListIntList:
+      oneOf:
+        - $ref: '#/components/schemas/IntList'
+        - type: array
+          items:
+            $ref: '#/components/schemas/IntList'
+
+    ListFloatList:
+      oneOf:
+        - $ref: '#/components/schemas/FloatList'
+        - type: array
+          items:
+            $ref: '#/components/schemas/FloatList'
+
+    CapacityInboundPhone:
+      type: object
+      properties:
+        interval:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        volume:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        aht:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        asa:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        size_room:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        patience:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        retrial:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        service_level:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        service_time:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        number_agents:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+
+    CapacityInboundChat:
+      type: object
+      properties:
+        interval:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        volume:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        aht:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        asa:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        size_room:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        patience:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        retrial:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        service_level:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        service_time:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        number_agents:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        max_sessions:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        share_sequential_work:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+
+    CapacityOutboundPhone:
+      type: object
+      properties:
+        interval:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        volume:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        aht_correct:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        aht_wrong:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        netto_contact_rate:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        right_person_contact_rate:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        number_agents:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+
