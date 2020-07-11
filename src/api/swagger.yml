@@ -28,7 +28,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InboundPhone'
+              $ref: '#/components/schemas/CapacityInboundPhone'
       responses:
         405:
           description: Invalid input
@@ -243,3 +243,34 @@ components:
           - description: The interval in seconds for which the volume is given
           - $ref: '#/components/schemas/IntList'
 
+    CapacityBackOffice:
+      type: object
+      properties:
+        interval:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        volume:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/ListIntList'
+        aht:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/ListIntList'
+        backlog_within:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        occupancy:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+        backlog_sum:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+        number_agents:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/ListFloatList'
