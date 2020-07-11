@@ -28,7 +28,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CapacityInboundPhone'
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundPhone'
+              - required:
+                - interval
+                - volume
+                - aht
+                - servive_level
+                - service_time
+              - description: "size_room, patience and retrial are optional"
       responses:
         405:
           description: Invalid input
@@ -37,15 +45,21 @@ paths:
     post:
       tags:
       - capacity
-      summary: get the number of agents for a servie
-      operationId: src.frontend_api.endpoints.player.get_profile
-      parameters:
-      - name: player_id
-        in: query
-        description: player id (steam id)
-        required: true
-        schema:
-          type: string
+      summary: get the volume for a service level
+      operationId: src.api.endpoints.capacity.get_volume_for_service_level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundPhone'
+              - required:
+                - interval
+                - number_agents
+                - aht
+                - servive_level
+                - service_time
+              - description: "size_room, patience and retrial are optional"
       responses:
         405:
           description: Invalid input
@@ -55,14 +69,20 @@ paths:
       tags:
       - capacity
       summary: get the number of agents for a servie
-      operationId: src.frontend_api.endpoints.player.get_profile
-      parameters:
-      - name: player_id
-        in: query
-        description: player id (steam id)
-        required: true
-        schema:
-          type: string
+      operationId: src.api.endpoints.capacity.get_number_agents_for_average_waiting_time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundPhone'
+              - required:
+                - interval
+                - volume
+                - aht
+                - servive_level
+                - service_time
+              - description: "size_room, patience and retrial are optional"
       responses:
         405:
           description: Invalid input
@@ -72,14 +92,20 @@ paths:
       tags:
       - capacity
       summary: get the number of agents for a servie
-      operationId: src.frontend_api.endpoints.player.get_profile
-      parameters:
-      - name: player_id
-        in: query
-        description: player id (steam id)
-        required: true
-        schema:
-          type: string
+      operationId: src.api.endpoints.capacity.get_volume_for_average_waiting_time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundPhone'
+              - required:
+                - interval
+                - number_agents
+                - aht
+                - servive_level
+                - service_time
+              - description: "size_room, patience and retrial are optional"
       responses:
         405:
           description: Invalid input
