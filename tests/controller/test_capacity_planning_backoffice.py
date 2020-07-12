@@ -1,6 +1,6 @@
 import unittest
 
-from src.controller.capacity_planning_backoffice import BackOfficeController
+from src.controller.capacity_planning.backoffice import BackOfficeController
 
 
 class BackOfficeControllerTester(unittest.TestCase):

@@ -1,6 +1,6 @@
 import unittest
 
-from src.controller.capacity_planning_outbound_phone import OutboundPhoneController
+from src.controller.capacity_planning.outbound_phone import OutboundPhoneController
 
 
 class CapacityPlanningParameters(unittest.TestCase):
