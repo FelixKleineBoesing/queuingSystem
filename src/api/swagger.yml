@@ -10,8 +10,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
 servers:
-- url: https://petstore.swagger.io/v2
-- url: http://petstore.swagger.io/v2
+- url: https://127.0.0.1:5000
 tags:
 - name: capacity
   description: All functions that rely on plan FTEs for different Channels

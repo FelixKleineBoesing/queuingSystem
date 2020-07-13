@@ -1,2 +1,2 @@
-connexion[swagger-ui]>=2.5.1, <2.6
+connexion[swagger-ui]>=2.5.1
 flask_cors>=3.0.8, <3.1
