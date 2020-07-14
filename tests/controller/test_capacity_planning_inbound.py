@@ -2,27 +2,10 @@ import unittest
 
 from src.controller.capacity_planning.inbound_phone import InboundPhoneController
 from src.controller.capacity_planning.inbound_chat import InboundChatController
+from tests.capacity_arguments import InboundArguments
 
 
-class CapacityPlanningParameters(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.interval = [15 * 60, 10 * 60]
-        cls.volume = [50, 40]
-        cls.aht = [180, 170]
-        cls.service_level = [0.9, 0.85]
-        cls.service_time = [10, 15]
-        cls.size_room = [100, 120]
-        cls.patience = [180, 190]
-        cls.retrial = [0.15, 0.25]
-        cls.number_agents = [14, 15]
-        cls.asa = [50, 60]
-        cls.max_sessions = [5, 9]
-        cls.share_sequential_work = [0.15, 0.22]
-
-
-class CapacityPlanningInboundPhoneTester(CapacityPlanningParameters):
+class CapacityPlanningInboundPhoneTester(unittest.TestCase, InboundArguments):
 
     controller = InboundPhoneController()
 
@@ -113,7 +96,7 @@ class CapacityPlanningInboundPhoneTester(CapacityPlanningParameters):
         self.assertEqual(volumes[1], 76.88878676470583)
 
 
-class CapacityPlanningInboundChat(CapacityPlanningParameters):
+class CapacityPlanningInboundChat(unittest.TestCase, InboundArguments):
 
     controller = InboundChatController()
 

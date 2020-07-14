@@ -1,23 +1,10 @@
 import unittest
 
 from src.controller.capacity_planning.outbound_phone import OutboundPhoneController
+from tests.capacity_arguments import OutboundArguments
 
 
-class CapacityPlanningParameters(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.interval = [30 * 60, 10 * 60]
-        cls.volume = [20, 40]
-        cls.dialing_time = [5, 10]
-        cls.netto_contract_rate = [0.9, 0.85]
-        cls.right_person_contact_rate = [0.8, 0.75]
-        cls.aht_correct = [200, 170]
-        cls.aht_wrong = [15, 170]
-        cls.number_agents = [1.68, 2]
-
-
-class CapacityPlanningOutboundTester(CapacityPlanningParameters):
+class CapacityPlanningOutboundTester(OutboundArguments, unittest.TestCase):
 
     outbound = OutboundPhoneController()
 
