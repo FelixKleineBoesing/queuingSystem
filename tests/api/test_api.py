@@ -34,3 +34,8 @@ class ApiTester(unittest.TestCase):
         self.assertIn("/static/<path:filename>", rules)
         self.assertIn("/ui/<path:filename>", rules)
 
+
+class ApiClient(unittest.TestCase):
+
+    app = get_app()
+    client = app.app.test_client()

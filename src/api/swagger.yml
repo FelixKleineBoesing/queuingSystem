@@ -33,7 +33,7 @@ paths:
                 - interval
                 - volume
                 - aht
-                - servive_level
+                - service_level
                 - service_time
               - description: "size_room, patience and retrial are optional"
       responses:
@@ -56,7 +56,7 @@ paths:
                 - interval
                 - number_agents
                 - aht
-                - servive_level
+                - service_level
                 - service_time
               - description: "size_room, patience and retrial are optional"
       responses:
@@ -79,7 +79,7 @@ paths:
                 - interval
                 - volume
                 - aht
-                - servive_level
+                - service_level
                 - service_time
               - description: "size_room, patience and retrial are optional"
       responses:
@@ -102,7 +102,7 @@ paths:
                 - interval
                 - number_agents
                 - aht
-                - servive_level
+                - service_level
                 - service_time
               - description: "size_room, patience and retrial are optional"
       responses:
@@ -125,7 +125,7 @@ paths:
                 - interval
                 - number_agents
                 - aht
-                - servive_level
+                - service_level
                 - service_time
                 - max_sessions
                 - share_sequential_work
@@ -150,7 +150,7 @@ paths:
                 - interval
                 - number_agents
                 - aht
-                - servive_level
+                - service_level
                 - service_time
                 - max_sessions
                 - share_sequential_work
@@ -175,7 +175,7 @@ paths:
                 - interval
                 - number_agents
                 - aht
-                - servive_level
+                - service_level
                 - service_time
                 - max_sessions
                 - share_sequential_work
@@ -200,7 +200,7 @@ paths:
                 - interval
                 - number_agents
                 - aht
-                - servive_level
+                - service_level
                 - service_time
                 - max_sessions
                 - share_sequential_work
