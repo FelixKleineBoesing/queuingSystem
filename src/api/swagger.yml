@@ -79,8 +79,7 @@ paths:
                 - interval
                 - volume
                 - aht
-                - service_level
-                - service_time
+                - asa
               - description: "size_room, patience and retrial are optional"
       responses:
         405:
@@ -102,8 +101,7 @@ paths:
                 - interval
                 - number_agents
                 - aht
-                - service_level
-                - service_time
+                - asa
               - description: "size_room, patience and retrial are optional"
       responses:
         405:
@@ -123,7 +121,7 @@ paths:
               - $ref: '#/components/schemas/CapacityInboundChat'
               - required:
                 - interval
-                - number_agents
+                - volume
                 - aht
                 - service_level
                 - service_time
