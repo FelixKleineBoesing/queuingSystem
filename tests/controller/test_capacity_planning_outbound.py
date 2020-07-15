@@ -12,7 +12,7 @@ class CapacityPlanningOutboundTester(OutboundArguments, unittest.TestCase):
         number_agents = self.outbound.get_number_agents(interval=self.interval, volume=self.volume,
                                                         dialing_time=self.dialing_time,
                                                         aht_correct=self.aht_correct, aht_wrong=self.aht_wrong,
-                                                        netto_contact_rate=self.netto_contract_rate,
+                                                        netto_contact_rate=self.netto_contact_rate,
                                                         right_person_contact_rate=self.right_person_contact_rate)
         self.assertTrue(isinstance(number_agents, list))
         self.assertTrue(number_agents[0], 1.6800000000000004)
@@ -22,7 +22,7 @@ class CapacityPlanningOutboundTester(OutboundArguments, unittest.TestCase):
         volume = self.outbound.get_volume(interval=self.interval, number_agents=self.number_agents,
                                           dialing_time=self.dialing_time, aht_correct=self.aht_correct,
                                           aht_wrong=self.aht_wrong,
-                                          netto_contact_rate=self.netto_contract_rate,
+                                          netto_contact_rate=self.netto_contact_rate,
                                           right_person_contact_rate=self.right_person_contact_rate)
         self.assertTrue(isinstance(volume, list))
         print(volume)

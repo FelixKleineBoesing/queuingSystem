@@ -41,7 +41,7 @@ class OutboundArguments:
     interval = [30 * 60, 10 * 60]
     volume = [20, 40]
     dialing_time = [5, 10]
-    netto_contract_rate = [0.9, 0.85]
+    netto_contact_rate = [0.9, 0.85]
     right_person_contact_rate = [0.8, 0.75]
     aht_correct = [200, 170]
     aht_wrong = [15, 170]

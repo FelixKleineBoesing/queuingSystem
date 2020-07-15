@@ -171,10 +171,9 @@ paths:
               - $ref: '#/components/schemas/CapacityInboundChat'
               - required:
                 - interval
-                - number_agents
+                - volume
                 - aht
-                - service_level
-                - service_time
+                - asa
                 - max_sessions
                 - share_sequential_work
               - description: "size_room, patience and retrial are optional"
@@ -198,8 +197,7 @@ paths:
                 - interval
                 - number_agents
                 - aht
-                - service_level
-                - service_time
+                - asa
                 - max_sessions
                 - share_sequential_work
               - description: "size_room, patience and retrial are optional"
@@ -221,7 +219,7 @@ paths:
               - $ref: '#/components/schemas/CapacityOutboundPhone'
               - required:
                 - interval
-                - number_agents
+                - volume
                 - aht_correct
                 - aht_wrong
                 - dialing_time

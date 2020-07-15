@@ -1,5 +1,5 @@
 from tests.api.test_api import ApiClient
-from tests.capacity_arguments import InboundArguments
+from tests.capacity_arguments import InboundArguments, BackOfficeArguments, OutboundArguments
 
 
 class InboundTester(ApiClient, InboundArguments):
@@ -126,7 +126,7 @@ class InboundTester(ApiClient, InboundArguments):
 
     def test_inbound_chat_get_volume_for_service_level(self):
         body = {"interval": self.interval,
-                "volume": self.volume,
+                "number_agents": self.number_agents,
                 "aht": self.aht,
                 "service_level": self.service_level,
                 "service_time": self.service_time,
@@ -134,7 +134,7 @@ class InboundTester(ApiClient, InboundArguments):
                 "share_sequential_work": self.share_sequential_work}
         response = self.client.post("/capacity/inbound/chat/volume-for-service-level", json=body).json
         self.assertEqual(response["status_code"], 200)
-        volumes = [47.57812500000002, 39.457720588235254]
+        volumes = [73.5, 52.94117647058823]
         for vol_hat, vol in zip(response["result"], volumes):
             self.assertAlmostEqual(vol, vol_hat, places=6)
 
@@ -145,7 +145,7 @@ class InboundTester(ApiClient, InboundArguments):
         response = self.client.post("/capacity/inbound/chat/volume-for-service-level", json=body).json
         self.assertEqual(response["status_code"], 200)
         self.assertEqual(response["status_code"], 200)
-        volumes = [50.203125000000014, 42.4770220588235]
+        volumes = [70.0, 52.94117647058823]
         for vol_hat, vol in zip(response["result"], volumes):
             self.assertAlmostEqual(vol, vol_hat, places=6)
 
@@ -158,7 +158,7 @@ class InboundTester(ApiClient, InboundArguments):
                 "share_sequential_work": self.share_sequential_work}
         response = self.client.post("/capacity/inbound/chat/number-agents-for-average-waiting-time", json=body).json
         self.assertEqual(response["status_code"], 200)
-        self.assertEqual(response["result"], [14, 15])
+        self.assertEqual(response["result"], [18, 7])
 
         body["size_room"] = self.size_room
         body["patience"] = self.patience
@@ -166,7 +166,7 @@ class InboundTester(ApiClient, InboundArguments):
 
         response = self.client.post("/capacity/inbound/chat/number-agents-for-average-waiting-time", json=body).json
         self.assertEqual(response["status_code"], 200)
-        self.assertEqual(response["result"], [14, 14])
+        self.assertEqual(response["result"], [1, 1])
 
     def test_inbound_chat_get_volume_for_average_waiting_time(self):
         body = {"interval": self.interval,
@@ -175,14 +175,45 @@ class InboundTester(ApiClient, InboundArguments):
                 "asa": self.asa,
                 "max_sessions": self.max_sessions,
                 "share_sequential_work": self.share_sequential_work}
-        response = self.client.post("/capacity/inbound/chat/number-agents-for-average-waiting-time", json=body).json
+        response = self.client.post("/capacity/inbound/chat/volume-for-average-waiting-time", json=body).json
+        volumes = [70.0, 91.38686236213228]
         self.assertEqual(response["status_code"], 200)
-        self.assertEqual(response["result"], [14, 15])
+        for vol_hat, vol in zip(response["result"], volumes):
+            self.assertAlmostEqual(vol, vol_hat, places=6)
 
         body["size_room"] = self.size_room
         body["patience"] = self.patience
         body["retrial"] = self.retrial
 
-        response = self.client.post("/capacity/inbound/chat/number-agents-for-average-waiting-time", json=body).json
+        response = self.client.post("/capacity/inbound/chat/volume-for-average-waiting-time", json=body).json
         self.assertEqual(response["status_code"], 200)
-        self.assertEqual(response["result"], [14, 14])
+        volumes = [252.05468749999991, 576.6865808823521]
+        for vol_hat, vol in zip(response["result"], volumes):
+            self.assertAlmostEqual(vol, vol_hat, places=6)
+
+
+class OutboundTester(ApiClient, OutboundArguments):
+
+    def test_outbound_phone_get_number_agents(self):
+        body = {"interval": self.interval,
+                "volume": self.volume,
+                "dialing_time": self.dialing_time,
+                "netto_contact_rate": self.netto_contact_rate,
+                "right_person_contact_rate": self.right_person_contact_rate,
+                "aht_correct": self.aht_correct,
+                "aht_wrong": self.aht_wrong}
+        response = self.client.post("/capacity/outbound/phone/number-agents", json=body).json
+        self.assertEqual(response["status_code"], 200)
+        self.assertEqual(response["result"], [1.6800000000000004, 10.2])
+
+    def test_outbound_phone_get_volume(self):
+        pass
+
+
+class BackOfficeTester(ApiClient, BackOfficeArguments):
+
+    def test_backoffice_get_number_agents(self):
+        pass
+
+    def test_backoffice_get_volume(self):
+        pass
