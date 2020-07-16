@@ -1,6 +1,6 @@
 import unittest
 
-from src.modelling.capacity_planning.backoffice.backoffice import BackOfficeCalculator
+from src.modelling.capacity_planning.naive.backoffice import BackOfficeCalculator
 
 
 class BackOfficeTester(unittest.TestCase):

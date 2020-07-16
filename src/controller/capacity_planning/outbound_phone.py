@@ -2,7 +2,7 @@ import inspect
 
 from src.controller.helpers import IntList, FloatList, check_length_list_equality
 from src.misc.helper_functions import annotation_type_checker
-from src.modelling.capacity_planning.outbound.outbound import OutboundCalculator
+from src.modelling.capacity_planning.naive.outbound import OutboundCalculator
 
 
 class OutboundPhoneController:

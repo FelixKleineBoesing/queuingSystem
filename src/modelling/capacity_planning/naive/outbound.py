@@ -2,7 +2,7 @@ from types import MethodType, FunctionType
 from typing import Union
 
 from src.modelling.capacity_planning.optimizer import Optimizer
-from src.modelling.capacity_planning.outbound.outbound_arguments import OutboundArguments
+from src.modelling.capacity_planning.naive.optimizer_arguments import OutboundArguments
 
 
 class OutboundCalculator:

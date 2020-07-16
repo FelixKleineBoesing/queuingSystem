@@ -2,7 +2,7 @@ import inspect
 
 from src.controller.helpers import IntList, FloatList, check_length_list_equality, ListIntList, ListFloatList
 from src.misc.helper_functions import annotation_type_checker
-from src.modelling.capacity_planning.backoffice.backoffice import BackOfficeCalculator
+from src.modelling.capacity_planning.naive.backoffice import BackOfficeCalculator
 
 
 class BackOfficeController:

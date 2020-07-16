@@ -1,6 +1,6 @@
 import unittest
 
-from src.modelling.capacity_planning.outbound.outbound import OutboundCalculator
+from src.modelling.capacity_planning.naive.outbound import OutboundCalculator
 
 
 class OutboundCalculatorTester(unittest.TestCase):
