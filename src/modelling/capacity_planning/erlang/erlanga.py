@@ -212,7 +212,6 @@ class ErlangA(ErlangBase):
                   "mu": 1 / (aht * share_sequential_work * max(1, (max_sessions - 1)))}
         if size_waiting_room is not None:
             kwargs["size_waiting_room"] = size_waiting_room
-        print(lambda_)
         # TODO an idea is to return the loss from this function instead of the value that should be returned
         number_agents = self.minimize(self.get_max_waiting_probability,
                                       kwargs=kwargs, optim_argument="number_agents", target_value=service_level)

@@ -207,13 +207,43 @@ class OutboundTester(ApiClient, OutboundArguments):
         self.assertEqual(response["result"], [1.6800000000000004, 10.2])
 
     def test_outbound_phone_get_volume(self):
-        pass
+        body = {"interval": self.interval,
+                "number_agents": self.number_agents,
+                "dialing_time": self.dialing_time,
+                "netto_contact_rate": self.netto_contact_rate,
+                "right_person_contact_rate": self.right_person_contact_rate,
+                "aht_correct": self.aht_correct,
+                "aht_wrong": self.aht_wrong}
+        response = self.client.post("/capacity/outbound/phone/volume", json=body).json
+        self.assertEqual(response["status_code"], 200)
+        self.assertEqual(response["result"], [19.999999999999996, 7.843137254901961])
 
 
 class BackOfficeTester(ApiClient, BackOfficeArguments):
 
     def test_backoffice_get_number_agents(self):
-        pass
+        body = {"interval": self.interval,
+                "volume": self.lambdas,
+                "backlog_sum": self.backlog_sums,
+                "occupancy": self.occupancy,
+                "aht": self.ahts,
+                "backlog_within": self.backlog_within}
+        response = self.client.post("/capacity/backoffice/number-agents", json=body).json
+        self.assertEqual(response["status_code"], 200)
+        for na_hat, na in zip(response["result"], self.number_agents):
+            for item_hat, item in zip(na_hat, na):
+                self.assertAlmostEqual(item_hat, item, places=6)
+
+        self.assertEqual(response["result"], self.number_agents)
 
     def test_backoffice_get_volume(self):
-        pass
+        body = {"interval": self.interval,
+                "number_agents": self.number_agents,
+                "occupancy": self.occupancy,
+                "aht": self.ahts,
+                "backlog_within": self.backlog_within}
+        response = self.client.post("/capacity/backoffice/volume", json=body).json
+        self.assertEqual(response["status_code"], 200)
+        for v_hat, v in zip(response["result"], self.lambdas_with_backlog):
+            for item_hat, item in zip(v_hat, v):
+                self.assertAlmostEqual(item_hat, item, places=6)

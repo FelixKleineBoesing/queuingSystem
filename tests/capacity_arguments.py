@@ -45,4 +45,4 @@ class OutboundArguments:
     right_person_contact_rate = [0.8, 0.75]
     aht_correct = [200, 170]
     aht_wrong = [15, 170]
-    number_agents = [1.68, 2]
+    number_agents = [1.68, 2.0]

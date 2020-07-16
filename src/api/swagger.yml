@@ -297,7 +297,6 @@ paths:
                 - aht
                 - backlog_within
                 - occupancy
-                - backlog_sum
               - description: ""
       responses:
         405:
@@ -488,7 +487,7 @@ components:
         number_agents:
           allOf:
           - description: The interval in seconds for which the volume is given
-          - $ref: '#/components/schemas/IntList'
+          - $ref: '#/components/schemas/FloatList'
           - example: 1.68
 
     CapacityBackOffice:
