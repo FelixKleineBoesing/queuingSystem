@@ -74,6 +74,11 @@ class System:
         self.busy_worker_ids = []
         self.events = []
         self.processes = processes
+        self.processes_time_next_cust = [np.NaN for _ in range(len(self.processes))]
+        self.processes_next_customer = [None for _ in range(len(self.processes))]
+
+    def reset(self):
+        pass
 
     def get_free_worker_random(self):
         """
@@ -108,10 +113,12 @@ class System:
     def run(self):
 
         finished = False
+        i = 0.0
 
         while not finished:
             for processes in self.processes:
+                pass
 
-            task = self.get_new_task()
+
 
 
