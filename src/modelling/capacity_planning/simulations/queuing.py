@@ -29,11 +29,15 @@ class Process:
         self.language = language
         self.channel = channel
 
-    def retake_customer(self):
+    def retake_customer(self, customer: Customer):
         pass
 
-    def get_customer(self) -> Customer:
-        pass
+    def get_customer(self) -> (float, Customer):
+        """
+
+        :return: a tuple of the time that this customers appears since the last customer
+        """
+        return 1, None
 
 
 class Worker:
@@ -76,6 +80,7 @@ class System:
         self.processes = processes
         self.processes_time_next_cust = [np.NaN for _ in range(len(self.processes))]
         self.processes_next_customer = [None for _ in range(len(self.processes))]
+        self.customer_queue = []
 
     def reset(self):
         pass
@@ -110,14 +115,31 @@ class System:
     def get_new_task(self):
         pass
 
+    def assign_customer_to_worker(self, worker, customer):
+        pass
+
     def run(self):
 
         finished = False
         i = 0.0
 
         while not finished:
-            for processes in self.processes:
+            # update the next customers for each process here. Since each process measures the time in distance to
+            # another customers there needs to be only one customer per process rememberd
+            for i in range(len(self.processes)):
+                if self.processes_next_customer[i] is None:
+                    time, cust = self.processes[i].get_customer()
+                    self.processes_next_customer[i] = cust
+                    self.processes_time_next_cust[i] = time
+
+            if len(self.free_worker_ids) > 0:
                 pass
+            else:
+                self.customer_queue.append()
+
+            # TODO check for abandonment's
+
+
 
 
 
