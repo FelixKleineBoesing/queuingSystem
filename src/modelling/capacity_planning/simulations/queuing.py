@@ -3,28 +3,53 @@ from typing import List
 import numpy as np
 
 
+class Customer:
+
+    def __init__(self, patience: int, channel: str, language: str = None, retrial: bool = False):
+        """
+
+        :param patience: the patience of this customer
+        :param retrial: whether he would retrial if he abandons
+        """
+        self.patience = patience
+        self.retrial = retrial
+        self.channel = channel
+        self.language = language
+
+
 class Process:
-    pass
+    """
+    This class generate Customer based on a given probability
+    """
+    def __init__(self, open_from: int, close_from: int, incoming_prob, patience_prob, language: str, channel: str):
+        self.open_from = open_from
+        self.close_from = close_from
+        self.incoming_prob = incoming_prob
+        self.patience = patience_prob
+        self.language = language
+        self.channel = channel
+
+    def retake_customer(self):
+        pass
+
+    def get_customer(self) -> Customer:
+        pass
 
 
 class Worker:
 
-    def __init__(self, work_begin: int, work_end: int, ahts):
+    def __init__(self, work_begin: int, work_end: int, ahts, languages: list, channels: list):
         self.work_begin = work_begin
         self.work_end = work_end
         self.ahts = ahts
+        self.languages = languages
+        self.channels = channels
 
     def execute_task(self):
         pass
 
 
-class Customer:
-
-    def __init__(self):
-        pass
-
-
-class Task:
+class Event:
 
     def __init__(self):
         pass
@@ -43,6 +68,8 @@ class System:
         :param processes:
         """
         self.worker = worker
+        self.open_time = open_time
+        self.closed_time = closed_time
         self.free_worker_ids = [i for i in range(len(worker))]
         self.busy_worker_ids = []
         self.events = []
@@ -83,6 +110,8 @@ class System:
         finished = False
 
         while not finished:
+            for processes in self.processes:
+
             task = self.get_new_task()
 
 
