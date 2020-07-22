@@ -1,6 +1,7 @@
 from sortedcontainers import SortedList
 from typing import List
 import numpy as np
+from aenum import Enum
 
 
 class Customer:
@@ -55,8 +56,16 @@ class Worker:
 
 class Event:
 
-    def __init__(self):
-        pass
+    def __init__(self, event_type, appearance_time, list_index):
+        self.event_type = event_type
+        self.list_index = list_index
+        self.appearance_time = appearance_time
+
+
+class EventType(Enum):
+    incoming_customer = 0
+    abandoned_customer = 1
+    worker_finished = 2
 
 
 class System:
@@ -79,12 +88,13 @@ class System:
         self.free_worker_ids = [i for i in range(len(self.worker))]
         self.busy_worker_ids = []
 
-        #self.events = []
+        self.events = SortedList(key=lambda x: x.appearance_time)
 
         # These two lists held one customer and his appearance time for each process
         self.processes_time_next_customer = [np.NaN for _ in range(len(self.processes))]
         self.processes_next_customer = [None for _ in range(len(self.processes))]
         self.worker_serving_time = [None for _ in range(len(self.worker))]
+        self.customer_queue_abandonment = []
         self.customer_queue = []
 
     def reset(self):
@@ -97,10 +107,10 @@ class System:
         :return:
         """
         if len(self.free_worker_ids) > 0:
-            id = np.random.choice(self.free_worker_ids)
-            self.busy_worker_ids.append(id)
-            self.free_worker_ids.remove(id)
-            return self.worker[id]
+            worker_id = int(np.random.choice(self.free_worker_ids))
+            self.busy_worker_ids.append(worker_id)
+            self.free_worker_ids.remove(worker_id)
+            return self.worker[worker_id], worker_id
 
     def get_free_worker_best(self):
         """
@@ -121,12 +131,13 @@ class System:
     def get_new_task(self):
         pass
 
-    def assign_customer_to_worker(self, customer):
-        worker = self.get_free_worker_random()
+    def assign_customer_to_worker(self, customer, day_time: float) -> Event:
+        worker, worker_id = self.get_free_worker_random()
         time = worker.serve_customer(customer)
-        return time
+        self.worker_serving_time[worker_id] = time + day_time
+        return Event(event_type=EventType.worker_finished, appearance_time=time + day_time, list_index=worker_id)
 
-    def get_next_customer(self):
+    def get_next_customer(self) -> (float, Customer):
         next_cust_index = int(np.argmin(self.processes_time_next_customer))
         next_cust_time = self.processes_time_next_customer[next_cust_index]
         next_cust = self.processes_next_customer[next_cust_index]
@@ -135,6 +146,25 @@ class System:
         self.processes_time_next_customer[next_cust_index] = None
 
         return next_cust_time, next_cust
+
+    def assign_new_customer(self, day_time):
+        next_customer_time, next_customer = self.get_next_customer()
+
+        if self.is_worker_available() and len(self.customer_queue) == 0:
+            self.assign_customer_to_worker(next_customer, day_time=day_time)
+        else:
+            self.customer_queue.append(next_customer)
+            self.customer_queue_abandonment.append(next_customer.patience + day_time)
+            # TODO find something how to solve the list index problem here since the list willl be always popped
+            event = Event(event_type=EventType.abandoned_customer,
+                          appearance_time=next_customer.patience + day_time, list_index=None)
+
+            if self.is_worker_available():
+                customer = self.customer_queue.pop()
+                _ = self.customer_queue_abandonment.pop()
+                self.assign_customer_to_worker(customer, day_time=day_time)
+        return event
+
 
     def run(self):
 
@@ -149,13 +179,11 @@ class System:
                     time, cust = self.processes[i].get_customer()
                     self.processes_next_customer[i] = cust
                     self.processes_time_next_customer[i] = time + day_time
+                    event = Event(event_type=EventType.incoming_customer, list_index=i, appearance_time=time + day_time)
+                    self.events.append(event)
 
-            next_customer_time, next_customer = self.get_next_customer()
 
-            if len(self.free_worker_ids) > 0:
-                serving_time = self.assign_customer_to_worker(next_customer)
-            else:
-                self.customer_queue.append(next_customer)
+
 
 
             # TODO check for abandonment's
