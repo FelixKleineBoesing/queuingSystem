@@ -49,8 +49,8 @@ class Worker:
         self.languages = languages
         self.channels = channels
 
-    def execute_task(self):
-        pass
+    def serve_customer(self, customer: Customer):
+        return 0
 
 
 class Event:
@@ -72,14 +72,19 @@ class System:
         :param processes:
         """
         self.worker = worker
+        self.processes = processes
         self.open_time = open_time
         self.closed_time = closed_time
-        self.free_worker_ids = [i for i in range(len(worker))]
+
+        self.free_worker_ids = [i for i in range(len(self.worker))]
         self.busy_worker_ids = []
-        self.events = []
-        self.processes = processes
-        self.processes_time_next_cust = [np.NaN for _ in range(len(self.processes))]
+
+        #self.events = []
+
+        # These two lists held one customer and his appearance time for each process
+        self.processes_time_next_customer = [np.NaN for _ in range(len(self.processes))]
         self.processes_next_customer = [None for _ in range(len(self.processes))]
+        self.worker_serving_time = [None for _ in range(len(self.worker))]
         self.customer_queue = []
 
     def reset(self):
@@ -91,10 +96,11 @@ class System:
 
         :return:
         """
-        id = np.random.choice(self.free_worker_ids)
-        self.busy_worker_ids.append(id)
-        self.free_worker_ids.remove(id)
-        return self.worker[id]
+        if len(self.free_worker_ids) > 0:
+            id = np.random.choice(self.free_worker_ids)
+            self.busy_worker_ids.append(id)
+            self.free_worker_ids.remove(id)
+            return self.worker[id]
 
     def get_free_worker_best(self):
         """
@@ -115,13 +121,25 @@ class System:
     def get_new_task(self):
         pass
 
-    def assign_customer_to_worker(self, worker, customer):
-        pass
+    def assign_customer_to_worker(self, customer):
+        worker = self.get_free_worker_random()
+        time = worker.serve_customer(customer)
+        return time
+
+    def get_next_customer(self):
+        next_cust_index = int(np.argmin(self.processes_time_next_customer))
+        next_cust_time = self.processes_time_next_customer[next_cust_index]
+        next_cust = self.processes_next_customer[next_cust_index]
+
+        self.processes_next_customer[next_cust_index] = None
+        self.processes_time_next_customer[next_cust_index] = None
+
+        return next_cust_time, next_cust
 
     def run(self):
 
         finished = False
-        i = 0.0
+        day_time = 0.0
 
         while not finished:
             # update the next customers for each process here. Since each process measures the time in distance to
@@ -130,12 +148,15 @@ class System:
                 if self.processes_next_customer[i] is None:
                     time, cust = self.processes[i].get_customer()
                     self.processes_next_customer[i] = cust
-                    self.processes_time_next_cust[i] = time
+                    self.processes_time_next_customer[i] = time + day_time
+
+            next_customer_time, next_customer = self.get_next_customer()
 
             if len(self.free_worker_ids) > 0:
-                pass
+                serving_time = self.assign_customer_to_worker(next_customer)
             else:
-                self.customer_queue.append()
+                self.customer_queue.append(next_customer)
+
 
             # TODO check for abandonment's
 
