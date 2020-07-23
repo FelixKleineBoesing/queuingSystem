@@ -56,9 +56,10 @@ class Worker:
 
 class Event:
 
-    def __init__(self, event_type, appearance_time, list_index):
+    def __init__(self, event_type, appearance_time, func, **kwargs):
         self.event_type = event_type
-        self.list_index = list_index
+        self.func = func
+        self.kwargs = kwargs
         self.appearance_time = appearance_time
 
 
@@ -131,11 +132,14 @@ class System:
     def get_new_task(self):
         pass
 
-    def assign_customer_to_worker(self, customer, day_time: float) -> Event:
+    def create_new_event(self, event_type: EventType, appearance_time: float, ):
+
+    def assign_customer_to_worker(self, customer, day_time: float) -> None:
         worker, worker_id = self.get_free_worker_random()
         time = worker.serve_customer(customer)
         self.worker_serving_time[worker_id] = time + day_time
-        return Event(event_type=EventType.worker_finished, appearance_time=time + day_time, list_index=worker_id)
+        event = Event(event_type=EventType.worker_finished, appearance_time=time + day_time, list_index=worker_id)
+        self.events.append(event)
 
     def get_next_customer(self) -> (float, Customer):
         next_cust_index = int(np.argmin(self.processes_time_next_customer))
@@ -147,7 +151,7 @@ class System:
 
         return next_cust_time, next_cust
 
-    def assign_new_customer(self, day_time):
+    def assign_new_customer(self, day_time) -> None:
         next_customer_time, next_customer = self.get_next_customer()
 
         if self.is_worker_available() and len(self.customer_queue) == 0:
@@ -158,13 +162,11 @@ class System:
             # TODO find something how to solve the list index problem here since the list willl be always popped
             event = Event(event_type=EventType.abandoned_customer,
                           appearance_time=next_customer.patience + day_time, list_index=None)
-
+            self.events.append(event)
             if self.is_worker_available():
                 customer = self.customer_queue.pop()
                 _ = self.customer_queue_abandonment.pop()
                 self.assign_customer_to_worker(customer, day_time=day_time)
-        return event
-
 
     def run(self):
 
@@ -181,6 +183,7 @@ class System:
                     self.processes_time_next_customer[i] = time + day_time
                     event = Event(event_type=EventType.incoming_customer, list_index=i, appearance_time=time + day_time)
                     self.events.append(event)
+
 
 
 
