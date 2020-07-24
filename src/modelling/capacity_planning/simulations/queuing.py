@@ -1,3 +1,5 @@
+import uuid
+
 from sortedcontainers import SortedList
 from typing import List
 import numpy as np
@@ -6,7 +8,7 @@ from aenum import Enum
 
 class Customer:
 
-    def __init__(self, patience: int, channel: str, language: str = None, retrial: bool = False, id: int = 0):
+    def __init__(self, patience: float, channel: str, language: str = None, retrial: bool = False, id: int = 0):
         """
 
         :param patience: the patience of this customer
@@ -27,6 +29,15 @@ class Process:
     This class generate Customer based on a given probability
     """
     def __init__(self, open_from: int, close_from: int, incoming_prob, patience_prob, language: str, channel: str):
+        """
+
+        :param open_from:
+        :param close_from:
+        :param incoming_prob: prob density function for incoming interval
+        :param patience_prob:  prob density function for patience interval
+        :param language: language of this process
+        :param channel: channel of this process
+        """
         self.open_from = open_from
         self.close_from = close_from
         self.incoming_prob = incoming_prob
@@ -61,10 +72,24 @@ class Worker:
 
 class Event:
 
-    def __init__(self, event_type, appearance_time, **kwargs):
+    def __init__(self, event_type, appearance_time, events_to_remove: list = None, **kwargs):
+        """
+
+        :param event_type:
+        :param appearance_time:
+        :param events_to_remove: list of event id that should be removed when this event occurs
+        :param kwargs:
+        """
+        if events_to_remove is None:
+            events_to_remove = []
         self.event_type = event_type
         self.kwargs = kwargs
         self.appearance_time = appearance_time
+        self.events_to_remove = events_to_remove
+        self.id = str(uuid.uuid1())
+
+    def append_events_to_remove(self, event_id: int):
+        self.events_to_remove.append(event_id)
 
 
 class EventType(Enum):
@@ -77,7 +102,8 @@ class System:
     """
     Callcenter represantation of a day
     """
-    def __init__(self,  open_time: int, closed_time: int, worker: List[Worker], processes: List[Process]):
+    def __init__(self,  open_time: int, closed_time: int, worker: List[Worker], processes: List[Process],
+                 size_waiting_room: int = None):
         """
 
         :param open_time: the time in seconds of day when the System begins to work (8 am == 60 * 60 * 8
@@ -89,20 +115,24 @@ class System:
         self.processes = processes
         self.open_time = open_time
         self.closed_time = closed_time
+        self.size_waiting_room = size_waiting_room
 
         self.free_worker_ids = [i for i in range(len(self.worker))]
         self.busy_worker_ids = []
 
-        self.events = SortedList(key=lambda x: x.appearance_time)
-
         # These two lists held one customer and his appearance time for each process
-        self.processes_time_next_customer = [np.NaN for _ in range(len(self.processes))]
-        self.processes_next_customer = [None for _ in range(len(self.processes))]
-        self.worker_serving_time = [None for _ in range(len(self.worker))]
-        self.customer_queue_abandonment = []
-        self.customer_queue = []
-        self.customers = {}
-        self.customer_id = 0
+        self.processes_time_next_customer = None
+        self.processes_next_customer = None
+        self.worker_serving_time = None
+
+        self.customer_queue_abandonment = None
+        self.customer_queue = None
+        self.customers = None
+        self.customer_id = None
+
+        self.events = None
+        self.events_queue = None
+        self.reset_day()
 
     def reset_day(self):
         """
@@ -110,7 +140,21 @@ class System:
 
         :return:
         """
-        pass
+        self.free_worker_ids = [i for i in range(len(self.worker))]
+        self.busy_worker_ids = []
+
+        # These two lists held one customer and his appearance time for each process
+        self.processes_time_next_customer = [np.NaN for _ in range(len(self.processes))]
+        self.processes_next_customer = [None for _ in range(len(self.processes))]
+        self.worker_serving_time = [None for _ in range(len(self.worker))]
+
+        self.customer_queue_abandonment = []
+        self.customer_queue = []
+        self.customers = {}
+        self.customer_id = 0
+
+        self.events = {}
+        self.events_queue = SortedList(key=lambda x: x[1])
 
     def get_free_worker_random(self):
         """
@@ -130,7 +174,7 @@ class System:
 
         :return:
         """
-        pass
+        raise NotImplementedError()
 
     def is_worker_available(self):
         """
@@ -139,12 +183,6 @@ class System:
         :return:
         """
         return len(self.free_worker_ids) > 0
-
-    def get_new_task(self):
-        pass
-
-    def create_new_event(self, event_type: EventType, appearance_time: float, func: str, **kwargs: dict):
-        pass
 
     def execute_event(self, event: Event):
         if event.event_type is EventType.incoming_customer:
@@ -167,8 +205,7 @@ class System:
         worker, worker_id = self.get_free_worker_random()
         time = worker.serve_customer(customer)
         self.worker_serving_time[worker_id] = time + day_time
-        event = Event(event_type=EventType.worker_finished, appearance_time=time + day_time)
-        self.events.append(event)
+        self.append_new_event(event_type=EventType.worker_finished, appearance_time=time + day_time, kwargs={})
 
     def move_worker_to_free(self, worker_id: int):
         """
@@ -213,9 +250,9 @@ class System:
             self.customers[next_customer.id] = next_customer
             self.customer_queue.append(next_customer.id)
             self.customer_queue_abandonment.append(next_customer.patience + day_time)
-            event = Event(event_type=EventType.abandoned_customer,
-                          appearance_time=next_customer.patience + day_time, kwargs={})
-            self.events.append(event)
+            self.append_new_event(event_type=EventType.abandoned_customer,
+                                  appearance_time=next_customer.patience + day_time,
+                                  kwargs={})
             if self.is_worker_available():
                 customer_id = self.customer_queue.pop()
                 _ = self.customer_queue_abandonment.pop()
@@ -236,10 +273,11 @@ class System:
                     time, cust = self.processes[i].get_customer()
                     self.processes_next_customer[i] = cust
                     self.processes_time_next_customer[i] = time + day_time
-                    event = Event(event_type=EventType.incoming_customer, appearance_time=time + day_time, kwargs={"day_time": day_time})
-                    self.events.append(event)
+                    self.append_new_event(event_type=EventType.incoming_customer,
+                                          appearance_time=time + day_time,
+                                          kwargs={"day_time": day_time})
 
-                next_event = self.events.pop()
+                next_event = self.get_next_event()
                 self.execute_event(next_event)
                 day_time = next_event.appearance_time
 
@@ -247,3 +285,33 @@ class System:
         self.customer_id += 1
         return self.customer_id
 
+    def get_next_event(self):
+        """
+
+        :return:
+        """
+        event_id, appearance_time = self.events_queue.pop()
+        if event_id in self.events:
+            return self.events[event_id]
+        else:
+            return self.get_next_event()
+
+    def append_new_event(self, event_type: EventType, appearance_time: float, kwargs: dict,
+                         events_to_remove: list = None):
+        """
+
+        :param event_type:
+        :param appearance_time: The time in seconds of day when the event will appear
+        :param kwargs: the arguments to the corresponding event
+        :param events_to_remove:
+        :return:
+        """
+        if events_to_remove is None:
+            events_to_remove = []
+        event = Event(event_type=event_type, appearance_time=appearance_time, kwargs=kwargs,
+                      events_to_remove=events_to_remove)
+        self.events_queue.append((event.id, event.appearance_time))
+        self.events[event.id] = event
+
+    def remove_event(self, event_id: str):
+        del self.events[event_id]
