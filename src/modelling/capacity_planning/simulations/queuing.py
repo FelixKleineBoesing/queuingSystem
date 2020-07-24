@@ -8,7 +8,7 @@ from aenum import Enum
 
 class Customer:
 
-    def __init__(self, patience: float, channel: str, language: str = None, retrial: bool = False, id: int = 0):
+    def __init__(self, patience: float, channel: str, language: str = None, retrial: bool = False):
         """
 
         :param patience: the patience of this customer
@@ -21,7 +21,7 @@ class Customer:
         self.retrial = retrial
         self.channel = channel
         self.language = language
-        self.id = id
+        self.id = str(uuid.uuid1())
 
 
 class Process:
@@ -121,8 +121,7 @@ class System:
         self.busy_worker_ids = []
 
         # These two lists held one customer and his appearance time for each process
-        self.processes_time_next_customer = None
-        self.processes_next_customer = None
+        self.processes_has_next_customer = None
         self.worker_serving_time = None
 
         self.customer_queue_abandonment = None
@@ -133,6 +132,7 @@ class System:
         self.events = None
         self.events_queue = None
         self.reset_day()
+        self.customer_event_table = None
 
     def reset_day(self):
         """
@@ -144,8 +144,7 @@ class System:
         self.busy_worker_ids = []
 
         # These two lists held one customer and his appearance time for each process
-        self.processes_time_next_customer = [np.NaN for _ in range(len(self.processes))]
-        self.processes_next_customer = [None for _ in range(len(self.processes))]
+        self.processes_has_next_customer = [False for _ in range(len(self.processes))]
         self.worker_serving_time = [None for _ in range(len(self.worker))]
 
         self.customer_queue_abandonment = []
@@ -155,6 +154,11 @@ class System:
 
         self.events = {}
         self.events_queue = SortedList(key=lambda x: x[1])
+
+        self.customer_event_table = {}
+
+    def track_customer_related_events(self, customer_id: str, event_id: str, event_type: EventType):
+        self.customer_event_table[customer_id] = {event_type: event_id}
 
     def get_free_worker_random(self):
         """
@@ -186,7 +190,7 @@ class System:
 
     def execute_event(self, event: Event):
         if event.event_type is EventType.incoming_customer:
-            self.assign_new_customer(**event.kwargs)
+            self.assign_new_customer(event_time=event.appearance_time, **event.kwargs)
         elif event.event_type is EventType.abandoned_customer:
             pass
         elif event.event_type is EventType.worker_finished:
@@ -207,7 +211,15 @@ class System:
         self.worker_serving_time[worker_id] = time + day_time
         self.append_new_event(event_type=EventType.worker_finished, appearance_time=time + day_time, kwargs={})
 
-    def move_worker_to_free(self, worker_id: int):
+    def get_next_customer_from_queue(self):
+        if len(self.customer_queue) > 0:
+            customer_id = self.customer_queue.pop()[0]
+            if customer_id in self.customers:
+                return self.customers[customer_id]
+            else:
+                return self.get_next_customer_from_queue()
+
+    def move_worker_to_free(self, event_time: float, worker_id: int):
         """
         the specified worker has finished his workerd and therefore will be moved to the available agents again
 
@@ -216,49 +228,48 @@ class System:
         self.worker_serving_time[worker_id] = None
         self.busy_worker_ids.remove(worker_id)
         self.free_worker_ids.append(worker_id)
-
-    def get_next_customer(self) -> (float, Customer):
-        next_cust_index = int(np.argmin(self.processes_time_next_customer))
-        next_cust_time = self.processes_time_next_customer[next_cust_index]
-        next_cust = self.processes_next_customer[next_cust_index]
-
-        self.processes_next_customer[next_cust_index] = None
-        self.processes_time_next_customer[next_cust_index] = None
-
-        return next_cust_time, next_cust
+        if len(self.customer_queue) > 0:
+            customer = self.get_next_customer_from_queue()
+            self.assign_customer_to_worker(customer=customer, day_time=event_time)
+            if customer.id in self.customer_event_table:
+                customer_events = self.customer_event_table[customer.id]
+                abandond_event = customer_events.get(EventType.abandoned_customer)
+                if abandond_event is not None:
+                    del self.customer_event_table[customer.id]
+                    del self.events[abandond_event.id]
 
     def remove_customer_from_queue(self, customer_id):
         """
-        removes a customer from the waiting queue since the abandoned
+        removes a customer from the waiting queue since he abandoned
 
         :return:
         """
         del self.customers[customer_id]
 
-    def assign_new_customer(self, day_time: float, next_customer: Customer) -> None:
+    def assign_new_customer(self, event_time: float, customer: Customer) -> None:
         """
         this function assigns a new customer to the queue or a worker if this is the next event
 
-        :param day_time:
-        :param next_customer:
+        :param event_time:
+        :param customer:
         :return:
         """
-        next_customer.id = self.get_next_customer_id()
+        customer.id = self.get_next_customer_id()
         if self.is_worker_available() and len(self.customer_queue) == 0:
-            self.assign_customer_to_worker(next_customer, day_time=day_time)
+            self.assign_customer_to_worker(customer, day_time=event_time)
         else:
-            self.customers[next_customer.id] = next_customer
-            self.customer_queue.append(next_customer.id)
-            self.customer_queue_abandonment.append(next_customer.patience + day_time)
+            self.customers[customer.id] = customer
+            self.customer_queue.append(customer.id)
+            self.customer_queue_abandonment.append(customer.patience + event_time)
             self.append_new_event(event_type=EventType.abandoned_customer,
-                                  appearance_time=next_customer.patience + day_time,
+                                  appearance_time=customer.patience + event_time,
                                   kwargs={})
             if self.is_worker_available():
                 customer_id = self.customer_queue.pop()
                 _ = self.customer_queue_abandonment.pop()
                 customer = self.customers[customer_id]
                 del self.customers[customer_id]
-                self.assign_customer_to_worker(customer, day_time=day_time)
+                self.assign_customer_to_worker(customer, day_time=event_time)
 
     def run(self):
 
@@ -269,17 +280,15 @@ class System:
             # update the next customers for each process here. Since each process measures the time in distance to
             # another customers there needs to be only one customer per process rememberd
             for i in range(len(self.processes)):
-                if self.processes_next_customer[i] is None:
+                if self.processes_has_next_customer[i] is False:
                     time, cust = self.processes[i].get_customer()
-                    self.processes_next_customer[i] = cust
-                    self.processes_time_next_customer[i] = time + day_time
                     self.append_new_event(event_type=EventType.incoming_customer,
                                           appearance_time=time + day_time,
-                                          kwargs={"day_time": day_time})
+                                          kwargs={"customer": cust})
 
-                next_event = self.get_next_event()
-                self.execute_event(next_event)
-                day_time = next_event.appearance_time
+            next_event = self.get_next_event()
+            self.execute_event(next_event)
+            day_time = next_event.appearance_time
 
     def get_next_customer_id(self):
         self.customer_id += 1
