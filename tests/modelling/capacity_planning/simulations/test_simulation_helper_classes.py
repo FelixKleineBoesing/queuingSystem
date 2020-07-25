@@ -29,4 +29,4 @@ class EventTester(unittest.TestCase):
 class CustomerTester(unittest.TestCase):
 
     def test_construction(self):
-        customer = Customer(patience=5, channel="PHONE", language="GERMAN", retrial=True, id=0)
+        customer = Customer(patience=5, channel="PHONE", language="GERMAN", retrial=True)
