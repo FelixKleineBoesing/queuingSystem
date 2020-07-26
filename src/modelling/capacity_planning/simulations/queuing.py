@@ -121,7 +121,15 @@ class CallCenterSimulation:
         :param closed_time: same as open_time but the second the system is closed
         :param worker:
         :param processes:
-        :param stopping_criterita: This parameter controls the lenght of the Simulation
+        :param stopping_criterita: This parameter controls the length of the Simulation.
+            If None it will stop after 10.000 events. The possible keys are:
+            - max_events
+            - max_days
+            - max_customer
+            - max_seconds
+
+            This dictionary can contain several stopping criterias but the simulation stopps of one of these criteria
+            is hit
         """
         self.worker = worker
         self.processes = processes
@@ -145,6 +153,11 @@ class CallCenterSimulation:
         self.events_queue = None
         self.customer_event_table = None
 
+        self.day_time = None
+
+        if stopping_criterita is None:
+            stopping_criterita = {"max_events": 10000}
+        self.stopping_criteria = stopping_criterita
         self.reset_day()
 
     def reset_day(self):
@@ -169,10 +182,12 @@ class CallCenterSimulation:
 
         self.customer_event_table = {}
 
+        self.day_time = 0
+
     def run(self):
 
         finished = False
-        day_time = 0.0
+        self.day_time = 0.0
 
         while not finished:
             # update the next customers for each process here. Since each process measures the time in distance to
@@ -181,19 +196,22 @@ class CallCenterSimulation:
                 if self.processes_has_next_customer[i] is False:
                     time, cust = self.processes[i].get_customer()
                     event = self.append_new_event(event_type=EventType.incoming_customer,
-                                                  appearance_time=time + day_time,
+                                                  appearance_time=time + self.day_time,
                                                   kwargs={"customer": cust})
                     self.track_customer_related_events(customer_id=cust.id, event=event)
                     self.processes_has_next_customer[i] = True
 
             next_event = self.get_next_event()
-            print(day_time)
+            print(self.day_time)
             if next_event.appearance_time >= 24 * 60 * 60:
                 self.reset_day()
                 print("Reset Day")
             else:
                 self.execute_event(next_event)
-                day_time = next_event.appearance_time
+                self.day_time = next_event.appearance_time
+
+            # TODO add stopping criteria here
+            # TODO add statistics
 
     def get_free_worker_random(self):
         """
@@ -357,13 +375,4 @@ class CallCenterSimulation:
         else:
             raise NotImplementedError("No other event type are yet implemented")
         del self.events[event.id]
-
-
-class StatisticLogger(abc.ABC):
-
-    def __init__(self):
-        self.stats = {}
-
-    def track_events(self):
-        pass
 

@@ -25,4 +25,4 @@ class SystemTester(unittest.TestCase):
         callcenter = CallCenterSimulation(open_time=60 * 60 * 8, closed_time=60 * 60 * 22, worker=workers,
                                           processes=processes, size_waiting_room=None)
 
-        callcenter.run()
+        #callcenter.run()
