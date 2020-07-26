@@ -1,3 +1,4 @@
+import abc
 import uuid
 
 from sortedcontainers import SortedList
@@ -29,7 +30,8 @@ class Process:
     """
     This class generate Customer based on a given probability
     """
-    def __init__(self, open_from: int, close_from: int, incoming_prob: list, patience_prob: list, language: str, channel: str):
+    def __init__(self, open_from: int, close_from: int, incoming_prob: list, patience_prob: list, language: str,
+                 channel: str):
         """
 
         :param open_from:
@@ -107,18 +109,19 @@ class EventType(Enum):
     worker_finished = 2
 
 
-class System:
+class CallCenterSimulation:
     """
     Callcenter represantation of a day
     """
     def __init__(self,  open_time: int, closed_time: int, worker: List[Worker], processes: List[Process],
-                 size_waiting_room: int = None):
+                 size_waiting_room: int = None, stopping_criterita: dict = None):
         """
 
         :param open_time: the time in seconds of day when the System begins to work (8 am == 60 * 60 * 8
         :param closed_time: same as open_time but the second the system is closed
         :param worker:
         :param processes:
+        :param stopping_criterita: This parameter controls the lenght of the Simulation
         """
         self.worker = worker
         self.processes = processes
@@ -141,6 +144,7 @@ class System:
         self.events = None
         self.events_queue = None
         self.customer_event_table = None
+
         self.reset_day()
 
     def reset_day(self):
@@ -183,8 +187,13 @@ class System:
                     self.processes_has_next_customer[i] = True
 
             next_event = self.get_next_event()
-            self.execute_event(next_event)
-            day_time = next_event.appearance_time
+            print(day_time)
+            if next_event.appearance_time >= 24 * 60 * 60:
+                self.reset_day()
+                print("Reset Day")
+            else:
+                self.execute_event(next_event)
+                day_time = next_event.appearance_time
 
     def get_free_worker_random(self):
         """
@@ -288,8 +297,8 @@ class System:
             self.customers[customer.id] = customer
             self.customer_queue.append(customer.id)
             event = self.append_new_event(event_type=EventType.abandoned_customer,
-                                  appearance_time=customer.patience + event_time,
-                                  kwargs={"customer_id": customer.id})
+                                          appearance_time=customer.patience + event_time,
+                                          kwargs={"customer_id": customer.id})
             self.track_customer_related_events(customer_id=customer.id, event=event)
             if self.is_worker_available():
                 customer_id = self.customer_queue.pop()
@@ -347,3 +356,14 @@ class System:
             self.move_worker_to_free(event_time=event.appearance_time, **event.kwargs)
         else:
             raise NotImplementedError("No other event type are yet implemented")
+        del self.events[event.id]
+
+
+class StatisticLogger(abc.ABC):
+
+    def __init__(self):
+        self.stats = {}
+
+    def track_events(self):
+        pass
+
