@@ -160,6 +160,17 @@ class CallCenterSimulation:
         self.stopping_criteria = stopping_criterita
         self.reset_day()
 
+        self.statistics = {"number_customers":  0,
+                           "number_events": 0,
+                           "number_days": 0,
+                           "number_seconds": 0,
+                           "events": {
+                                "time": [],
+                                "event_name": [],
+                                "variable": [],
+                                "value": []
+                           }}
+
     def reset_day(self):
         """
         reset all variables for a new. Stats will be saved.
