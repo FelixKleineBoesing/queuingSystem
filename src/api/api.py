@@ -11,6 +11,7 @@ def get_app():
     app = connexion.FlaskApp(__name__)
     path = pkg_resources.resource_filename("src", "api/swagger.yml")
     app.add_api(path)
+
     CORS(app.app)
     return app
 

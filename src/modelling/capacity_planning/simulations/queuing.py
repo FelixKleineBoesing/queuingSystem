@@ -24,6 +24,7 @@ class Customer:
         self.channel = channel
         self.language = language
         self.id = str(uuid.uuid1())
+        self.call_time = None
 
 
 class Process:
@@ -61,7 +62,7 @@ class Process:
         :return: a tuple of the time that this customers appears since the last customer
         """
         customer = Customer(patience=np.random.choice(self.patience), channel=self.channel, language=self.language,
-                            retrial=True)
+                            retrial=False)
         customer.comes_from_process = self.id
         return np.random.choice(self.incoming_prob), customer
 
@@ -111,7 +112,7 @@ class EventType(Enum):
 
 class CallCenterSimulation:
     """
-    Callcenter represantation of a day
+    Callcenter representation of a day
     """
     def __init__(self,  open_time: int, closed_time: int, worker: List[Worker], processes: List[Process],
                  size_waiting_room: int = None, stopping_criterita: dict = None):
@@ -153,7 +154,8 @@ class CallCenterSimulation:
         self.events_queue = None
         self.customer_event_table = None
 
-        self.day_time = None
+        self.day_time = 0
+        self.days_simulated = 0
 
         if stopping_criterita is None:
             stopping_criterita = {"max_events": 10000}
@@ -165,10 +167,9 @@ class CallCenterSimulation:
                            "number_days": 0,
                            "number_seconds": 0,
                            "events": {
-                                "time": [],
-                                "event_name": [],
-                                "variable": [],
-                                "value": []
+                               "time": [],
+                               "variable": [],
+                               "value": []
                            }}
 
     def reset_day(self):
@@ -199,7 +200,7 @@ class CallCenterSimulation:
 
         finished = False
         self.day_time = 0.0
-
+        j = 0
         while not finished:
             # update the next customers for each process here. Since each process measures the time in distance to
             # another customers there needs to be only one customer per process rememberd
@@ -213,16 +214,51 @@ class CallCenterSimulation:
                     self.processes_has_next_customer[i] = True
 
             next_event = self.get_next_event()
-            print(self.day_time)
+            if j % 1000 == 0.0:
+                print(j)
             if next_event.appearance_time >= 24 * 60 * 60:
                 self.reset_day()
+                self.days_simulated += 1
+                self.statistics["number_days"] = self.days_simulated
                 print("Reset Day")
             else:
                 self.execute_event(next_event)
                 self.day_time = next_event.appearance_time
+            self.statistics["number_seconds"] = self.days_simulated * 24 * 60 * 60 + self.day_time
+            j += 1
+            finished = self.check_if_finished()
 
-            # TODO add stopping criteria here
-            # TODO add statistics
+    def append_event(self, time: float, variable: str, value):
+        """
+        tracks a statistic
+
+        :param time: appearance time
+        :param variable: Can be one of:
+            - waiting_time
+            - incoming_customer
+            - abandoned_customer
+            - queue_length
+        :param value:
+        :return:
+        """
+        self.statistics["events"]["time"].append(time)
+        self.statistics["events"]["variable"].append(variable)
+        self.statistics["events"]["value"].append(value)
+
+    def check_if_finished(self):
+        if "max_events" in self.stopping_criteria:
+            if self.statistics["number_events"] >= self.stopping_criteria["max_events"]:
+                return True
+        if "max_days" in self.stopping_criteria:
+            if self.statistics["number_events"] >= self.stopping_criteria["max_days"]:
+                return True
+        if "max_customer" in self.stopping_criteria:
+            if self.statistics["number_events"] >= self.stopping_criteria["max_customer"]:
+                return True
+        if "max_seconds" in self.stopping_criteria:
+            if self.statistics["number_events"] >= self.stopping_criteria["max_seconds"]:
+                return True
+        return False
 
     def get_free_worker_random(self):
         """
@@ -254,6 +290,8 @@ class CallCenterSimulation:
 
     def abandon_customer(self, event_time: float, customer_id: str):
         customer = self.customers[customer_id]
+        self.append_event(time=event_time, variable="abandoned_customer", value=0)
+        self.append_event(time=event_time, variable="waiting_time", value=customer.patience)
         if customer.retrial:
             process_id = self.processes_mapping[customer.comes_from_process]
             new_customer = self.processes[process_id].retake_abandoned_customer(customer)
@@ -273,13 +311,16 @@ class CallCenterSimulation:
         self.free_worker_ids.append(worker_id)
         if len(self.customer_queue) > 0:
             customer = self.get_next_customer_from_queue()
+            if customer is None:
+                return
+            self.append_event(time=event_time, variable="waiting_time", value=event_time - customer.call_time)
             self.assign_customer_to_worker(customer=customer, day_time=event_time)
             if customer.id in self.customer_event_table:
                 customer_events = self.customer_event_table[customer.id]
                 abandond_event = customer_events.get(EventType.abandoned_customer)
                 if abandond_event is not None:
                     del self.customer_event_table[customer.id]
-                    del self.events[abandond_event.id]
+                    del self.events[abandond_event]
 
     def assign_customer_to_worker(self, customer, day_time: float) -> None:
         """
@@ -305,7 +346,7 @@ class CallCenterSimulation:
 
     def get_next_customer_from_queue(self):
         if len(self.customer_queue) > 0:
-            customer_id = self.customer_queue.pop()[0]
+            customer_id = self.customer_queue.pop()
             if customer_id in self.customers:
                 return self.customers[customer_id]
             else:
@@ -319,16 +360,21 @@ class CallCenterSimulation:
         :param customer:
         :return:
         """
+        self.append_event(time=event_time, variable="incoming_customer", value=0)
         customer.id = self.get_next_customer_id()
         if self.is_worker_available() and len(self.customer_queue) == 0:
+            self.append_event(time=event_time, variable="waiting_time", value=0)
+            self.append_event(time=event_time, variable="queue_length", value=0)
             self.assign_customer_to_worker(customer, day_time=event_time)
         else:
+            customer.call_time = event_time
             self.customers[customer.id] = customer
             self.customer_queue.append(customer.id)
             event = self.append_new_event(event_type=EventType.abandoned_customer,
                                           appearance_time=customer.patience + event_time,
                                           kwargs={"customer_id": customer.id})
             self.track_customer_related_events(customer_id=customer.id, event=event)
+            self.append_event(time=event_time, variable="queue_length", value=len(self.customer_queue))
             if self.is_worker_available():
                 customer_id = self.customer_queue.pop()
                 customer = self.customers[customer_id]
@@ -377,8 +423,10 @@ class CallCenterSimulation:
         self.customer_event_table[customer_id] = {event.event_type: event.id}
 
     def execute_event(self, event: Event):
+        self.statistics["number_events"] += 1
         if event.event_type is EventType.incoming_customer:
             self.assign_new_customer(event_time=event.appearance_time, **event.kwargs)
+            self.statistics["number_customers"] += 1
         elif event.event_type is EventType.abandoned_customer:
             self.abandon_customer(event_time=event.appearance_time, **event.kwargs)
         elif event.event_type is EventType.worker_finished:
