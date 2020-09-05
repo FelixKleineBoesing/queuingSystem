@@ -1,4 +1,4 @@
 psycopg2
 pymongo
 sqlalchemy
-redis>=3.3.11, <3.4
+redis>=3.5.3, <3.6

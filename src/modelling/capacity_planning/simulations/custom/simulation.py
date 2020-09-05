@@ -26,6 +26,16 @@ class CallCenterSimulation:
             - max_customer
             - max_seconds
 
+            This can be combined with a bottom limit which must be reached for to exit the simulation
+            - min_day
+            - min_events
+            - min_customer
+            - min_seconds
+
+            For example should a simulation finish after 10000 events, but be at least one day. The lower limit has
+            to be achieved for a simulation exit.
+
+
             This dictionary can contain several stopping criterias but the simulation stopps of one of these criteria
             is hit
         """
@@ -135,6 +145,7 @@ class CallCenterSimulation:
             - incoming_customer
             - abandoned_customer
             - queue_length
+            - served_customer
         :param value:
         :return:
         """
@@ -143,19 +154,33 @@ class CallCenterSimulation:
         self.statistics["events"]["value"].append(value)
 
     def check_if_finished(self):
+        finished = False
         if "max_events" in self.stopping_criteria:
             if self.statistics["number_events"] >= self.stopping_criteria["max_events"]:
-                return True
+                finished = finished or True
         if "max_days" in self.stopping_criteria:
             if self.statistics["number_events"] >= self.stopping_criteria["max_days"]:
-                return True
+                finished = finished or True
         if "max_customer" in self.stopping_criteria:
             if self.statistics["number_events"] >= self.stopping_criteria["max_customer"]:
-                return True
+                finished = finished or True
         if "max_seconds" in self.stopping_criteria:
             if self.statistics["number_events"] >= self.stopping_criteria["max_seconds"]:
-                return True
-        return False
+                finished = finished or True
+        if "min_events" in self.stopping_criteria:
+            if self.statistics["number_events"] >= self.stopping_criteria["min_events"]:
+                finished = finished and True
+        if "min_days" in self.stopping_criteria:
+            if self.statistics["number_days"] >= self.stopping_criteria["min_days"]:
+                finished = finished and True
+        if "min_customer" in self.stopping_criteria:
+            if self.statistics["number_customers"] >= self.stopping_criteria["min_customer"]:
+                finished = finished and True
+        if "min_seconds" in self.stopping_criteria:
+            if self.statistics["number_seconds"] >= self.stopping_criteria["min_seconds"]:
+                finished = finished and True
+
+        return finished
 
     def get_free_worker_random(self):
         """
