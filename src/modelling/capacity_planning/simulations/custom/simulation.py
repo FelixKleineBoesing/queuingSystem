@@ -287,6 +287,7 @@ class CallCenterSimulation:
         if self.is_worker_available() and len(self.customer_queue) == 0:
             self.append_event(time=event_time, variable="waiting_time", value=0)
             self.append_event(time=event_time, variable="queue_length", value=0)
+            self.append_event(time=event_time, variable="customer_served", value=0)
             self.assign_customer_to_worker(customer, day_time=event_time)
         else:
             customer.call_time = event_time

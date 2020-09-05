@@ -1,5 +1,5 @@
 import uuid
-
+import pandas as pd
 import numpy as np
 
 from src.modelling.capacity_planning.simulations.probability_classes import Probability
@@ -77,3 +77,39 @@ class Worker:
     def serve_customer(self, customer: Customer):
         return np.random.choice(self.ahts)
 
+
+class StatisticsContainer:
+
+    def __init__(self, statistics_data: dict):
+        self.number_customer = statistics_data.get("number_customers", 0)
+        self.number_events = statistics_data.get("number_events", 0)
+        self.number_days = statistics_data.get("number_days", 0)
+        self.number_seconds = statistics_data.get("number_seconds", 0)
+
+        data = pd.DataFrame(statistics_data["events"])
+        self.number_abandoned_customer = np.sum(data["variable"] == "abandoned_customer")
+        self.number_incoming_customer = np.sum(data["variable"] == "incoming_customer")
+        self.number_incoming_customer = np.sum(data["variable"] == "incoming_customer")
+        self.served_customers = data.loc[data["variable"] == "served_customer", :]
+        self.queue_length = data.loc[data["variable"] == "queue_length", :]
+        self.waiting_time = data.loc[data["variable"] == "waiting_time", :]
+        self.incoming_customer = data.loc[data["variable"] == "incoming_customer", :]
+        self.abandoned_customer = data.loc[data["variable"] == "abandoned_customer", :]
+
+    def get_waiting_time_dist(self):
+        return self.waiting_time["value"].tolist()
+
+    def get_waiting_time_mean(self):
+        return np.mean(self.waiting_time["value"])
+
+    def get_queue_length_dist(self):
+        return self.queue_length["value"].tolist()
+
+    def get_queue_length_mean(self):
+        return np.mean(self.queue_length["value"])
+
+    def get_abort_level(self):
+        return self.number_abandoned_customer / self.number_incoming_customer
+
+    def get_service_level(self, service_time: float):
+        return 1 - self.get_abort_level() - np.sum(self.served_customers["value"] <= service_time)
