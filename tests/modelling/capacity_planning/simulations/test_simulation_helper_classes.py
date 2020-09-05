@@ -1,6 +1,7 @@
 import unittest
 
-from src.modelling.capacity_planning.simulations.queuing import Worker, Process, Event, EventType, Customer
+from src.modelling.capacity_planning.simulations.custom.events import Event, EventType
+from src.modelling.capacity_planning.simulations.custom.sim_parts import Customer, Process, Worker
 
 
 class WorkerTester(unittest.TestCase):

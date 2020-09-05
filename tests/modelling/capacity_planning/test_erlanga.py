@@ -63,6 +63,9 @@ class ErlangATester(unittest.TestCase):
         self.assertAlmostEqual(prob, 0.03655086716188359, places=4)
 
     def test_get_max_waiting_probability(self):
+        prob = self.get_max_waiting_probability(lambda_=1/10, mu=1/180, nu=1/5, number_agents=1, max_waiting_time=20,
+                                                size_waiting_room=800)
+        print(prob)
         prob = self.get_max_waiting_probability(lambda_=1/10, mu=1/240, nu=1/300, number_agents=28, max_waiting_time=20,
                                                 size_waiting_room=80)
         self.assertAlmostEqual(prob, 0.863372195753652, places=4)
@@ -83,6 +86,9 @@ class ErlangATester(unittest.TestCase):
     def test_get_abort_probability(self):
         prob = self.get_abort_probability(lambda_=1/10, mu=1/240, nu=1/30, number_agents=25, size_waiting_room=80)
         self.assertAlmostEqual(prob, 0.09759081562546817, places=4)
+
+        prob = self.get_abort_probability(lambda_=1/8, mu=1/180, nu=1/5, number_agents=10, size_waiting_room=1000)
+        print(prob)
 
     def test_mean_queue_length(self):
         mean_queue = self.get_mean_queue_length(lambda_=0.1, mu=1/240, nu=1/300, number_agents=28,

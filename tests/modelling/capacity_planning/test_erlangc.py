@@ -47,6 +47,9 @@ class ErlangCTester(unittest.TestCase):
         prob = self.get_max_waiting_probability(lambda_=0.1, mu=0.0033, number_agents=35, max_waiting_time=20)
         self.assertEqual(prob, 0.7710233599946846)
 
+        prob = self.get_max_waiting_probability(lambda_=0.1, mu=0.0033, number_agents=35, max_waiting_time=20)
+        self.assertEqual(prob, 0.7710233599946846)
+
         prob = self.get_max_waiting_probability(lambda_=0.1, mu=0.0033, number_agents=135, max_waiting_time=10)
         self.assertEqual(prob, 1)
 

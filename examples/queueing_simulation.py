@@ -1,4 +1,5 @@
-from src.modelling.capacity_planning.simulations.queuing import Process, Worker, CallCenterSimulation
+from src.modelling.capacity_planning.simulations.custom.sim_parts import Process, Worker
+from src.modelling.capacity_planning.simulations.custom.simulation import CallCenterSimulation
 
 
 def run():
