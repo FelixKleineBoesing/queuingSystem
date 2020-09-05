@@ -1,16 +1,16 @@
 import numpy as np
 
+from src.modelling.capacity_planning.erlang.erlang_base import ErlangBase
 from src.modelling.helpers import power_faculty
 
 
-class ErlangB:
+class ErlangB(ErlangBase):
 
     def get_probability(self, number_agents: int, lambda_: float, mu: float):
         """
         calculates the probability that there are c number people in the system
 
         :param number_agents: number of available agents
-        :param workload: lambda / mu
         :param lambda_: average arrival time in times per second
         :param mu: average supply time in times per second
         :return: probability of a blocked queue

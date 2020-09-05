@@ -21,7 +21,7 @@ class Task:
 
         :return:
         """
-        return {"domain": self.module,
+        return {"module": self.module,
                 "function": self.function,
                 "arguments": self.arguments,
                 "id": self.id}

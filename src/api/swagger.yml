@@ -1,19 +1,535 @@
-swagger: "2.0"
+openapi: 3.0.1
 info:
-  description: "rest api for capplan frontend"
-  version: "1.0.0"
-  title: "Swagger CapPlan"
+  title: CapPlan Analytics API
+  description: Rest API for capplan analytics
+  termsOfService: http://swagger.io/terms/
   contact:
-    email: "felix.boesing@t-online.de"
+    email: apiteam@swagger.io
   license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "localhost"
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: https://127.0.0.1:5000
 tags:
-- name: "dummy"
-  description: "dummy"
-schemes:
-- "https"
-- "http"
+- name: capacity
+  description: All functions that rely on plan FTEs for different Channels
+- name: scheduling
+  description: All functions for scheduling tasks and calculations
 paths:
-  /dummy/dummy:
+  /capacity/inbound/phone/number-agents-for-service-level:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents to reach a service level
+      operationId: src.api.endpoints.capacity.inbound_phone_get_number_agents_for_service_level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundPhone'
+              - required:
+                - interval
+                - volume
+                - aht
+                - service_level
+                - service_time
+              - description: "size_room, patience and retrial are optional"
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/inbound/phone/volume-for-service-level:
+    post:
+      tags:
+      - capacity
+      summary: get the volume for a service level
+      operationId: src.api.endpoints.capacity.inbound_phone_get_volume_for_service_level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundPhone'
+              - required:
+                - interval
+                - number_agents
+                - aht
+                - service_level
+                - service_time
+              - description: "size_room, patience and retrial are optional"
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/inbound/phone/number-agents-for-average-waiting-time:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.api.endpoints.capacity.inbound_phone_get_number_agents_for_average_waiting_time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundPhone'
+              - required:
+                - interval
+                - volume
+                - aht
+                - asa
+              - description: "size_room, patience and retrial are optional"
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/inbound/phone/volume-for-average-waiting-time:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.api.endpoints.capacity.inbound_phone_get_volume_for_average_waiting_time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundPhone'
+              - required:
+                - interval
+                - number_agents
+                - aht
+                - asa
+              - description: "size_room, patience and retrial are optional"
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/inbound/chat/number-agents-for-service-level:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.api.endpoints.capacity.inbound_chat_get_number_agents_for_service_level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundChat'
+              - required:
+                - interval
+                - volume
+                - aht
+                - service_level
+                - service_time
+                - max_sessions
+                - share_sequential_work
+              - description: "size_room, patience and retrial are optional"
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/inbound/chat/volume-for-service-level:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.api.endpoints.capacity.inbound_chat_get_volume_for_service_level
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundChat'
+              - required:
+                - interval
+                - number_agents
+                - aht
+                - service_level
+                - service_time
+                - max_sessions
+                - share_sequential_work
+              - description: "size_room, patience and retrial are optional"
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/inbound/chat/number-agents-for-average-waiting-time:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.api.endpoints.capacity.inbound_chat_get_number_agents_for_average_waiting_time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundChat'
+              - required:
+                - interval
+                - volume
+                - aht
+                - asa
+                - max_sessions
+                - share_sequential_work
+              - description: "size_room, patience and retrial are optional"
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/inbound/chat/volume-for-average-waiting-time:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.api.endpoints.capacity.inbound_chat_get_volume_for_average_waiting_time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityInboundChat'
+              - required:
+                - interval
+                - number_agents
+                - aht
+                - asa
+                - max_sessions
+                - share_sequential_work
+              - description: "size_room, patience and retrial are optional"
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/outbound/phone/number-agents:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.api.endpoints.capacity.outbound_phone_get_number_agents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityOutboundPhone'
+              - required:
+                - interval
+                - volume
+                - aht_correct
+                - aht_wrong
+                - dialing_time
+                - netto_contact_rate
+                - right_person_contact_rate
+              - description: "Calculates the number of agents that are necessary"
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/outbound/phone/volume:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.api.endpoints.capacity.outbound_phone_get_volume
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityOutboundPhone'
+              - required:
+                - interval
+                - number_agents
+                - aht_correct
+                - aht_wrong
+                - dialing_time
+                - netto_contact_rate
+                - right_person_contact_rate
+              - description: "Calculates the volume that can be achieved"
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/backoffice/number-agents:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.api.endpoints.capacity.backoffice_get_number_agents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityBackOffice'
+              - required:
+                - interval
+                - volume
+                - aht
+                - backlog_within
+                - occupancy
+                - backlog_sum
+              - description: ""
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+  /capacity/backoffice/volume:
+    post:
+      tags:
+      - capacity
+      summary: get the number of agents for a servie
+      operationId: src.api.endpoints.capacity.backoffice_get_volume
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/CapacityBackOffice'
+              - required:
+                - interval
+                - number_agents
+                - aht
+                - backlog_within
+                - occupancy
+              - description: ""
+      responses:
+        405:
+          description: Invalid input
+          content: {}
+
+components:
+  schemas:
+    IntList:
+      oneOf:
+        - type: array
+          items:
+            type: integer
+        - type: integer
+
+    FloatList:
+      oneOf:
+        - type: array
+          items:
+            type: number
+        - type: number
+
+    ListIntList:
+      oneOf:
+        - $ref: '#/components/schemas/IntList'
+        - type: array
+          items:
+            $ref: '#/components/schemas/IntList'
+
+    ListFloatList:
+      oneOf:
+        - $ref: '#/components/schemas/FloatList'
+        - type: array
+          items:
+            $ref: '#/components/schemas/FloatList'
+
+    CapacityInboundPhone:
+      type: object
+      properties:
+        interval:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 900
+        volume:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 50
+        aht:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 180
+        asa:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 50
+        size_room:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 100
+        patience:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 180
+        retrial:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 0.15
+        service_level:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 0.9
+        service_time:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 10
+        number_agents:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 14
+
+    CapacityInboundChat:
+      type: object
+      properties:
+        interval:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 900
+        volume:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 50
+        aht:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 180
+        asa:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 50
+        size_room:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 100
+        patience:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 180
+        retrial:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 0.15
+        service_level:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 0.9
+        service_time:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 10
+        number_agents:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 14
+        max_sessions:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 5
+        share_sequential_work:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 0.15
+
+    CapacityOutboundPhone:
+      type: object
+      properties:
+        interval:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 1800
+        volume:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 20
+        aht_correct:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 200
+        aht_wrong:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 15
+        netto_contact_rate:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 0.9
+        right_person_contact_rate:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 0.8
+        number_agents:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 1.68
+
+    CapacityBackOffice:
+      type: object
+      properties:
+        interval:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 1800
+        volume:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/ListIntList'
+          - example: [3, 3, 6, 6, 7, 7, 7, 8, 8, 4, 4, 3, 3, 5, 6, 9, 9, 9, 7, 7]
+        aht:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/ListIntList'
+          - example: [190, 190, 190, 190, 220, 220, 220, 220, 220, 190, 190, 190, 190, 190, 190, 190, 190, 190, 190, 190]
+        backlog_within:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 6
+        occupancy:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/FloatList'
+          - example: 0.9
+        backlog_sum:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/IntList'
+          - example: 33
+        number_agents:
+          allOf:
+          - description: The interval in seconds for which the volume is given
+          - $ref: '#/components/schemas/ListFloatList'
+          - example: [0.9969135802469136, 0.9969135802469136, 1.3487654320987656, 1.3487654320987656,
+                      1.6975308641975306, 1.6975308641975306, 0.9506172839506172, 1.0864197530864197,
+                      1.0864197530864197, 0.4691358024691358, 0.4691358024691358, 0.3518518518518519,
+                      0.3518518518518519, 0.5864197530864198, 0.7037037037037038, 1.0555555555555556,
+                      1.0555555555555556, 1.0555555555555556, 0.8209876543209875, 0.8209876543209875]
+

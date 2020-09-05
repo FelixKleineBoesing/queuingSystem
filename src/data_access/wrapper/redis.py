@@ -42,6 +42,15 @@ class RedisWrapper:
         """
         self.conn.rpush("queue:{}".format(queue), json.dumps(value))
 
+    def length_of_queue(self, queue: str):
+        """
+        gets the length of the given queue
+
+        :param queue: queue name
+        :return:
+        """
+        self.conn.llen("queue:{}".format(queue))
+
     def get_from_queue(self, queue: str, timeout: int = 1):
         """
         returns a value if there is one in queue, otherwise returns None if there is no value after the specified
