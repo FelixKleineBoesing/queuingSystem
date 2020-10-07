@@ -1,4 +1,5 @@
 import inspect
+from functools import wraps
 from typing import Union, List
 
 FloatList = Union[float, List[float]]
@@ -13,6 +14,7 @@ def check_length_list_equality(func):
     :param func:
     :return:
     """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         if len(args) > 0:
             val = args[0]

@@ -1,7 +1,10 @@
 import traceback
+from functools import wraps
 
 
 def statuscode_endpoint_wrapper(func):
+
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             res = func(*args, **kwargs)

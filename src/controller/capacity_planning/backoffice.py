@@ -21,8 +21,7 @@ class BackOfficeController:
                  backlog_sum: int):
             lambdas = [v / interval for v in volume]
 
-            kwargs = {"lambdas": lambdas, "ahts": aht,
-                      "backlog_sum": backlog_sum / interval,
+            kwargs = {"lambdas": lambdas, "ahts": aht, "backlog_sum": backlog_sum / interval,
                       "backlog_within": backlog_within, "occupancy": occupancy}
 
             backoffice = BackOfficeCalculator()

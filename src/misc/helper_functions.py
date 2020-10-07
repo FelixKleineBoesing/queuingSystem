@@ -2,6 +2,7 @@ import inspect
 import copy
 from typing import Union
 from typeguard import check_type
+from functools import wraps
 import datetime
 
 
@@ -19,6 +20,7 @@ def annotation_type_checker(func):
     else:
         defaults = {}
 
+    @wraps(func)
     def wrapper(*args, **kwargs):
         new_args, all_new_args = _get_args_without_self(args, func, all_args)
         key_args = _create_only_keyword_arguments(args=new_args, kwargs=kwargs,
@@ -135,6 +137,7 @@ def time_it(func):
     :param func:
     :return:
     """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         start = datetime.datetime.now()
         res = func(*args, **kwargs)

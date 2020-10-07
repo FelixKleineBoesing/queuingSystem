@@ -72,7 +72,8 @@ class ErlangCTester(unittest.TestCase):
         self.assertEqual(prob, 0)
 
     def test_get_blocking_probability(self):
-        prob = self.get_blocking_probability(lambda_=7, mu=1, number_agents=9)
+        prob = self.get_blocking_probability(lambda_=1/36, mu=1/180, number_agents=10)
+        print(prob)
         self.assertEqual(prob, 0.38494709415676875)
 
         prob = self.get_blocking_probability(lambda_=0.1, mu=0.0033, number_agents=35)
