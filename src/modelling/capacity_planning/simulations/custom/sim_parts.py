@@ -81,20 +81,29 @@ class Worker:
 class StatisticsContainer:
 
     def __init__(self, statistics_data: dict):
+        self.data = pd.DataFrame(statistics_data["events"])
         self.number_customer = statistics_data.get("number_customers", 0)
         self.number_events = statistics_data.get("number_events", 0)
         self.number_days = statistics_data.get("number_days", 0)
         self.number_seconds = statistics_data.get("number_seconds", 0)
 
-        data = pd.DataFrame(statistics_data["events"])
-        self.number_abandoned_customer = np.sum(data["variable"] == "abandoned_customer")
-        self.number_incoming_customer = np.sum(data["variable"] == "incoming_customer")
-        self.number_incoming_customer = np.sum(data["variable"] == "incoming_customer")
-        self.served_customers = data.loc[data["variable"] == "served_customer", :]
-        self.queue_length = data.loc[data["variable"] == "queue_length", :]
-        self.waiting_time = data.loc[data["variable"] == "waiting_time", :]
-        self.incoming_customer = data.loc[data["variable"] == "incoming_customer", :]
-        self.abandoned_customer = data.loc[data["variable"] == "abandoned_customer", :]
+        self.number_abandoned_customer = None
+        self.number_incoming_customer = None
+        self.number_served_customers = None
+        self.queue_length = None
+        self.waiting_time = None
+        self.incoming_customer = None
+        self.abandoned_customer = None
+        self.update()
+
+    def update(self):
+        self.number_abandoned_customer = np.sum(self.data["variable"] == "abandoned_customer")
+        self.number_incoming_customer = np.sum(self.data["variable"] == "incoming_customer")
+        self.number_served_customers = self.data.loc[self.data["variable"] == "served_customer", :]
+        self.queue_length = self.data.loc[self.data["variable"] == "queue_length", :]
+        self.waiting_time = self.data.loc[self.data["variable"] == "waiting_time", :]
+        self.incoming_customer = self.data.loc[self.data["variable"] == "incoming_customer", :]
+        self.abandoned_customer = self.data.loc[self.data["variable"] == "abandoned_customer", :]
 
     def get_waiting_time_dist(self):
         return self.waiting_time["value"].tolist()
@@ -112,4 +121,4 @@ class StatisticsContainer:
         return self.number_abandoned_customer / self.number_incoming_customer
 
     def get_service_level(self, service_time: float):
-        return 1 - self.get_abort_level() - np.sum(self.served_customers["value"] <= service_time)
+        return 1 - self.get_abort_level() - np.sum(self.number_served_customers["value"] <= service_time)
