@@ -29,8 +29,8 @@ class Process:
     """
     This class generate Customer based on a given probability
     """
-    def __init__(self, open_from: int, close_from: int, incoming_prob: Probability, patience_prob: list, language: str,
-                 channel: str):
+    def __init__(self, open_from: int, close_from: int, incoming_prob: Probability, patience_prob: Probability,
+                 language: str, channel: str):
         """
 
         :param open_from:
@@ -49,7 +49,7 @@ class Process:
         self.id = str(uuid.uuid1())
 
     def retake_abandoned_customer(self, customer: Customer):
-        # TODO create a new customer with possibly other stats
+        id = self.id
         return customer
 
     def get_customer(self, day_time: int = 0) -> (float, Customer):
@@ -59,7 +59,7 @@ class Process:
 
         :return: a tuple of the time that this customers appears since the last customer
         """
-        customer = Customer(patience=np.random.choice(self.patience), channel=self.channel, language=self.language,
+        customer = Customer(patience=self.patience.draw(1), channel=self.channel, language=self.language,
                             retrial=False)
         customer.comes_from_process = self.id
         return self.incoming_prob.draw(), customer
@@ -67,7 +67,7 @@ class Process:
 
 class Worker:
 
-    def __init__(self, work_begin: int, work_end: int, ahts, languages: list, channels: list):
+    def __init__(self, work_begin: int, work_end: int, ahts: Probability, languages: list, channels: list):
         self.work_begin = work_begin
         self.work_end = work_end
         self.ahts = ahts
@@ -75,7 +75,7 @@ class Worker:
         self.channels = channels
 
     def serve_customer(self, customer: Customer):
-        return np.random.choice(self.ahts)
+        return self.ahts.draw(1)
 
 
 class StatisticsContainer:
@@ -106,19 +106,54 @@ class StatisticsContainer:
         self.abandoned_customer = self.data.loc[self.data["variable"] == "abandoned_customer", :]
 
     def get_waiting_time_dist(self):
+        """
+        extracts the distribution of waiting times
+
+        :return:
+        """
         return self.waiting_time["value"].tolist()
 
     def get_waiting_time_mean(self):
+        """
+        extracts the mean waiting time
+
+        :return:
+        """
         return np.mean(self.waiting_time["value"])
 
     def get_queue_length_dist(self):
+        """
+        extracts the distribution of queue length
+
+        :return:
+        """
         return self.queue_length["value"].tolist()
 
     def get_queue_length_mean(self):
+        """
+        extracts the average queue length
+        :return:
+        """
         return np.mean(self.queue_length["value"])
 
     def get_abort_level(self):
+        """
+        extracts the share of abortion
+
+        :return:
+        """
         return self.number_abandoned_customer / self.number_incoming_customer
 
     def get_service_level(self, service_time: float):
-        return 1 - self.get_abort_level() - np.sum(self.number_served_customers["value"] <= service_time)
+        """
+        calculates the service level based on the supplied service time
+
+        :param service_time:
+        :return:
+        """
+        served_customer_not_in_time = np.sum(self.number_served_customers["value"] > service_time)
+        if served_customer_not_in_time == 0:
+            rel_not_served = 0
+        else:
+            rel_not_served = served_customer_not_in_time / self.number_served_customers.shape[0]
+        return 1 - self.get_abort_level() - rel_not_served

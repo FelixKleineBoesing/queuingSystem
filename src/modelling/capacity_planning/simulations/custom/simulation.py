@@ -236,6 +236,7 @@ class CallCenterSimulation:
             if customer is None:
                 return
             self.append_event(time=event_time, variable="waiting_time", value=event_time - customer.call_time)
+            self.append_event(time=event_time, variable="served_customer", value=event_time - customer.call_time)
             self.assign_customer_to_worker(customer=customer, day_time=event_time)
             if customer.id in self.customer_event_table:
                 customer_events = self.customer_event_table[customer.id]
@@ -268,7 +269,7 @@ class CallCenterSimulation:
 
     def get_next_customer_from_queue(self):
         if len(self.customer_queue) > 0:
-            customer_id = self.customer_queue.pop()
+            customer_id = self.customer_queue.pop(0)
             if customer_id in self.customers:
                 return self.customers[customer_id]
             else:

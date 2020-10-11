@@ -32,7 +32,7 @@ class ErlangC(ErlangBase):
     @staticmethod
     def get_blocking_probability(lambda_: float, mu: float, number_agents: int) -> float:
         """
-        get the probability that a customer must wait the maximum waiting time
+        get the probability that a customer cant be served immediately
 
         :param lambda_: average arrival time in times per second
         :param mu: average supply time in times per second

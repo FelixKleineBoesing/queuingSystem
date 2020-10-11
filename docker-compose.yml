@@ -6,7 +6,7 @@ services:
   capplan_frontend_api:
     build:
       context: ./
-      dockerfile: ./dockerfiles/dockerfile.api
+      dockerfile: ./dockerfiles/api.Dockerfile
     image: capplan_frontend_api
     container_name: capplan_frontend_api
     restart: on-failure
@@ -33,10 +33,33 @@ services:
     - python_db_network
     command: python3 -m src.api.api
 
+  capplan_postgres:
+    build:
+      context: ./
+      dockerfile: ./dockerfiles/postgres.Dockerfile
+    image: capplan_postgres
+    container_name: capplan_postgres
+    restart: on-failure
+    ports:
+      - 127.0.0.1:5432:5432
+
+  capplan_mlflow:
+    build:
+      context: ./
+      dockerfile: ./dockerfiles/mlflow.Dockerfile
+    image: capplan_mlflow
+    container_name: capplan_mlflow
+    restart: on-failure
+    volumes:
+      - ./data/mlflow/fileStore:/opt/mlflow/fileStore
+      - ./data/mlflow/artifactStore:/opt/mlflow/artifactStore
+    ports:
+      - 127.0.0.1:5001:5001
+
 #  capplan_worker:
 #    build:
 #      context: ./
-#      dockerfile: ./dockerfiles/dockerfile.worker
+#      dockerfile: ./dockerfiles/worker.Dockerfile
 #    image: capplan_worker
 #    restart: on-failure
 #    environment:
@@ -64,7 +87,7 @@ services:
 #  capplan_worker_critical:
 #    build:
 #      context: ./
-#      dockerfile: ./dockerfiles/dockerfile.worker
+#      dockerfile: ./dockerfiles/worker.Dockerfile
 #    image: capplan_worker
 #    restart: on-failure
 #    environment:
