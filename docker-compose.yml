@@ -55,6 +55,7 @@ services:
       - ./data/mlflow/artifactStore:/opt/mlflow/artifactStore
     ports:
       - 127.0.0.1:5001:5001
+      - 127.0.0.1:4040:4040
 
 #  capplan_worker:
 #    build:
