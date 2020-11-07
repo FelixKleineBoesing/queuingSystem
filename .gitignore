@@ -3,3 +3,4 @@
 *.xlsm
 *.cprof
 tests/.coverage
+data/mlflow/

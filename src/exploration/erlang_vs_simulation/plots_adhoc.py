@@ -13,16 +13,16 @@ def plot_service_levels(x_values: list, erlang_values: list, simulation_values: 
 
 
 if __name__ == "__main__":
-    default_params = {"lambda_": 10, "max_waiting_time": 20, "aht": 180, "aht_sd": 10, "number_agents": 10}
+    default_params = {"lambda_": 10, "max_waiting_time": 20, "aht": 240, "aht_sd": 0.5*240, "number_agents": 10}
     agents_values = compare_number_agents(default_params, 1, 50, 50)
-    lambda_values = compare_lambda(default_params, 3, 6, 50)
-    aht_values = compare_aht(default_params, 200, 330, 50)
+    # lambda_values = compare_lambda(default_params, 3, 6, 50)
+    # aht_values = compare_aht(default_params, 200, 330, 50)
 
     plot_service_levels(x_values=agents_values["number_agents"], erlang_values=agents_values["Erlang"],
                         simulation_values=agents_values["Simulation"]).show()
 
-    plot_service_levels(x_values=lambda_values["lambda_"], erlang_values=lambda_values["Erlang"],
-                        simulation_values=lambda_values["Simulation"]).show()
-
-    plot_service_levels(x_values=aht_values["aht"], erlang_values=aht_values["Erlang"],
-                        simulation_values=aht_values["Simulation"]).show()
+    # plot_service_levels(x_values=lambda_values["lambda_"], erlang_values=lambda_values["Erlang"],
+    #                     simulation_values=lambda_values["Simulation"]).show()
+    #
+    # plot_service_levels(x_values=aht_values["aht"], erlang_values=aht_values["Erlang"],
+    #                     simulation_values=aht_values["Simulation"]).show()

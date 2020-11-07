@@ -75,7 +75,7 @@ class Worker:
         self.channels = channels
 
     def serve_customer(self, customer: Customer):
-        return self.ahts.draw(1)
+        return np.max(self.ahts.draw(1), 0)
 
 
 class StatisticsContainer:

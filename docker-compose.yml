@@ -33,29 +33,37 @@ services:
     - python_db_network
     command: python3 -m src.api.api
 
-  capplan_postgres:
-    build:
-      context: ./
-      dockerfile: ./dockerfiles/postgres.Dockerfile
-    image: capplan_postgres
-    container_name: capplan_postgres
-    restart: on-failure
-    ports:
-      - 127.0.0.1:5432:5432
+#  capplan_postgres:
+#    build:
+#      context: ./
+#      dockerfile: ./dockerfiles/postgres.Dockerfile
+#    image: capplan_postgres
+#    container_name: capplan_postgres
+#    restart: on-failure
+#    volumes:
+#      - ./data/postgres:/var/lib/postgresql/data
+#    ports:
+#      - 127.0.0.1:5432:5432
+#
+#  capplan_mlflow:
+#    build:
+#      context: ./
+#      dockerfile: ./dockerfiles/mlflow.Dockerfile
+#    image: capplan_mlflow
+#    container_name: capplan_mlflow
+#    restart: on-failure
+#    volumes:
+#      - ./data/mlflow/fileStore:/opt/mlflow/fileStore
+#      - ./data/mlflow/artifactStore:/opt/mlflow/artifactStore
+#    ports:
+#      - 5001:5001
+#    environment:
+#      - POSTGRES_HOST=capplan_postgres
+#      - POSTGRES_PORT=5432
+#      - POSTGRES_USER=Saitama
+#      - POSTGRES_PASSWORD=onepunchman
+#      - POSTGRES_DB=Tracking
 
-  capplan_mlflow:
-    build:
-      context: ./
-      dockerfile: ./dockerfiles/mlflow.Dockerfile
-    image: capplan_mlflow
-    container_name: capplan_mlflow
-    restart: on-failure
-    volumes:
-      - ./data/mlflow/fileStore:/opt/mlflow/fileStore
-      - ./data/mlflow/artifactStore:/opt/mlflow/artifactStore
-    ports:
-      - 127.0.0.1:5001:5001
-      - 127.0.0.1:4040:4040
 
 #  capplan_worker:
 #    build:
