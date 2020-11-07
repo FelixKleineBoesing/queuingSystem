@@ -320,14 +320,14 @@ components:
         - type: number
 
     ListIntList:
-      oneOf:
+      anyOf:
         - $ref: '#/components/schemas/IntList'
         - type: array
           items:
             $ref: '#/components/schemas/IntList'
 
     ListFloatList:
-      oneOf:
+      anyOf:
         - $ref: '#/components/schemas/FloatList'
         - type: array
           items:
