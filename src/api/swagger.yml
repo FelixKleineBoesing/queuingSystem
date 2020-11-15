@@ -489,6 +489,12 @@ components:
           - description: The interval in seconds for which the volume is given
           - $ref: '#/components/schemas/FloatList'
           - example: 1.68
+        dialing_time:
+          allOf:
+          - description: The number of seconds that are neccessary to dial the number
+          - $ref: '#/components/schemas/IntList'
+          - example: 15
+
 
     CapacityBackOffice:
       type: object
