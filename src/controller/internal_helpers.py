@@ -1,6 +1,8 @@
 import inspect
 from functools import wraps
 from typing import Union, List
+import holidays
+from holidays import HolidayBase
 
 FloatList = Union[float, List[float]]
 IntList = Union[int, List[int]]
@@ -48,3 +50,12 @@ def _check_if_equal_length(arg: list, length: int):
     assert isinstance(arg, list), "if one argument is of type list, all arguments must be of type list"
     assert length == len(arg), "Length of all arguments must be equal if of type list"
 
+
+def get_possible_countries_from_library():
+    provinces = {}
+    for name, cls in inspect.getmembers(holidays.countries, inspect.isclass):
+        inheritance = inspect.getmro(cls)
+        if inheritance[1] is HolidayBase:
+            provinces[name] = cls.PROVINCES
+
+    return list(provinces.keys()), provinces
