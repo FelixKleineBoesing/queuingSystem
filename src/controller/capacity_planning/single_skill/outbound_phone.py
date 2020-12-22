@@ -1,5 +1,6 @@
 import inspect
 
+from src.controller.capacity_planning.single_skill.helpers import Arguments
 from src.controller.internal_helpers import IntList, FloatList, check_length_list_equality
 from src.misc.helper_functions import annotation_type_checker
 from src.modelling.capacity_planning.naive.outbound import OutboundCalculator
@@ -91,3 +92,14 @@ class OutboundPhoneController:
                 args = {key: value[i] for key, value in func_args.items()}
                 volume_list.append(func(**args))
             return volume_list
+
+
+class OutboundPhoneArguments(Arguments):
+    interval: int
+    number_agents: int
+    volume: float
+    dialing_time: float
+    aht_correct: float
+    aht_wrong: float
+    netto_contact_rate: float
+    right_person_contact_rate: float

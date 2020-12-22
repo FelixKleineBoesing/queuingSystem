@@ -1,6 +1,6 @@
 import unittest
 
-from src.controller.capacity_planning.outbound_phone import OutboundPhoneController
+from src.controller.capacity_planning.single_skill.outbound_phone import OutboundPhoneController
 from tests.capacity_arguments import OutboundArguments
 
 

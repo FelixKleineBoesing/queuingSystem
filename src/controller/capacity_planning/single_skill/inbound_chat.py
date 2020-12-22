@@ -1,6 +1,7 @@
 import inspect
 from typing import Union, List
 
+from src.controller.capacity_planning.single_skill.helpers import Arguments
 from src.controller.internal_helpers import IntList, FloatList, check_length_list_equality
 from src.misc.helper_functions import annotation_type_checker
 from src.modelling.capacity_planning.erlang.erlangc import ErlangC
@@ -230,4 +231,16 @@ class InboundChatController:
                 args = {key: value[i] for key, value in func_args.items()}
                 volumes.append(func(**args))
             return volumes
+
+
+class InboundChatArguments(Arguments):
+    interval: int
+    number_agents: int
+    aht: float
+    asa: int
+    max_sessions: int
+    share_sequential_work: float
+    size_room: int
+    patience: int
+    retrial: float
 

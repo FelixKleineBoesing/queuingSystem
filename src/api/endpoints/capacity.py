@@ -1,9 +1,9 @@
 from src.api.helpers import statuscode_endpoint_wrapper
 
-from src.controller.capacity_planning.backoffice import BackOfficeController
-from src.controller.capacity_planning.outbound_phone import OutboundPhoneController
-from src.controller.capacity_planning.inbound_chat import InboundChatController
-from src.controller.capacity_planning.inbound_phone import InboundPhoneController
+from src.controller.capacity_planning.single_skill.backoffice import BackOfficeController
+from src.controller.capacity_planning.single_skill.outbound_phone import OutboundPhoneController
+from src.controller.capacity_planning.single_skill.inbound_chat import InboundChatController
+from src.controller.capacity_planning.single_skill.inbound_phone import InboundPhoneController
 
 
 @statuscode_endpoint_wrapper

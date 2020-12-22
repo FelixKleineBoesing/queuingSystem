@@ -1,6 +1,6 @@
 import unittest
 
-from src.controller.capacity_planning.backoffice import BackOfficeController
+from src.controller.capacity_planning.single_skill.backoffice import BackOfficeController
 from tests.capacity_arguments import BackOfficeArguments
 
 

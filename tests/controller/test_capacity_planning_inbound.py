@@ -1,7 +1,7 @@
 import unittest
 
-from src.controller.capacity_planning.inbound_phone import InboundPhoneController
-from src.controller.capacity_planning.inbound_chat import InboundChatController
+from src.controller.capacity_planning.single_skill.inbound_phone import InboundPhoneController
+from src.controller.capacity_planning.single_skill.inbound_chat import InboundChatController
 from tests.capacity_arguments import InboundArguments
 
 

@@ -1,5 +1,6 @@
 import inspect
 
+from src.controller.capacity_planning.single_skill.helpers import Arguments
 from src.controller.internal_helpers import IntList, FloatList, check_length_list_equality, ListIntList, ListFloatList
 from src.misc.helper_functions import annotation_type_checker
 from src.modelling.capacity_planning.naive.backoffice import BackOfficeCalculator
@@ -64,3 +65,13 @@ class BackOfficeController:
                 args = {key: value[i] for key, value in func_args.items()}
                 number_agents_list.append(func(**args))
             return number_agents_list
+
+
+class BackOfficeArguments(Arguments):
+    interval: int
+    number_agents: int
+    aht: float
+    backlog_within: int
+    backlog_sum: float
+    occupancy: float
+    volume: float
