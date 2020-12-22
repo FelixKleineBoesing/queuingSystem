@@ -302,9 +302,163 @@ paths:
         405:
           description: Invalid input
           content: {}
+  /misc/calendar/compensated-working-days:
+    post:
+      tags:
+        - capacity
+      summary: calculate the compensated working days for a specific range on weekly base
+      operationId: src.api.endpoints.misc.get_compensated_working_days_per_week
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date_start:
+                  type: integer
+                  example: 1577660400
+                  description: Start of time range as unix timestamp
+                date_end:
+                  type: integer
+                  example: 1610319600
+                  description: End of time range as unix timestamp
+                country:
+                  type: string
+                  example: "DE"
+                  description: iso country code
+                province:
+                  type: string
+                  example: "BW"
+                  description: iso code of state/province
+                compensation_method:
+                  type: string
+                  example: "month"
+                  description: can be "month" or "week_interval"
+                compensation_interval:
+                  type: array
+                  example: [2, 2]
+                  items:
+                    type: integer
+                    minItems: 3
+                    maxItems: 3
+                  description: Interval of compensation. Can only be used if compensation_method is "week_interval"
+
+              required:
+                - date_start
+                - date_end
+                - country
+                - compensation_method
+              description: ""
+      responses:
+        405:
+          description: Invalid input
+          content: { }
+        200:
+          description: Successfully calculated
+          content:
+            text/plain:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status_code:
+                    type: integer
+                  result:
+                    type: object
+                    properties:
+                      CW:
+                        type: StringList
+                        example: ['2020-01', '2020-02']
+                      unix:
+                        type: IntList
+                        example: [1577660400, 1578265200]
+                      compensated_working_days:
+                        type: FloatList
+                        example: [4.0, 5.0]
+                      working_days:
+                        type: FloatList
+                        example: [4, 5]
+
+  /misc/calendar/holiday-countries:
+    post:
+      tags:
+        - capacity
+      summary: returns a list of countries that are available for holidays
+      operationId: src.api.endpoints.misc.get_holiday_countries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: ""
+      responses:
+        405:
+          description: Invalid input
+          content: { }
+        200:
+          description: Successfully calculated
+          content:
+            text/plain:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status_code:
+                    type: integer
+                  result:
+                    type: array
+                    items:
+                      type: string
+
+  /misc/calendar/provinces-countries:
+    post:
+      tags:
+        - capacity
+      summary: returns a list of countries that are available for holidays
+      operationId: src.api.endpoints.misc.get_provinces_of_country
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                country:
+                  type: string
+                  description: country name for which the states/provinces should be returned
+                  example: "Germany"
+
+              required:
+                - country
+      responses:
+        405:
+          description: Invalid input
+          content: { }
+        200:
+          description: Successfully calculated
+          content:
+            text/plain:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status_code:
+                    type: integer
+                  result:
+                    type: array
+                    items:
+                      type: string
 
 components:
   schemas:
+
+    StringList:
+      type: array
+      items:
+        type: string
+
     IntList:
       oneOf:
         - type: array

@@ -41,5 +41,12 @@ class HolidayControllerTester(unittest.TestCase):
                                                                  country=country, province=province,
                                                                  compensation_method=compensation_method,
                                                                  compensation_interval=compensation_interval)
+        self.assertTrue(isinstance(comp_working_days, dict))
+        self.assertListEqual(sorted(list(comp_working_days.keys())),
+                             sorted(["CW", "unix", "compensated_working_days", "working_days"]))
+        self.assertEqual(comp_working_days["compensated_working_days"][0], 4.0)
+        self.assertEqual(comp_working_days["compensated_working_days"][10], 5.0)
+        self.assertEqual(comp_working_days["compensated_working_days"][20], 4.75)
+        print(comp_working_days)
 
 

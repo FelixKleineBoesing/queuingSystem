@@ -12,10 +12,9 @@ def convert_unix_to_datetime(timestamps: Union[List[int], int]):
 
 def convert_datetime_to_unix(datetimes: Union[List[datetime], datetime]):
     if isinstance(datetimes, datetime):
-        return datetime.timestamp(datetimes)
+        return int(datetime.timestamp(datetimes))
     else:
-        return [datetime.timestamp(d) for d in datetimes]
-
+        return [int(datetime.timestamp(d)) for d in datetimes]
 
 
 def convert_datetime_to_isoweek(datetimes: Union[List[datetime], datetime]):
@@ -30,7 +29,7 @@ def convert_isoweek_to_datetime(isoweeks: Union[List[str], str]):
         return isoweek.Week(int(isoweeks[0]), int(isoweeks[1])).Monday
     else:
         isoweeks = [i.split("-") for i in isoweeks]
-        return [isoweek.Week(int(i[0]), int(i[1])).monday() for i in isoweeks]
+        return [datetime.fromordinal(isoweek.Week(int(i[0]), int(i[1])).monday().toordinal()) for i in isoweeks]
 
 
 def get_months_from_datetime(datetimes: Union[List[datetime], datetime]):
