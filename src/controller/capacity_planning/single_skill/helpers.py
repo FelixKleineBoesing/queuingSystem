@@ -8,3 +8,6 @@ class Arguments(abc.ABC):
 
     def __setitem__(self, key, value):
         return setattr(self, key, value)
+
+    def check_if_item_has_attr(self, item):
+        return hasattr(self, item)
