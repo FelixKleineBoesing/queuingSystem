@@ -1,5 +1,4 @@
 from aenum import Enum
-import inspect
 from src.controller.capacity_planning.single_skill.backoffice import BackOfficeController, BackOfficeArguments
 from src.controller.capacity_planning.single_skill.helpers import Arguments
 from src.controller.capacity_planning.single_skill.inbound_chat import InboundChatController, InboundChatArguments

@@ -14,7 +14,7 @@ def plot_service_levels(x_values: list, erlang_values: list, simulation_values: 
 
 if __name__ == "__main__":
     default_params = {"lambda_": 10, "max_waiting_time": 20, "aht": 240, "aht_sd": 0.5*240, "number_agents": 10}
-    agents_values = compare_number_agents(default_params, 1, 50, 50)
+    agents_values = compare_number_agents(default_params, 20, 40, 20)
     # lambda_values = compare_lambda(default_params, 3, 6, 50)
     # aht_values = compare_aht(default_params, 200, 330, 50)
 
